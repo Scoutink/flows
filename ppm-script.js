@@ -58,21 +58,11 @@ const PPM = (() => {
         
         // Apply backlog filter if active
         if (state.backlogFilter) {
-            console.log('Filtering by backlog item:', state.backlogFilter);
-            console.log('Cards in column before filter:', cards.length);
-            
             cards = cards.filter(c => {
                 const isTheBacklogItem = c.id === state.backlogFilter;
                 const isLinkedToBacklog = c.linkedBacklogItems && c.linkedBacklogItems.includes(state.backlogFilter);
-                
-                if (isTheBacklogItem || isLinkedToBacklog) {
-                    console.log('Card passes filter:', c.title, '- isBacklogItem:', isTheBacklogItem, '- isLinked:', isLinkedToBacklog);
-                }
-                
                 return isTheBacklogItem || isLinkedToBacklog;
             });
-            
-            console.log('Cards in column after filter:', cards.length);
         }
         
         return cards.sort((a, b) => a.order - b.order);
@@ -1335,14 +1325,10 @@ const PPM = (() => {
     };
     
     ui.filterByBacklog = (cardId) => {
-        console.log('filterByBacklog called with cardId:', cardId);
-        
         // Toggle filter
         if (state.backlogFilter === cardId) {
-            console.log('Clearing filter (was already active)');
             state.backlogFilter = null;
         } else {
-            console.log('Setting filter to:', cardId);
             state.backlogFilter = cardId;
             
             // Check if any tasks are linked to this backlog item
@@ -1350,7 +1336,6 @@ const PPM = (() => {
             const linkedCount = board.cards.filter(c => 
                 c.linkedBacklogItems && c.linkedBacklogItems.includes(cardId)
             ).length;
-            console.log('Tasks linked to this backlog item:', linkedCount);
             
             if (linkedCount === 0) {
                 alert(`No tasks are linked to this backlog item yet.\n\nTo link tasks:\n1. Open any task outside the Backlog column\n2. Click "Link to Backlog" in the task details\n3. Select this backlog item\n\nOr when creating a new task, select backlog items to link.`);
@@ -1452,29 +1437,18 @@ const PPM = (() => {
         const banner = document.getElementById('backlog-filter-banner');
         const label = document.getElementById('backlog-filter-label');
         
-        console.log('updateBacklogFilterBanner called, filter:', state.backlogFilter);
-        console.log('Banner element:', banner ? 'found' : 'not found');
-        
-        if (!banner || !label) {
-            console.error('Banner or label element not found in DOM');
-            return;
-        }
+        if (!banner || !label) return;
         
         if (state.backlogFilter) {
             const board = getCurrentBoard();
             const backlogCard = getCardById(board, state.backlogFilter);
-            console.log('Backlog card:', backlogCard ? backlogCard.title : 'not found');
             
             if (backlogCard) {
                 label.textContent = backlogCard.title;
                 banner.classList.remove('hidden');
-                console.log('Banner shown with title:', backlogCard.title);
-            } else {
-                console.error('Backlog card not found for ID:', state.backlogFilter);
             }
         } else {
             banner.classList.add('hidden');
-            console.log('Banner hidden (no filter active)');
         }
     };
 
