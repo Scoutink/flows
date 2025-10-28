@@ -1485,6 +1485,14 @@ document.addEventListener('DOMContentLoaded', () => {
     flowDeleteBtn?.addEventListener('click', deleteCurrentFlow);
     // Global tag filter removed - now using per-flow filtering only
 
+    // Export tag to board button
+    const exportTagBtn = document.getElementById('export-tag-to-board');
+    exportTagBtn?.addEventListener('click', () => {
+        if (appState.activeTag) {
+            exportTagToBoard(appState.activeTag, appState.currentFlowId);
+        }
+    });
+
     // banner clear
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('#clear-tag-filter');
