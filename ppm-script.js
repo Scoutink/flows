@@ -12,7 +12,9 @@ const PPM = (() => {
         theme: 'light',
         draggedCard: null,
         draggedOverColumn: null,
-        backlogFilter: null // Filter cards by backlog item ID
+        backlogFilter: null, // Filter cards by backlog item ID
+        // Mobile accordion state for columns
+        mobileAccordion: {} // {columnId: boolean (expanded)}
     };
 
     // ===== UTILITIES =====
@@ -660,17 +662,34 @@ const PPM = (() => {
         const limit = column.limit;
         const isOverLimit = limit && cards.length > limit;
         
+        // Mobile accordion state (default: first column expanded, others collapsed)
+        if (state.mobileAccordion[column.id] === undefined) {
+            const firstColumn = board.columns.sort((a, b) => a.order - b.order)[0];
+            state.mobileAccordion[column.id] = (column.id === firstColumn.id);
+        }
+        const isExpanded = state.mobileAccordion[column.id];
+        const accordionClass = isExpanded ? '' : 'collapsed';
+        
         return `
             <div class="board-column" data-column-id="${column.id}">
-                <div class="column-header">
-                    <h3 class="column-title">${column.name}</h3>
-                    <span class="column-count ${isOverLimit ? 'over-limit' : ''}">${cards.length}${limit ? `/${limit}` : ''}</span>
-                    <button class="btn-icon" onclick="PPM.ui.openColumnMenu(event, '${column.id}')">
-                        <i class="fa-solid fa-ellipsis-h"></i>
-                    </button>
-                </div>
-                <div class="column-cards" data-column-id="${column.id}">
-                    ${cards.map(card => renderCard(board, card)).join('')}
+                <button class="column-accordion-toggle ${accordionClass}" data-accordion-column="${column.id}">
+                    <div class="toggle-left">
+                        <i class="fa-solid fa-chevron-down toggle-icon"></i>
+                        <span class="column-title-mobile">${column.name}</span>
+                    </div>
+                    <span class="card-count-badge ${isOverLimit ? 'over-limit' : ''}">${cards.length}${limit ? `/${limit}` : ''}</span>
+                </button>
+                <div class="column-accordion-content ${accordionClass}">
+                    <div class="column-header">
+                        <h3 class="column-title">${column.name}</h3>
+                        <span class="column-count ${isOverLimit ? 'over-limit' : ''}">${cards.length}${limit ? `/${limit}` : ''}</span>
+                        <button class="btn-icon" onclick="PPM.ui.openColumnMenu(event, '${column.id}')">
+                            <i class="fa-solid fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                    <div class="column-cards" data-column-id="${column.id}">
+                        ${cards.map(card => renderCard(board, card)).join('')}
+                    </div>
                 </div>
             </div>
         `;
@@ -1534,6 +1553,27 @@ const PPM = (() => {
         
         document.getElementById('add-member-btn')?.addEventListener('click', () => {
             ui.addMember();
+        });
+        
+        // Mobile accordion toggles for columns
+        document.addEventListener('click', (e) => {
+            const columnToggle = e.target.closest('[data-accordion-column]');
+            if (columnToggle) {
+                e.stopPropagation(); // Prevent card click when clicking toggle
+                const columnId = columnToggle.dataset.accordionColumn;
+                state.mobileAccordion[columnId] = !state.mobileAccordion[columnId];
+                const isExpanded = state.mobileAccordion[columnId];
+                
+                // Toggle button state
+                columnToggle.classList.toggle('collapsed', !isExpanded);
+                
+                // Toggle content
+                const content = columnToggle.nextElementSibling;
+                if (content && content.classList.contains('column-accordion-content')) {
+                    content.classList.toggle('collapsed', !isExpanded);
+                }
+                return false;
+            }
         });
     };
 

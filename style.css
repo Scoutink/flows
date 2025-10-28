@@ -316,6 +316,134 @@ body.dark-theme .execution-mode .evidence-node.active { background-color: rgba(9
         min-height: 100vh;
     }
     
+    /* ==== MOBILE ACCORDION SYSTEM ==== */
+    
+    /* Control Accordion */
+    .control-node {
+        margin-bottom: 0.75rem;
+    }
+    
+    .control-accordion-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        background: var(--surface-alt-color);
+        border: none;
+        padding: 1rem;
+        cursor: pointer;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        transition: background 0.2s;
+        min-height: 52px;
+    }
+    
+    .control-accordion-toggle:active {
+        background: var(--border-color);
+    }
+    
+    .control-accordion-toggle .toggle-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+    }
+    
+    .control-accordion-toggle .toggle-icon {
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+        color: var(--primary-color);
+        min-width: 24px;
+    }
+    
+    .control-accordion-toggle.collapsed .toggle-icon {
+        transform: rotate(-90deg);
+    }
+    
+    .control-accordion-toggle .control-title-mobile {
+        font-size: 1rem;
+        font-weight: 600;
+        text-align: left;
+        color: var(--text-color);
+        line-height: 1.3;
+    }
+    
+    .control-accordion-content {
+        max-height: 5000px;
+        overflow: hidden;
+        transition: max-height 0.4s ease, opacity 0.3s ease;
+        opacity: 1;
+    }
+    
+    .control-accordion-content.collapsed {
+        max-height: 0;
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    /* Panel Accordion (Actions/Evidence) */
+    .panel-accordion-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        padding: 0.875rem 1rem;
+        cursor: pointer;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s;
+        min-height: 48px;
+    }
+    
+    .panel-accordion-toggle:active {
+        background: var(--surface-alt-color);
+    }
+    
+    .panel-accordion-toggle .toggle-left {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .panel-accordion-toggle .toggle-icon {
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+        color: var(--text-color);
+    }
+    
+    .panel-accordion-toggle.collapsed .toggle-icon {
+        transform: rotate(-90deg);
+    }
+    
+    .panel-accordion-toggle .panel-title-mobile {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    
+    .panel-accordion-toggle .panel-count {
+        font-size: 0.85rem;
+        color: var(--text-muted-color);
+        background: var(--border-color);
+        padding: 0.2rem 0.5rem;
+        border-radius: 12px;
+    }
+    
+    .panel-accordion-content {
+        max-height: 3000px;
+        overflow: hidden;
+        transition: max-height 0.3s ease, opacity 0.25s ease;
+        opacity: 1;
+    }
+    
+    .panel-accordion-content.collapsed {
+        max-height: 0;
+        opacity: 0;
+        pointer-events: none;
+    }
+    
     /* Header */
     .header-controls {
         flex-direction: column;
@@ -398,29 +526,34 @@ body.dark-theme .execution-mode .evidence-node.active { background-color: rgba(9
         justify-content: space-between;
     }
     
-    /* TWO-PANEL LAYOUT → STACKED */
+    /* TWO-PANEL LAYOUT → ACCORDION PANELS */
     .registers-container {
         flex-direction: column;
         min-height: auto;
         height: auto;
         overflow: visible;
+        gap: 0.75rem;
     }
     
     .action-register-panel,
     .evidence-register-panel {
         width: 100% !important;
         border-right: none;
-        border-bottom: 2px solid var(--border-color);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 0;
         min-height: auto;
         height: auto;
+        background: var(--surface-color);
     }
     
-    .evidence-register-panel {
-        border-bottom: none;
+    .action-register-panel .panel-accordion-content,
+    .evidence-register-panel .panel-accordion-content {
+        padding: 0.75rem;
     }
     
     .panel-title {
-        font-size: 1.1rem;
+        display: none; /* Hidden on mobile, replaced by accordion toggle */
     }
     
     /* Control Headers */

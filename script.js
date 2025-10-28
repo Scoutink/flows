@@ -47,7 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // selection & UI
         selectedActionPaths: {},
         expandedTextAreas: new Set(),
-        activeTag: null // per-flow execution tag filter
+        activeTag: null, // per-flow execution tag filter
+        // Mobile accordion state
+        mobileAccordion: {
+            controls: {}, // {controlPath: boolean (expanded)}
+            panels: {}    // {panelId: boolean (expanded)}
+        }
     };
 
     let quillEditor = null;
@@ -603,35 +608,60 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const controlOriginal = isFiltered ? getObjectByPath(path, flow) : control;
         const controlProgress = calculateControlProgress(controlOriginal);
+        
+        // Mobile accordion state (default: first control expanded, others collapsed)
+        if (appState.mobileAccordion.controls[path] === undefined) {
+            const controlIndex = path.split('.')[1]; // e.g., "data.0" → "0"
+            appState.mobileAccordion.controls[path] = controlIndex === '0'; // First one expanded
+        }
+        const isExpanded = appState.mobileAccordion.controls[path];
+        const accordionClass = isExpanded ? '' : 'collapsed';
 
         const el = document.createElement('div');
         el.className = 'control-node';
         el.dataset.path = path;
         el.innerHTML = `
-            <div class="control-header">
-              <div class="control-header-top">
-                <div class="control-title">${control.name}</div>
-                <div class="controls creation-only">
-                  <button class="btn-add" title="Add Action" data-action="add-action" data-path="${path}"><i class="fa-solid fa-plus"></i></button>
-                  <button class="btn-edit" title="Edit Control Name" data-action="edit-name" data-path="${path}" data-level="control"><i class="fa-solid fa-pen"></i></button>
-                  <button class="btn-add" title="Clone/Share existing" data-action="import-node" data-path="${path}" data-level="action"><i class="fa-solid fa-copy"></i></button>
-                  <button class="btn-delete" title="Delete Control" data-action="delete-node" data-path="${path}" data-level="control"><i class="fa-solid fa-trash-can"></i></button>
+            <button class="control-accordion-toggle ${accordionClass}" data-accordion-control="${path}">
+                <div class="toggle-left">
+                    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+                    <span class="control-title-mobile">${control.name}</span>
                 </div>
-                <div class="controls execution-only">
-                  <button class="btn-export-board" title="Export to Project Board" data-action="export-to-board" data-path="${path}"><i class="fa-solid fa-diagram-project"></i> Create Board</button>
+            </button>
+            <div class="control-accordion-content ${accordionClass}">
+                <div class="control-header">
+                  <div class="control-header-top">
+                    <div class="control-title">${control.name}</div>
+                    <div class="controls creation-only">
+                      <button class="btn-add" title="Add Action" data-action="add-action" data-path="${path}"><i class="fa-solid fa-plus"></i></button>
+                      <button class="btn-edit" title="Edit Control Name" data-action="edit-name" data-path="${path}" data-level="control"><i class="fa-solid fa-pen"></i></button>
+                      <button class="btn-add" title="Clone/Share existing" data-action="import-node" data-path="${path}" data-level="action"><i class="fa-solid fa-copy"></i></button>
+                      <button class="btn-delete" title="Delete Control" data-action="delete-node" data-path="${path}" data-level="control"><i class="fa-solid fa-trash-can"></i></button>
+                    </div>
+                    <div class="controls execution-only">
+                      <button class="btn-export-board" title="Export to Project Board" data-action="export-to-board" data-path="${path}"><i class="fa-solid fa-diagram-project"></i> Create Board</button>
+                    </div>
+                  </div>
+                  ${renderTags(getObjectByPath(path, flow), path, flow)}
+                  <div class="progress-bar-container"><div class="progress-bar" style="width: ${controlProgress}%;"></div></div>
                 </div>
-              </div>
-              ${renderTags(getObjectByPath(path, flow), path, flow)}
-              <div class="progress-bar-container"><div class="progress-bar" style="width: ${controlProgress}%;"></div></div>
-            </div>
-            <div class="registers-container">
-                ${renderActionPanel(control, path, isFiltered, flow)}${renderEvidencePanel(control, path, isFiltered, flow)}
+                <div class="registers-container">
+                    ${renderActionPanel(control, path, isFiltered, flow)}${renderEvidencePanel(control, path, isFiltered, flow)}
+                </div>
             </div>`;
         return el;
     }
 
     function renderActionPanel(control, controlPath, isFiltered, flow) {
         const actions = control.subcategories || [];
+        const panelId = `actions-${controlPath}`;
+        
+        // Mobile accordion state (default: expanded)
+        if (appState.mobileAccordion.panels[panelId] === undefined) {
+            appState.mobileAccordion.panels[panelId] = true;
+        }
+        const isExpanded = appState.mobileAccordion.panels[panelId];
+        const accordionClass = isExpanded ? '' : 'collapsed';
+        
         let itemsHtml = actions.map(action => {
             const actionPath = isFiltered && action._path ? action._path :
                 `${controlPath}.subcategories.${(getObjectByPath(controlPath, flow).subcategories || []).indexOf(action)}`;
@@ -660,7 +690,21 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>`;
         }).join('');
         if (itemsHtml === '') itemsHtml = `<div class="empty-state">No actions yet.</div>`;
-        return `<div class="action-register-panel"><h3 class="panel-title creation-only"><i class="fa-solid fa-person-running"></i> Actions</h3>${itemsHtml}</div>`;
+        
+        return `
+        <div class="action-register-panel">
+            <button class="panel-accordion-toggle ${accordionClass}" data-accordion-panel="${panelId}">
+                <div class="toggle-left">
+                    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+                    <span class="panel-title-mobile"><i class="fa-solid fa-person-running"></i> Actions</span>
+                </div>
+                <span class="panel-count">${actions.length}</span>
+            </button>
+            <div class="panel-accordion-content ${accordionClass}">
+                <h3 class="panel-title creation-only"><i class="fa-solid fa-person-running"></i> Actions</h3>
+                ${itemsHtml}
+            </div>
+        </div>`;
     }
 
     function renderEvidencePanel(controlFilteredOrFull, controlPath, isFiltered, flow) {
@@ -693,7 +737,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return renderEvidenceNode(getObjectByPath(evidencePath, flow), evidencePath);
         }).join('') || `<div class="empty-state">No evidence for this action${appState.activeTag ? ' with this tag' : ''}.</div>`;
 
-        return `<div class="evidence-register-panel"><h3 class="panel-title creation-only"><i class="fa-solid fa-receipt"></i> Evidence</h3>${itemsHtml}</div>`;
+        return `
+        <div class="evidence-register-panel">
+            <button class="panel-accordion-toggle ${accordionClass}" data-accordion-panel="${panelId}">
+                <div class="toggle-left">
+                    <i class="fa-solid fa-chevron-down toggle-icon"></i>
+                    <span class="panel-title-mobile"><i class="fa-solid fa-file-lines"></i> Evidence</span>
+                </div>
+                <span class="panel-count">${evidenceItems.length}</span>
+            </button>
+            <div class="panel-accordion-content ${accordionClass}">
+                <h3 class="panel-title creation-only"><i class="fa-solid fa-receipt"></i> Evidence</h3>
+                ${itemsHtml}
+            </div>
+        </div>`;
     }
 
     function renderEvidenceNode(node, path) {
@@ -1499,6 +1556,45 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btn) { appState.activeTag = null; render(); }
     });
 
+    // Mobile accordion toggles
+    document.addEventListener('click', (e) => {
+        // Control accordion toggle
+        const controlToggle = e.target.closest('[data-accordion-control]');
+        if (controlToggle) {
+            const path = controlToggle.dataset.accordionControl;
+            appState.mobileAccordion.controls[path] = !appState.mobileAccordion.controls[path];
+            const isExpanded = appState.mobileAccordion.controls[path];
+            
+            // Toggle button state
+            controlToggle.classList.toggle('collapsed', !isExpanded);
+            
+            // Toggle content
+            const content = controlToggle.nextElementSibling;
+            if (content && content.classList.contains('control-accordion-content')) {
+                content.classList.toggle('collapsed', !isExpanded);
+            }
+            return;
+        }
+        
+        // Panel accordion toggle
+        const panelToggle = e.target.closest('[data-accordion-panel]');
+        if (panelToggle) {
+            const panelId = panelToggle.dataset.accordionPanel;
+            appState.mobileAccordion.panels[panelId] = !appState.mobileAccordion.panels[panelId];
+            const isExpanded = appState.mobileAccordion.panels[panelId];
+            
+            // Toggle button state
+            panelToggle.classList.toggle('collapsed', !isExpanded);
+            
+            // Toggle content
+            const content = panelToggle.nextElementSibling;
+            if (content && content.classList.contains('panel-accordion-content')) {
+                content.classList.toggle('collapsed', !isExpanded);
+            }
+            return;
+        }
+    });
+    
     // Global click/change listeners
     document.addEventListener('click', handleAppClick);
     document.addEventListener('change', handleAppChange);
