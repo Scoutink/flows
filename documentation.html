@@ -207,6 +207,7 @@
             <ul>
                 <li><a href="#getting-started">Getting Started</a></li>
                 <li><a href="#workflows">Managing Workflows</a></li>
+                <li><a href="#project-boards">Exporting to Project Boards</a></li>
                 <li><a href="#creation-mode">Creation Mode</a></li>
                 <li><a href="#execution-mode">Execution Mode</a></li>
                 <li><a href="#tags">Working with Tags</a></li>
@@ -309,8 +310,90 @@
             <p>If you see a <span class="badge"><i class="fa-solid fa-link"></i> Linked</span> badge next to your workflow name, it means this workflow is synchronized with others. Changes you make will be reflected in all linked workflows when you save.</p>
         </section>
 
+        <section id="project-boards">
+            <h2>3. Exporting to Project Boards</h2>
+            <p>One of the most powerful features is the ability to export your workflows to visual Kanban boards for project execution.</p>
+            
+            <h3>What are Project Boards?</h3>
+            <p>Project Boards are Trello-like Kanban boards that let you:</p>
+            <ul>
+                <li>Execute workflow requirements as real projects</li>
+                <li>Assign tasks to team members with different roles</li>
+                <li>Set deadlines and track progress visually</li>
+                <li>Drag and drop tasks through stages (Backlog → To Do → In Progress → Review → Done)</li>
+                <li>Collaborate with your team on compliance execution</li>
+            </ul>
+
+            <div class="feature">
+                <strong><i class="fa-solid fa-diagram-project"></i> Two Export Methods:</strong>
+                <p>You can create boards in two ways, depending on how you want to organize your work:</p>
+            </div>
+
+            <h3>Method 1: Export a Control to Board</h3>
+            <p>Create a board from a single Control (one compliance area):</p>
+            <ol style="list-style-type: decimal; padding-left: 40px;">
+                <li>Switch to <strong>Execution Mode</strong></li>
+                <li>Find the Control you want to execute</li>
+                <li>Click <strong>"📊 Create Board"</strong> button in the Control header</li>
+                <li>Confirm the export</li>
+                <li>Board opens with all Evidence from that Control as tasks</li>
+            </ol>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-info-circle"></i> What Gets Exported:</strong>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>Control name becomes Board name</li>
+                    <li>Each Evidence item becomes a Card (task)</li>
+                    <li>Tags become Labels</li>
+                    <li>Attachments (links, images, notes) transfer to cards</li>
+                    <li>All cards start in "Backlog" column</li>
+                </ul>
+            </div>
+
+            <h3>Method 2: Export by Tag (Cross-Workflow Boards)</h3>
+            <p>Create a board from ALL items across the workflow that share a tag:</p>
+            <ol style="list-style-type: decimal; padding-left: 40px;">
+                <li>Switch to <strong>Execution Mode</strong></li>
+                <li>Click any tag (e.g., #firewall, #high-priority, #it-team)</li>
+                <li>Workflow filters to show tagged items</li>
+                <li>Click <strong>"Create Board from Tag"</strong> in the tag filter banner</li>
+                <li>Board is created with tasks from multiple Controls</li>
+            </ol>
+
+            <div class="feature">
+                <strong><i class="fa-solid fa-magic"></i> Tag Export Benefits:</strong>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li><strong>Priority Boards:</strong> #high-priority → Only urgent tasks from entire workflow</li>
+                    <li><strong>Department Boards:</strong> #it-team → All IT department tasks</li>
+                    <li><strong>Technology Boards:</strong> #firewall → All firewall tasks across all Controls</li>
+                    <li><strong>Schedule Boards:</strong> #quarterly → All quarterly review items</li>
+                    <li><strong>Cross-Control:</strong> Combine tasks from ID.AM, ID.RA, ID.SC into one board</li>
+                </ul>
+            </div>
+
+            <div class="highlight">
+                <strong>Control Export vs Tag Export:</strong>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li><strong>Control Export:</strong> "ID.AM - Asset Management" → 20 tasks from one area</li>
+                    <li><strong>Tag Export:</strong> "#firewall" → 45 tasks from 5 different Controls</li>
+                </ul>
+            </div>
+
+            <h3>Using Project Boards</h3>
+            <p>Once a board is created, you can:</p>
+            <ul>
+                <li>Assign team members with 4 roles (👷 Executor, ✅ Approver, 👁️ Follower, 📊 Supervisor)</li>
+                <li>Set due dates with visual indicators</li>
+                <li>Drag tasks between columns as work progresses</li>
+                <li>Track completion percentage</li>
+                <li>Collaborate with your team</li>
+            </ul>
+
+            <p>See the <a href="boards-documentation.html" style="color: #4a6cf7; font-weight: 600;">Project Boards User Manual</a> for complete details on using boards.</p>
+        </section>
+
         <section id="creation-mode">
-            <h2>3. Creation Mode - Building Your Workflow</h2>
+            <h2>4. Creation Mode - Building Your Workflow</h2>
             <p>Switch to Creation Mode (toggle at top) to build and edit your workflow structure.</p>
 
             <h3>Adding Items</h3>
@@ -398,7 +481,7 @@
         </section>
 
         <section id="tags">
-            <h2>5. Working with Tags</h2>
+            <h2>6. Working with Tags</h2>
 
             <h3>What are Tags?</h3>
             <p>Tags are labels you can add to any Control, Action, or Evidence item. They help you organize and find related items across your workflow.</p>
@@ -451,7 +534,7 @@
         </section>
 
         <section id="linked-workflows">
-            <h2>6. Linked Workflows in Detail</h2>
+            <h2>7. Linked Workflows in Detail</h2>
 
             <h3>Understanding Linked Workflows</h3>
             <p>Linked workflows stay structurally synchronized. This means:</p>
@@ -544,7 +627,7 @@
         </section>
 
         <section id="tips">
-            <h2>7. Tips & Best Practices</h2>
+            <h2>8. Tips & Best Practices</h2>
 
             <h3>🎯 Workflow Organization</h3>
             <ul>
@@ -607,7 +690,7 @@
         </section>
 
         <section>
-            <h2>8. Keyboard & Interface Reference</h2>
+            <h2>9. Keyboard & Interface Reference</h2>
 
             <h3>Mode Toggle</h3>
             <p>The switch at the top right toggles between Creation and Execution modes. The mode you're in affects what buttons and features are visible.</p>
@@ -630,7 +713,7 @@
         </section>
 
         <section>
-            <h2>9. Frequently Asked Questions</h2>
+            <h2>10. Frequently Asked Questions</h2>
 
             <h3>Can I undo changes?</h3>
             <p>Currently, there's no undo button. Always save carefully. If needed, you can copy a workflow before making major changes as a backup.</p>
@@ -655,7 +738,7 @@
         </section>
 
         <section>
-            <h2>10. Getting Help</h2>
+            <h2>11. Getting Help</h2>
             
             <p>If you encounter issues or have questions:</p>
             <ul>
