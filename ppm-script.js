@@ -688,7 +688,21 @@ const PPM = (() => {
             <div class="card ${isBacklogCard ? 'backlog-card' : ''}" 
                  draggable="true" 
                  data-card-id="${card.id}"
-                 onclick="PPM.ui.${isBacklogCard ? 'handleBacklogCardClick' : 'openCardDetail'}('${card.id}', event)">
+                 onclick="PPM.ui.openCardDetail('${card.id}')">
+                ${isBacklogCard ? `
+                    <div class="backlog-card-actions">
+                        <button class="backlog-action-btn" 
+                                onclick="event.stopPropagation(); PPM.ui.filterByBacklog('${card.id}')" 
+                                title="Filter board by this item">
+                            <i class="fa-solid fa-filter"></i>
+                        </button>
+                        <button class="backlog-action-btn" 
+                                onclick="event.stopPropagation(); PPM.ui.openCardDetail('${card.id}')" 
+                                title="View details">
+                            <i class="fa-solid fa-info-circle"></i>
+                        </button>
+                    </div>
+                ` : ''}
                 ${card.labels.length > 0 ? `
                     <div class="card-labels">
                         ${card.labels.slice(0, 3).map(label => `<span class="card-label">${label}</span>`).join('')}
@@ -696,10 +710,24 @@ const PPM = (() => {
                 ` : ''}
                 <h4 class="card-title">${card.title}</h4>
                 ${card.description ? `<p class="card-description">${card.description.substring(0, 100)}${card.description.length > 100 ? '...' : ''}</p>` : ''}
+                
+                ${isBacklogCard && card.attachments.length > 0 ? `
+                    <div class="backlog-attachments">
+                        ${card.attachments.slice(0, 5).map((att, idx) => `
+                            <button class="attachment-preview-btn" 
+                                    onclick="event.stopPropagation(); PPM.ui.openAttachment('${card.id}', ${idx})"
+                                    title="${att.title}">
+                                <i class="fa-solid fa-${att.type === 'link' ? 'link' : att.type === 'image' ? 'image' : att.type === 'note' ? 'book-open' : 'comment'}"></i>
+                            </button>
+                        `).join('')}
+                        ${card.attachments.length > 5 ? `<span class="attachment-more">+${card.attachments.length - 5}</span>` : ''}
+                    </div>
+                ` : ''}
+                
                 <div class="card-meta">
                     ${dueDate ? `<span class="card-due ${dueDateClass}"><i class="fa-solid fa-clock"></i> ${formatDate(dueDate)}</span>` : ''}
                     ${card.checklist.length > 0 ? `<span class="card-checklist"><i class="fa-solid fa-check-square"></i> ${card.checklist.filter(c => c.completed).length}/${card.checklist.length}</span>` : ''}
-                    ${card.attachments.length > 0 ? `<span class="card-attachments"><i class="fa-solid fa-paperclip"></i> ${card.attachments.length}</span>` : ''}
+                    ${!isBacklogCard && card.attachments.length > 0 ? `<span class="card-attachments"><i class="fa-solid fa-paperclip"></i> ${card.attachments.length}</span>` : ''}
                     ${hasApprover ? `<span class="card-approval"><i class="fa-solid fa-user-check"></i></span>` : ''}
                 </div>
                 ${assignees.length > 0 ? `
@@ -1209,13 +1237,7 @@ const PPM = (() => {
         }
     };
     
-    ui.handleBacklogCardClick = (cardId, event) => {
-        // Check if click is on card itself (not a child element)
-        if (event && event.target.closest('.card-labels, .card-assignees')) {
-            ui.openCardDetail(cardId);
-            return;
-        }
-        
+    ui.filterByBacklog = (cardId) => {
         // Toggle filter
         if (state.backlogFilter === cardId) {
             state.backlogFilter = null;

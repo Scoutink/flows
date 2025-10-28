@@ -918,19 +918,81 @@ button {
 .backlog-card {
     cursor: pointer;
     position: relative;
+    padding-top: 45px;
 }
 
-.backlog-card::before {
-    content: "📋";
+.backlog-card-actions {
     position: absolute;
     top: 8px;
     right: 8px;
-    font-size: 0.9rem;
-    opacity: 0.6;
+    display: flex;
+    gap: 6px;
+    z-index: 10;
 }
 
-.backlog-card:hover {
-    border-left: 3px solid #4a6cf7;
+.backlog-action-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.backlog-action-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.backlog-action-btn:active {
+    transform: translateY(0);
+}
+
+.backlog-attachments {
+    display: flex;
+    gap: 6px;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+
+.attachment-preview-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 1rem;
+}
+
+.attachment-preview-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: scale(1.1);
+}
+
+.attachment-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    padding: 0 8px;
 }
 
 /* Backlog Selector */
