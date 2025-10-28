@@ -11,7 +11,8 @@ const PPM = (() => {
         users: [],
         theme: 'light',
         draggedCard: null,
-        draggedOverColumn: null
+        draggedOverColumn: null,
+        backlogFilter: null // Filter cards by backlog item ID
     };
 
     // ===== UTILITIES =====
@@ -53,9 +54,17 @@ const PPM = (() => {
     };
 
     const getCardsByColumn = (board, columnId) => {
-        return board.cards
-            .filter(c => c.columnId === columnId)
-            .sort((a, b) => a.order - b.order);
+        let cards = board.cards.filter(c => c.columnId === columnId);
+        
+        // Apply backlog filter if active
+        if (state.backlogFilter) {
+            cards = cards.filter(c => 
+                c.id === state.backlogFilter || // Show the backlog item itself
+                c.linkedBacklogItems.includes(state.backlogFilter) // Show cards linked to it
+            );
+        }
+        
+        return cards.sort((a, b) => a.order - b.order);
     };
 
     // ===== DATA LAYER =====
@@ -245,6 +254,7 @@ const PPM = (() => {
             checklist: cardData.checklist || [],
             labels: cardData.labels || [],
             attachments: cardData.attachments || [],
+            linkedBacklogItems: cardData.linkedBacklogItems || [], // IDs of backlog cards this task is linked to
             status: {
                 current: 'pending',
                 blocked: false,
@@ -603,6 +613,9 @@ const PPM = (() => {
         
         // Render columns
         renderColumns(board);
+        
+        // Update backlog filter banner
+        updateBacklogFilterBanner();
     };
 
     const renderBoardMembers = (board) => {
@@ -667,11 +680,15 @@ const PPM = (() => {
         if (isOverdue) dueDateClass = 'overdue';
         else if (isDueSoon) dueDateClass = 'due-soon';
         
+        // Get the backlog column ID (first column)
+        const backlogColumnId = board.columns[0]?.id;
+        const isBacklogCard = card.columnId === backlogColumnId;
+        
         return `
-            <div class="card" 
+            <div class="card ${isBacklogCard ? 'backlog-card' : ''}" 
                  draggable="true" 
                  data-card-id="${card.id}"
-                 onclick="PPM.ui.openCardDetail('${card.id}')">
+                 onclick="PPM.ui.${isBacklogCard ? 'handleBacklogCardClick' : 'openCardDetail'}('${card.id}', event)">
                 ${card.labels.length > 0 ? `
                     <div class="card-labels">
                         ${card.labels.slice(0, 3).map(label => `<span class="card-label">${label}</span>`).join('')}
@@ -798,6 +815,10 @@ const PPM = (() => {
             const board = getCurrentBoard();
             const column = getColumnById(board, columnId);
             
+            // Get backlog items for linking (if not adding to backlog)
+            const backlogColumnId = board.columns[0]?.id;
+            const backlogCards = columnId !== backlogColumnId ? getCardsByColumn(board, backlogColumnId) : [];
+            
             openModal(`Add Task to ${column.name}`, `
                 <form id="add-card-form" class="modal-form">
                     <label for="card-title">Task Title *</label>
@@ -805,6 +826,18 @@ const PPM = (() => {
                     
                     <label for="card-description">Description</label>
                     <textarea id="card-description" rows="3"></textarea>
+                    
+                    ${backlogCards.length > 0 ? `
+                        <label>Link to Backlog Items (optional)</label>
+                        <div class="backlog-selector">
+                            ${backlogCards.map(bc => `
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="backlog-link" value="${bc.id}">
+                                    <span>${bc.title}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    ` : ''}
                     
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Cancel</button>
@@ -818,8 +851,12 @@ const PPM = (() => {
                     const title = document.getElementById('card-title').value.trim();
                     const description = document.getElementById('card-description').value.trim();
                     
+                    // Get selected backlog items
+                    const linkedBacklogItems = Array.from(document.querySelectorAll('input[name="backlog-link"]:checked'))
+                        .map(cb => cb.value);
+                    
                     if (title) {
-                        createCard(board, columnId, { title, description });
+                        createCard(board, columnId, { title, description, linkedBacklogItems });
                         saveBoards();
                         closeModal();
                         renderColumns(board);
@@ -978,10 +1015,11 @@ const PPM = (() => {
                         <div class="detail-section">
                             <label>Attachments</label>
                             <div class="attachments-list">
-                                ${card.attachments.map(att => `
-                                    <div class="attachment-item">
+                                ${card.attachments.map((att, idx) => `
+                                    <div class="attachment-item clickable" onclick="PPM.ui.openAttachment('${card.id}', ${idx})">
                                         <i class="fa-solid fa-${att.type === 'link' ? 'link' : att.type === 'image' ? 'image' : att.type === 'note' ? 'book-open' : 'comment'}"></i>
                                         <span>${att.title}</span>
+                                        ${att.type === 'link' ? `<i class="fa-solid fa-external-link-alt" style="margin-left: auto; font-size: 0.85em; opacity: 0.6;"></i>` : ''}
                                     </div>
                                 `).join('')}
                             </div>
@@ -1041,6 +1079,23 @@ const PPM = (() => {
                             <i class="fa-solid fa-plus"></i> Assign Supervisor
                         </button>
                     </div>
+                    
+                    ${card.columnId !== board.columns[0]?.id ? `
+                        <div class="detail-section">
+                            <label>Linked Backlog Items 🔗</label>
+                            <div class="linked-backlog-items">
+                                ${card.linkedBacklogItems.length > 0 ? 
+                                    card.linkedBacklogItems.map(itemId => {
+                                        const backlogCard = getCardById(board, itemId);
+                                        return backlogCard ? `<div class="linked-item">${backlogCard.title}</div>` : '';
+                                    }).join('') 
+                                    : '<p class="text-muted">Not linked to any backlog items</p>'}
+                            </div>
+                            <button class="btn-secondary btn-sm" onclick="PPM.ui.linkToBacklog('${card.id}')">
+                                <i class="fa-solid fa-link"></i> Link to Backlog
+                            </button>
+                        </div>
+                    ` : ''}
                     
                     <div class="detail-section">
                         <label>Due Date</label>
@@ -1153,6 +1208,127 @@ const PPM = (() => {
             renderColumns(board);
         }
     };
+    
+    ui.handleBacklogCardClick = (cardId, event) => {
+        // Check if click is on card itself (not a child element)
+        if (event && event.target.closest('.card-labels, .card-assignees')) {
+            ui.openCardDetail(cardId);
+            return;
+        }
+        
+        // Toggle filter
+        if (state.backlogFilter === cardId) {
+            state.backlogFilter = null;
+        } else {
+            state.backlogFilter = cardId;
+        }
+        
+        const board = getCurrentBoard();
+        renderColumns(board);
+        updateBacklogFilterBanner();
+    };
+    
+    ui.clearBacklogFilter = () => {
+        state.backlogFilter = null;
+        const board = getCurrentBoard();
+        renderColumns(board);
+        updateBacklogFilterBanner();
+    };
+    
+    ui.openAttachment = (cardId, attIndex) => {
+        const board = getCurrentBoard();
+        const card = getCardById(board, cardId);
+        if (!card || !card.attachments[attIndex]) return;
+        
+        const att = card.attachments[attIndex];
+        
+        if (att.type === 'link') {
+            window.open(att.url, '_blank');
+        } else if (att.type === 'image') {
+            openModal(att.title, `
+                <div class="attachment-viewer">
+                    <img src="${att.url}" alt="${att.title}" style="max-width: 100%; max-height: 70vh;">
+                </div>
+            `);
+        } else if (att.type === 'note') {
+            openModal(att.title, `
+                <div class="attachment-viewer">
+                    <div style="white-space: pre-wrap;">${att.content || ''}</div>
+                </div>
+            `);
+        } else if (att.type === 'comment') {
+            openModal(att.title, `
+                <div class="attachment-viewer">
+                    <div style="white-space: pre-wrap;">${att.content || ''}</div>
+                </div>
+            `);
+        }
+    };
+    
+    ui.linkToBacklog = (cardId) => {
+        const board = getCurrentBoard();
+        const card = getCardById(board, cardId);
+        const backlogColumnId = board.columns[0]?.id;
+        // Get all backlog cards without filter
+        const backlogCards = board.cards.filter(c => c.columnId === backlogColumnId).sort((a, b) => a.order - b.order);
+        
+        if (backlogCards.length === 0) {
+            alert('No backlog items available to link.');
+            return;
+        }
+        
+        openModal('Link to Backlog Items', `
+            <div class="modal-form">
+                <p>Select backlog items to link this task to:</p>
+                <div class="backlog-selector">
+                    ${backlogCards.map(bc => `
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="backlog-link-update" value="${bc.id}" 
+                                   ${card.linkedBacklogItems.includes(bc.id) ? 'checked' : ''}>
+                            <span>${bc.title}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Cancel</button>
+                    <button type="button" class="btn-primary" onclick="PPM.ui.saveBacklogLinks('${cardId}')">Save</button>
+                </div>
+            </div>
+        `);
+    };
+    
+    ui.saveBacklogLinks = (cardId) => {
+        const board = getCurrentBoard();
+        const card = getCardById(board, cardId);
+        
+        const linkedBacklogItems = Array.from(document.querySelectorAll('input[name="backlog-link-update"]:checked'))
+            .map(cb => cb.value);
+        
+        updateCard(board, cardId, { linkedBacklogItems });
+        saveBoards();
+        closeModal();
+        
+        // Reopen card detail to show updated links
+        ui.openCardDetail(cardId);
+    };
+    
+    const updateBacklogFilterBanner = () => {
+        const banner = document.getElementById('backlog-filter-banner');
+        const label = document.getElementById('backlog-filter-label');
+        
+        if (!banner || !label) return;
+        
+        if (state.backlogFilter) {
+            const board = getCurrentBoard();
+            const backlogCard = getCardById(board, state.backlogFilter);
+            if (backlogCard) {
+                label.textContent = backlogCard.title;
+                banner.classList.remove('hidden');
+            }
+        } else {
+            banner.classList.add('hidden');
+        }
+    };
 
     // ===== THEME =====
     const toggleTheme = () => {
@@ -1215,6 +1391,10 @@ const PPM = (() => {
                 saveBoards();
                 renderColumns(board);
             }
+        });
+        
+        document.getElementById('clear-backlog-filter')?.addEventListener('click', () => {
+            ui.clearBacklogFilter();
         });
     };
 
