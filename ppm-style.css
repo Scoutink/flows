@@ -1064,3 +1064,54 @@ button {
     max-width: 100%;
     text-align: center;
 }
+
+/* User Selector */
+.user-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 15px;
+}
+
+.user-select-btn {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+    color: var(--text-primary);
+    width: 100%;
+    text-align: left;
+}
+
+.user-select-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(74, 108, 247, 0.3);
+}
+
+.user-select-btn .member-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.user-select-btn:hover .member-avatar {
+    background: white;
+    color: var(--primary);
+}
