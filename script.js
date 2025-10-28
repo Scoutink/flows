@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const flowNewBtn = document.getElementById('flow-new');
     const flowRenameBtn = document.getElementById('flow-rename');
     const flowDeleteBtn = document.getElementById('flow-delete');
-    const globalTagFilterBtn = document.getElementById('global-tag-filter');
 
     const modal = {
         backdrop: document.getElementById('modal-backdrop'),
@@ -1335,7 +1334,7 @@ document.addEventListener('DOMContentLoaded', () => {
     flowNewBtn?.addEventListener('click', openNewFlowModal);
     flowRenameBtn?.addEventListener('click', renameCurrentFlow);
     flowDeleteBtn?.addEventListener('click', deleteCurrentFlow);
-    globalTagFilterBtn?.addEventListener('click', openGlobalTagFilter);
+    // Global tag filter removed - now using per-flow filtering only
 
     // banner clear
     document.addEventListener('click', (e) => {
