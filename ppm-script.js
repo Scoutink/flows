@@ -662,9 +662,6 @@ const PPM = (() => {
                 <div class="column-cards" data-column-id="${column.id}">
                     ${cards.map(card => renderCard(board, card)).join('')}
                 </div>
-                <button class="add-card-btn" onclick="PPM.ui.openAddCardModal('${column.id}')">
-                    <i class="fa-solid fa-plus"></i> Add task
-                </button>
             </div>
         `;
     };
@@ -903,6 +900,28 @@ const PPM = (() => {
             });
         },
         
+        openBoardMenuSingle: () => {
+            const board = getCurrentBoard();
+            if (!board) return;
+            
+            openModal(`Board Settings`, `
+                <div class="column-menu">
+                    <button class="menu-btn" onclick="PPM.ui.renameBoard('${board.id}')">
+                        <i class="fa-solid fa-pen"></i> Rename Board
+                    </button>
+                    <button class="menu-btn" onclick="PPM.ui.addColumnFromMenu()">
+                        <i class="fa-solid fa-columns"></i> Add Column
+                    </button>
+                    <button class="menu-btn" onclick="PPM.ui.archiveBoard('${board.id}')">
+                        <i class="fa-solid fa-archive"></i> Archive Board
+                    </button>
+                    <button class="menu-btn danger" onclick="PPM.ui.deleteBoard('${board.id}')">
+                        <i class="fa-solid fa-trash"></i> Delete Board
+                    </button>
+                </div>
+            `);
+        },
+        
         openColumnMenu: (e, columnId) => {
             e.stopPropagation();
             const board = getCurrentBoard();
@@ -910,6 +929,9 @@ const PPM = (() => {
             
             openModal(`Column: ${column.name}`, `
                 <div class="column-menu">
+                    <button class="menu-btn" onclick="PPM.ui.addTaskFromMenu('${columnId}')">
+                        <i class="fa-solid fa-plus"></i> Add Task
+                    </button>
                     <button class="menu-btn" onclick="PPM.ui.renameColumn('${columnId}')">
                         <i class="fa-solid fa-pen"></i> Rename
                     </button>
@@ -955,6 +977,70 @@ const PPM = (() => {
                 saveBoards();
                 closeModal();
                 renderColumns(board);
+            }
+        },
+        
+        addColumnFromMenu: () => {
+            const board = getCurrentBoard();
+            const name = prompt('Column name:');
+            if (name && name.trim()) {
+                addColumn(board, name.trim());
+                saveBoards();
+                closeModal();
+                renderColumns(board);
+            }
+        },
+        
+        addTaskFromMenu: (columnId) => {
+            closeModal();
+            ui.openAddCardModal(columnId);
+        },
+        
+        addMember: () => {
+            const board = getCurrentBoard();
+            if (!board) return;
+            
+            // Get all users not already members
+            const currentMemberIds = board.members.map(m => m.userId);
+            const availableUsers = state.users.filter(u => !currentMemberIds.includes(u.id));
+            
+            if (availableUsers.length === 0) {
+                alert('All users are already members of this board.');
+                return;
+            }
+            
+            openModal('Add Member to Board', `
+                <div class="modal-form">
+                    <p>Select a user to add to this board:</p>
+                    <div class="user-selector">
+                        ${availableUsers.map(user => `
+                            <button class="user-select-btn" onclick="PPM.ui.confirmAddMember('${user.id}')">
+                                <div class="member-avatar" style="display: inline-flex; margin-right: 10px;">
+                                    <span>${user.name.split(' ').map(n => n[0]).join('').toUpperCase()}</span>
+                                </div>
+                                <span>${user.name}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `);
+        },
+        
+        confirmAddMember: (userId) => {
+            const board = getCurrentBoard();
+            const user = state.users.find(u => u.id === userId);
+            
+            if (user) {
+                board.members.push({
+                    userId: user.id,
+                    name: user.name,
+                    avatar: user.avatar || null,
+                    addedAt: new Date().toISOString()
+                });
+                
+                saveBoards();
+                closeModal();
+                renderBoardMembers(board);
             }
         },
         
@@ -1417,6 +1503,14 @@ const PPM = (() => {
         
         document.getElementById('clear-backlog-filter')?.addEventListener('click', () => {
             ui.clearBacklogFilter();
+        });
+        
+        document.getElementById('board-menu-btn')?.addEventListener('click', () => {
+            ui.openBoardMenuSingle();
+        });
+        
+        document.getElementById('add-member-btn')?.addEventListener('click', () => {
+            ui.addMember();
         });
     };
 
