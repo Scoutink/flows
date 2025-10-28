@@ -268,6 +268,14 @@ body.dark-theme .execution-mode .evidence-node.active { background-color: rgba(9
     border-radius: 999px;
     font-size: 0.9rem;
 }
+.btn-export-tag-board {
+    background: var(--primary-color); color: white; border: none;
+    padding: 0.4rem 0.75rem; border-radius: 6px; cursor: pointer; transition: var(--transition);
+    font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.85rem;
+}
+.btn-export-tag-board:hover { background: var(--accent-color); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(74, 108, 247, 0.3); }
+.btn-export-tag-board.hidden { display: none !important; }
 .clear-tag-filter {
     border: 1px solid var(--border-color);
     background: none;
