@@ -338,8 +338,8 @@
         <section id="creating-boards">
             <h2>2. Creating Boards from Workflows</h2>
             
-            <h3>Method 1: Export from Workflow (Recommended)</h3>
-            <p>The easiest way to create a board is to export it directly from a workflow Control:</p>
+            <h3>Method 1: Export Control from Workflow</h3>
+            <p>Export a single Control as a complete project board:</p>
             
             <ol>
                 <li>Open your workflow in the <strong>Workflow Manager</strong></li>
@@ -349,6 +349,42 @@
                 <li>Confirm the export in the dialog</li>
                 <li>The board opens automatically in a new tab</li>
             </ol>
+            
+            <h3>Method 1b: Export by Tag from Workflow (NEW!)</h3>
+            <p>Create a board from all items across the workflow that share a specific tag:</p>
+            
+            <ol>
+                <li>Open your workflow in <strong>Execution Mode</strong></li>
+                <li>Click any tag (e.g., #firewall, #high-priority, #it-team)</li>
+                <li>The workflow filters to show only items with that tag</li>
+                <li>Click the <strong>"<i class="fa-solid fa-diagram-project"></i> Create Board from Tag"</strong> button in the tag filter banner</li>
+                <li>Confirm the export</li>
+                <li>Board is created with ALL tagged items from across multiple Controls</li>
+            </ol>
+            
+            <div class="feature">
+                <strong><i class="fa-solid fa-magic"></i> Tag Export Power:</strong>
+                <p>Unlike Control export which gives you one Control's tasks, tag export collects tasks from the <strong>entire workflow</strong>:</p>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>If a <strong>Control</strong> has the tag → ALL its Evidence becomes cards</li>
+                    <li>If an <strong>Action</strong> has the tag → ALL its Evidence becomes cards</li>
+                    <li>If <strong>Evidence</strong> has the tag → That Evidence becomes a card</li>
+                    <li>System automatically deduplicates (same Evidence never added twice)</li>
+                </ul>
+            </div>
+            
+            <div class="example-box">
+                <h4>💡 Tag Export Example</h4>
+                <p><strong>Scenario:</strong> You have a workflow with 5 Controls. Various items are tagged #firewall.</p>
+                <p><strong>Tagged Items:</strong></p>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>Control "ID.AM" has #firewall → 8 Evidence items</li>
+                    <li>Action "ID.RA-5" has #firewall → 5 Evidence items</li>
+                    <li>Action "ID.SC-7" has #firewall → 12 Evidence items</li>
+                    <li>Individual Evidence "ID.BE-1.3" has #firewall → 1 Evidence item</li>
+                </ul>
+                <p><strong>Result:</strong> Board created with 26 firewall-related tasks from 3 different Controls!</p>
+            </div>
 
             <div class="tip">
                 <strong><i class="fa-solid fa-info-circle"></i> What Gets Exported:</strong>
@@ -371,6 +407,35 @@
                 <li>Click <strong>Create</strong></li>
                 <li>Manually add cards as needed</li>
             </ol>
+            
+            <h3>Choosing the Right Export Method</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Export Method</th>
+                        <th>When to Use</th>
+                        <th>What You Get</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Control Export</strong></td>
+                        <td>Execute one compliance area as a project</td>
+                        <td>All tasks from that Control</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tag Export</strong></td>
+                        <td>Organize by priority, department, or topic</td>
+                        <td>All tasks with that tag, from multiple Controls</td>
+                    </tr>
+                    <tr>
+                        <td><strong>From Scratch</strong></td>
+                        <td>Non-compliance projects</td>
+                        <td>Empty board you build manually</td>
+                    </tr>
+                </tbody>
+            </table>
 
             <div class="highlight">
                 <strong>⚠️ Important:</strong> Boards exported from workflows maintain a link to their source Control. This means you can potentially sync progress back to the workflow in future versions. Manually created boards don't have this connection.
@@ -835,6 +900,11 @@
 
             <h3>Label Strategy & Best Practices</h3>
             
+            <div class="tip">
+                <strong><i class="fa-solid fa-sparkles"></i> Pro Tip: Tags → Boards:</strong>
+                <p>Remember: Tags in your workflow become labels in boards. But more importantly, you can CREATE BOARDS from tags! Click any tag in Execution Mode to filter, then "Create Board from Tag" to get a board with all tagged items from across the entire workflow.</p>
+            </div>
+            
             <h4>Categorize by Type:</h4>
             <ul>
                 <li><strong>Technical:</strong> #firewall, #network, #database</li>
@@ -1130,9 +1200,20 @@
 
             <h3>Can I export the same workflow Control multiple times?</h3>
             <p>Yes! That's the whole point. Export once for Q1, again for Q2, etc. Each board is independent.</p>
+            
+            <h3>What's the difference between Control export and Tag export?</h3>
+            <p><strong>Control export:</strong> Creates a board from ONE Control with all its Actions and Evidence.</p>
+            <p><strong>Tag export:</strong> Creates a board from ALL items across the ENTIRE workflow that have a specific tag. This can include items from multiple Controls.</p>
+            <p><strong>Example:</strong> Control export gives you "ID.AM" tasks only. Tag export of #firewall gives you firewall tasks from ID.AM, ID.RA, ID.SC, etc.</p>
 
             <h3>What happens if I delete a workflow after exporting it?</h3>
-            <p>The board continues to work fine. It maintains a reference to the source Control ID, but doesn't depend on the workflow existing.</p>
+            <p>The board continues to work fine. It maintains a reference to the source Control ID (or source tag), but doesn't depend on the workflow existing.</p>
+            
+            <h3>Can I create a board for multiple tags at once?</h3>
+            <p>Not yet. Currently, you can create boards for one tag at a time. Multi-tag boards are planned for a future update. As a workaround, create separate boards per tag, or use a combined tag like #high-priority-firewall.</p>
+            
+            <h3>Will the same task appear twice if it has the filter tag in multiple places?</h3>
+            <p>No! The system automatically deduplicates. If an Evidence item matches through multiple paths (e.g., its parent Action has the tag AND the Evidence itself has the tag), it's only added to the board once.</p>
 
             <h3>Can I add cards that weren't in the original workflow?</h3>
             <p>Absolutely! Use the "+ Add task" button to create new cards. Boards can evolve beyond their workflow origins.</p>
