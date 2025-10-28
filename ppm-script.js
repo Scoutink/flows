@@ -77,6 +77,7 @@ const PPM = (() => {
             state.boards = data.boards || [];
         } catch (e) {
             console.error('Load boards error:', e);
+            alert('Failed to load boards. Please refresh the page.');
             state.boards = [];
         }
     };
@@ -91,6 +92,7 @@ const PPM = (() => {
             state.currentUser = state.users[0] || null;
         } catch (e) {
             console.error('Load users error:', e);
+            alert('Failed to load users. Please refresh the page.');
             state.users = [];
         }
     };
@@ -545,11 +547,18 @@ const PPM = (() => {
             return;
         }
         
-        grid.classList.remove('hidden');
-        emptyState.classList.add('hidden');
+        const activeBoards = state.boards.filter(b => !b.archived);
         
-        grid.innerHTML = state.boards
-            .filter(b => !b.archived)
+        if (activeBoards.length === 0) {
+            grid.classList.add('hidden');
+            if (emptyState) emptyState.classList.remove('hidden');
+            return;
+        }
+        
+        grid.classList.remove('hidden');
+        if (emptyState) emptyState.classList.add('hidden');
+        
+        grid.innerHTML = activeBoards
             .map(board => renderBoardCard(board))
             .join('');
         
@@ -1006,7 +1015,7 @@ const PPM = (() => {
             const availableUsers = state.users.filter(u => !currentMemberIds.includes(u.id));
             
             if (availableUsers.length === 0) {
-                alert('All users are already members of this board.');
+                alert(`All ${state.users.length} users are already members of this board.\n\nCurrent members:\n${board.members.map(m => `• ${m.name}`).join('\n')}`);
                 return;
             }
             
