@@ -549,11 +549,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // tag banner
         const banner = document.getElementById('tag-filter-banner');
         const label = document.getElementById('active-tag-label');
+        const exportTagBtn = document.getElementById('export-tag-to-board');
         if (appState.activeTag) {
             label.textContent = `#${appState.activeTag}`;
             banner.classList.remove('hidden');
+            if (exportTagBtn) exportTagBtn.classList.remove('hidden');
         } else {
             banner.classList.add('hidden');
+            if (exportTagBtn) exportTagBtn.classList.add('hidden');
         }
 
         // data (filtered or raw)
@@ -1715,6 +1718,283 @@ document.addEventListener('DOMContentLoaded', () => {
         
         return attachments;
     }
+
+    // --- TAG-BASED BOARD EXPORT ---
+    async function exportTagToBoard(tag, flowId) {
+        if (!confirm(`Create Project Board for all items tagged with "#${tag}"?\n\nThis will create a board with tasks from all Controls, Actions, and Evidence that have this tag.`)) {
+            return;
+        }
+        
+        try {
+            // Load PPM data
+            const boardsRes = await fetch(`ppm-boards.json?t=${Date.now()}`);
+            const boardsData = await boardsRes.json();
+            
+            const usersRes = await fetch(`ppm-users.json?t=${Date.now()}`);
+            const usersData = await usersRes.json();
+            
+            // Get current flow
+            const flow = getCurrentFlow();
+            if (!flow) {
+                alert('No workflow selected');
+                return;
+            }
+            
+            // Collect all items with the tag
+            const taggedItems = {
+                controls: [],
+                actions: [],
+                evidence: []
+            };
+            
+            (flow.data || []).forEach(control => {
+                // Check control
+                if (nodeHasTag(control, tag)) {
+                    taggedItems.controls.push(control);
+                }
+                
+                // Check actions
+                (control.subcategories || []).forEach(action => {
+                    if (nodeHasTag(action, tag)) {
+                        taggedItems.actions.push({
+                            action: action,
+                            controlName: control.name
+                        });
+                    }
+                    
+                    // Check evidence
+                    (action.subcategories || []).forEach(evidence => {
+                        if (nodeHasTag(evidence, tag)) {
+                            taggedItems.evidence.push({
+                                evidence: evidence,
+                                actionName: action.name,
+                                controlName: control.name
+                            });
+                        }
+                    });
+                });
+            });
+            
+            // Create board
+            const board = {
+                id: generateId('board'),
+                name: `#${tag} - ${flow.name}`,
+                description: `Tasks filtered by tag "#${tag}" from workflow "${flow.name}"`,
+                sourceControlId: null,
+                sourceFlowId: flowId,
+                sourceTag: tag,
+                createdAt: new Date().toISOString(),
+                createdBy: usersData.users[0]?.id || 'user-default-001',
+                archived: false,
+                members: [{
+                    userId: usersData.users[0]?.id || 'user-default-001',
+                    name: usersData.users[0]?.name || 'Default User',
+                    email: usersData.users[0]?.email || 'user@company.com',
+                    role: 'admin',
+                    avatar: usersData.users[0]?.avatar || '',
+                    joinedAt: new Date().toISOString()
+                }],
+                columns: [
+                    { id: generateId('col'), name: 'Backlog', order: 0, limit: null, color: '#6c757d' },
+                    { id: generateId('col'), name: 'To Do', order: 1, limit: null, color: '#0d6efd' },
+                    { id: generateId('col'), name: 'In Progress', order: 2, limit: 5, color: '#0dcaf0' },
+                    { id: generateId('col'), name: 'Review', order: 3, limit: null, color: '#ffc107' },
+                    { id: generateId('col'), name: 'Done', order: 4, limit: null, color: '#198754' }
+                ],
+                cards: [],
+                labels: [
+                    {
+                        id: generateId('label'),
+                        boardId: generateId('board'),
+                        name: tag,
+                        color: '#4a6cf7',
+                        description: 'Primary filter tag'
+                    }
+                ],
+                settings: {
+                    notificationsEnabled: true,
+                    allowGuestView: false,
+                    enforceWIPLimit: false
+                },
+                activity: []
+            };
+            
+            const backlogColumn = board.columns[0];
+            let cardOrder = 0;
+            
+            // Convert tagged controls to cards (all their evidence)
+            taggedItems.controls.forEach(control => {
+                (control.subcategories || []).forEach(action => {
+                    (action.subcategories || []).forEach(evidence => {
+                        const card = createCardFromEvidence(
+                            evidence,
+                            action,
+                            control,
+                            board,
+                            backlogColumn.id,
+                            cardOrder++,
+                            usersData.users[0]?.id || 'user-default-001'
+                        );
+                        board.cards.push(card);
+                    });
+                });
+            });
+            
+            // Convert tagged actions to cards (all their evidence)
+            taggedItems.actions.forEach(item => {
+                (item.action.subcategories || []).forEach(evidence => {
+                    // Check if already added from control
+                    const exists = board.cards.find(c => c.sourceId === evidence.id);
+                    if (!exists) {
+                        const card = createCardFromEvidence(
+                            evidence,
+                            item.action,
+                            { name: item.controlName },
+                            board,
+                            backlogColumn.id,
+                            cardOrder++,
+                            usersData.users[0]?.id || 'user-default-001'
+                        );
+                        board.cards.push(card);
+                    }
+                });
+            });
+            
+            // Convert tagged evidence to cards
+            taggedItems.evidence.forEach(item => {
+                // Check if already added
+                const exists = board.cards.find(c => c.sourceId === item.evidence.id);
+                if (!exists) {
+                    const card = createCardFromEvidence(
+                        item.evidence,
+                        { name: item.actionName },
+                        { name: item.controlName },
+                        board,
+                        backlogColumn.id,
+                        cardOrder++,
+                        usersData.users[0]?.id || 'user-default-001'
+                    );
+                    board.cards.push(card);
+                }
+            });
+            
+            // Add activity log
+            board.activity.push({
+                id: generateId('act'),
+                boardId: board.id,
+                cardId: null,
+                userId: usersData.users[0]?.id || 'user-default-001',
+                type: 'board.created',
+                timestamp: new Date().toISOString(),
+                data: { boardName: board.name, tag: tag },
+                description: `Board created from tag filter "#${tag}"`
+            });
+            
+            // Save board
+            boardsData.boards.push(board);
+            const saveRes = await fetch('save_board.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(boardsData)
+            });
+            
+            const saveJson = await saveRes.json();
+            if (!saveRes.ok || saveJson.status !== 'success') {
+                throw new Error(saveJson.message || 'Failed to save board');
+            }
+            
+            // Redirect to board
+            const totalControls = taggedItems.controls.length;
+            const totalActions = taggedItems.actions.length;
+            const totalEvidence = taggedItems.evidence.length;
+            const summary = [];
+            if (totalControls > 0) summary.push(`${totalControls} Control${totalControls > 1 ? 's' : ''}`);
+            if (totalActions > 0) summary.push(`${totalActions} Action${totalActions > 1 ? 's' : ''}`);
+            if (totalEvidence > 0) summary.push(`${totalEvidence} Evidence item${totalEvidence > 1 ? 's' : ''}`);
+            
+            alert(`Board "#${tag}" created successfully!\n\nIncluded:\n- ${summary.join('\n- ')}\n- Total: ${board.cards.length} tasks`);
+            window.open(`board.html?id=${board.id}`, '_blank');
+            
+        } catch (e) {
+            console.error('Export tag to board error:', e);
+            alert('Failed to create board from tag: ' + e.message);
+        }
+    }
+    
+    function createCardFromEvidence(evidence, action, control, board, columnId, order, userId) {
+        const now = new Date().toISOString();
+        
+        return {
+            id: generateId('card'),
+            boardId: board.id,
+            columnId: columnId,
+            order: order,
+            title: evidence.name,
+            description: `**From:** ${control.name} → ${action.name}\n\n${evidence.text || ''}`,
+            sourceType: 'evidence',
+            sourceId: evidence.id,
+            sourceGrade: evidence.grade,
+            sourceContext: {
+                controlName: control.name,
+                actionName: action.name
+            },
+            assignments: [],
+            schedule: {
+                startDate: null,
+                startMode: 'date',
+                startDays: null,
+                startDependency: null,
+                dueDate: null,
+                dueMode: 'date',
+                dueDays: null,
+                recurrence: {
+                    enabled: false,
+                    pattern: 'monthly',
+                    interval: 1,
+                    startOf: 'month',
+                    endOf: null,
+                    customDays: [],
+                    endMode: 'never',
+                    endOccurrences: null,
+                    endDate: null
+                },
+                reminders: []
+            },
+            checklist: [],
+            labels: evidence.tags || [],
+            attachments: convertFooterToAttachments(evidence.footer || {}),
+            status: {
+                current: 'pending',
+                blocked: false,
+                blockedReason: null,
+                approvalStatus: null,
+                approvedBy: null,
+                approvedAt: null
+            },
+            effort: {
+                estimated: null,
+                actual: null,
+                unit: 'hours'
+            },
+            activity: [],
+            createdAt: now,
+            createdBy: userId,
+            updatedAt: now,
+            updatedBy: userId
+        };
+    }
+    
+    // Event handler for export tag to board button
+    document.addEventListener('DOMContentLoaded', () => {
+        const exportTagBtn = document.getElementById('export-tag-to-board');
+        if (exportTagBtn) {
+            exportTagBtn.addEventListener('click', () => {
+                if (appState.activeTag) {
+                    exportTagToBoard(appState.activeTag, appState.currentFlowId);
+                }
+            });
+        }
+    });
 
     // LOAD
     loadAll();
