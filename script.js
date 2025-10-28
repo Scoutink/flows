@@ -1984,18 +1984,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
     
-    // Event handler for export tag to board button
-    document.addEventListener('DOMContentLoaded', () => {
-        const exportTagBtn = document.getElementById('export-tag-to-board');
-        if (exportTagBtn) {
-            exportTagBtn.addEventListener('click', () => {
-                if (appState.activeTag) {
-                    exportTagToBoard(appState.activeTag, appState.currentFlowId);
-                }
-            });
-        }
-    });
-
     // LOAD
     loadAll();
 });
