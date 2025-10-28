@@ -12,7 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const flowSelect = document.getElementById('flow-select');
     const flowNewBtn = document.getElementById('flow-new');
     const flowRenameBtn = document.getElementById('flow-rename');
+    const flowUnlinkBtn = document.getElementById('flow-unlink');
     const flowDeleteBtn = document.getElementById('flow-delete');
+    const linkedIndicator = document.getElementById('linked-indicator');
 
     const modal = {
         backdrop: document.getElementById('modal-backdrop'),
@@ -35,6 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
             flows: {
                 // flowId: { completed: { evidenceId: true/false } }
             }
+        },
+        // Workflow links for structural synchronization
+        workflowLinks: {
+            links: [] // [{groupId, workflows:[flowId1, flowId2]}]
         },
         // current flow selection
         currentFlowId: null,
@@ -212,12 +218,95 @@ document.addEventListener('DOMContentLoaded', () => {
         reconcileAllExecutions();
     };
 
+    // --- WORKFLOW LINKING ---
+    const getLinkedWorkflows = (flowId) => {
+        for (const linkGroup of appState.workflowLinks.links) {
+            if (linkGroup.workflows.includes(flowId)) {
+                return linkGroup.workflows.filter(id => id !== flowId);
+            }
+        }
+        return [];
+    };
+
+    const isWorkflowLinked = (flowId) => {
+        return appState.workflowLinks.links.some(group => group.workflows.includes(flowId));
+    };
+
+    const createLinkGroup = (sourceFlowId, targetFlowId) => {
+        const linkGroup = {
+            groupId: generateId('link'),
+            workflows: [sourceFlowId, targetFlowId]
+        };
+        appState.workflowLinks.links.push(linkGroup);
+        return linkGroup.groupId;
+    };
+
+    const addToLinkGroup = (flowId, existingFlowId) => {
+        for (const linkGroup of appState.workflowLinks.links) {
+            if (linkGroup.workflows.includes(existingFlowId)) {
+                if (!linkGroup.workflows.includes(flowId)) {
+                    linkGroup.workflows.push(flowId);
+                }
+                return linkGroup.groupId;
+            }
+        }
+        return null;
+    };
+
+    const unlinkWorkflow = (flowId) => {
+        appState.workflowLinks.links = appState.workflowLinks.links.map(group => {
+            return {
+                ...group,
+                workflows: group.workflows.filter(id => id !== flowId)
+            };
+        }).filter(group => group.workflows.length > 1); // Remove groups with only 1 workflow
+        saveWorkflowLinks();
+    };
+
+    const propagateToLinkedWorkflows = (sourceFlowId) => {
+        const linkedFlowIds = getLinkedWorkflows(sourceFlowId);
+        if (linkedFlowIds.length === 0) return;
+
+        const sourceFlow = appState.workflow.flows.find(f => f.id === sourceFlowId);
+        if (!sourceFlow) return;
+
+        linkedFlowIds.forEach(targetFlowId => {
+            const targetFlow = appState.workflow.flows.find(f => f.id === targetFlowId);
+            if (!targetFlow) return;
+
+            // Deep clone the structure from source
+            const clonedData = JSON.parse(JSON.stringify(sourceFlow.data));
+            
+            // Regenerate IDs for the target flow while preserving its execution state
+            const regenerateIds = (node) => {
+                const oldId = node.id;
+                node.id = generateId(node.id.split('-')[0]);
+                
+                // Map old ID to new ID for execution state
+                if (oldId.startsWith('evi-')) {
+                    const targetExec = appState.executions.flows[targetFlowId];
+                    if (targetExec && targetExec.completed[oldId] !== undefined) {
+                        // Preserve completion state with new ID
+                        targetExec.completed[node.id] = targetExec.completed[oldId];
+                        delete targetExec.completed[oldId];
+                    }
+                }
+                
+                (node.subcategories || []).forEach(regenerateIds);
+            };
+            
+            clonedData.forEach(regenerateIds);
+            targetFlow.data = clonedData;
+        });
+    };
+
     // --- SERVER IO ---
     async function loadAll() {
         try {
-            const [wfRes, exRes] = await Promise.all([
+            const [wfRes, exRes, linksRes] = await Promise.all([
                 fetch(`workflow.json?t=${Date.now()}`),
-                fetch(`executions.json?t=${Date.now()}`)
+                fetch(`executions.json?t=${Date.now()}`),
+                fetch(`workflow-links.json?t=${Date.now()}`)
             ]);
             if (!wfRes.ok) throw new Error('Failed to load workflow.json');
             appState.workflow = await wfRes.json();
@@ -242,6 +331,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 appState.executions = { flows: {} };
             }
 
+            if (linksRes.ok) {
+                appState.workflowLinks = await linksRes.json();
+                if (!appState.workflowLinks || !appState.workflowLinks.links) appState.workflowLinks = { links: [] };
+            } else {
+                appState.workflowLinks = { links: [] };
+            }
+
             if (!appState.currentFlowId || !getCurrentFlow()) {
                 appState.currentFlowId = appState.workflow.flows[0]?.id || null;
             }
@@ -259,6 +355,11 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
         btn.disabled = true;
         try {
+            // If in creation mode, propagate changes to linked workflows
+            if (appState.currentMode === 'creation') {
+                propagateToLinkedWorkflows(appState.currentFlowId);
+            }
+
             const res = await fetch('save_workflow.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -272,6 +373,22 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(e);
             btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Save Failed';
             setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 1600);
+        }
+    }
+
+    async function saveWorkflowLinks() {
+        try {
+            const res = await fetch('save_workflow_links.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(appState.workflowLinks)
+            });
+            const json = await res.json();
+            if (!res.ok || json.status !== 'success') throw new Error(json.message || 'Link save failed');
+            return true;
+        } catch (e) {
+            console.error('Failed to save workflow links:', e);
+            return false;
         }
     }
     async function saveExecution() {
@@ -414,6 +531,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentFlow) {
             workflowRoot.innerHTML = `<div class="empty-state">No flows. Create one to get started.</div>`;
             return;
+        }
+
+        // Show linked indicator if current flow is linked
+        const isLinked = isWorkflowLinked(appState.currentFlowId);
+        if (linkedIndicator) {
+            linkedIndicator.style.display = isLinked ? 'inline-flex' : 'none';
+        }
+        if (flowUnlinkBtn) {
+            flowUnlinkBtn.style.display = isLinked ? 'inline-block' : 'none';
         }
 
         // top toggles
@@ -1209,12 +1335,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 <label>Flow name</label>
                 <input type="text" id="new-flow-name" placeholder="My Flow" required>
                 <div style="margin-top:.5rem;">
-                    <label><input type="radio" name="new-flow-mode" value="empty" checked> New empty flow</label><br>
-                    <label><input type="radio" name="new-flow-mode" value="clone"> Clone existing flow</label><br>
-                    <label><input type="radio" name="new-flow-mode" value="share"> Share existing flow</label>
+                    <label><input type="radio" name="new-flow-mode" value="empty" checked> 
+                        <strong>Empty</strong> - Create new empty workflow</label><br>
+                    <label><input type="radio" name="new-flow-mode" value="copy"> 
+                        <strong>Copy</strong> - Duplicate existing workflow (independent)</label><br>
+                    <label><input type="radio" name="new-flow-mode" value="linked"> 
+                        <strong>Linked</strong> - Create linked workflow (stays synchronized)</label>
                 </div>
                 <div id="source-flow-block" style="margin-top:.5rem;">
-                    <label>Source flow (for clone/share)</label>
+                    <label>Source flow (for copy/linked)</label>
                     <select id="source-flow-select">${flowsOptions}</select>
                 </div>
                 <div class="modal-form-actions">
@@ -1225,7 +1354,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         openModal('Create Flow', body, () => {
             const form = document.getElementById('new-flow-form');
-            form.addEventListener('submit', (e) => {
+            form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const name = (document.getElementById('new-flow-name').value || '').trim();
                 const mode = form.querySelector('input[name="new-flow-mode"]:checked').value;
@@ -1233,34 +1362,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 const id = generateId('flow');
 
                 let data = [];
-                if (mode === 'clone' || mode === 'share') {
+                if (mode === 'copy' || mode === 'linked') {
                     const src = appState.workflow.flows.find(f => f.id === srcId);
                     data = JSON.parse(JSON.stringify(src.data || []));
-                    if (mode === 'clone') {
-                        // regenerate IDs
-                        data.forEach(ctl => {
-                            ctl.id = generateId('cat');
-                            (ctl.subcategories || []).forEach(act => {
-                                act.id = generateId('act');
-                                (act.subcategories || []).forEach(ev => ev.id = generateId('evi'));
-                            });
-                            delete ctl.shareKey;
-                            (ctl.subcategories || []).forEach(a => { delete a.shareKey; (a.subcategories||[]).forEach(e=>delete e.shareKey); });
+                    
+                    // Always regenerate IDs for new flow
+                    data.forEach(ctl => {
+                        ctl.id = generateId('cat');
+                        (ctl.subcategories || []).forEach(act => {
+                            act.id = generateId('act');
+                            (act.subcategories || []).forEach(ev => ev.id = generateId('evi'));
                         });
-                    } else {
-                        // share: assign shareKey to each node tree
-                        data.forEach(ctl => setShareKeyDeep(ctl, ctl.shareKey || ctl.id));
-                        (data || []).forEach(ctl => (ctl.subcategories || []).forEach(act => {
-                            if (!act.shareKey) setShareKeyDeep(act, act.id);
-                            (act.subcategories || []).forEach(ev => { if (!ev.shareKey) setShareKeyDeep(ev, ev.id); });
-                        }));
+                        delete ctl.shareKey;
+                        (ctl.subcategories || []).forEach(a => { delete a.shareKey; (a.subcategories||[]).forEach(e=>delete e.shareKey); });
+                    });
+
+                    // For linked mode, create link group
+                    if (mode === 'linked') {
+                        // Check if source is already linked
+                        if (isWorkflowLinked(srcId)) {
+                            addToLinkGroup(id, srcId);
+                        } else {
+                            createLinkGroup(srcId, id);
+                        }
+                        await saveWorkflowLinks();
                     }
                 }
+                
                 appState.workflow.flows.push({ id, name, data });
                 appState.currentFlowId = id;
-
-                // Execution inheritance for "share" mode
-                if (mode === 'share') initializeSharedExecutionFromSource(id, srcId);
 
                 closeModal();
                 render();
@@ -1281,6 +1411,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const flow = getCurrentFlow();
         if (!flow) return;
         if (!confirm(`Delete flow "${flow.name}"?`)) return;
+        
+        // Remove from link groups
+        unlinkWorkflow(flow.id);
+        
         // clean execution for this flow
         delete appState.executions.flows[flow.id];
         appState.workflow.flows = appState.workflow.flows.filter(f => f.id !== flow.id);
@@ -1333,6 +1467,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     flowNewBtn?.addEventListener('click', openNewFlowModal);
     flowRenameBtn?.addEventListener('click', renameCurrentFlow);
+    flowUnlinkBtn?.addEventListener('click', () => {
+        if (appState.currentMode !== 'creation') return;
+        if (!confirm('Unlink this workflow? It will become independent and stop syncing with linked workflows.')) return;
+        unlinkWorkflow(appState.currentFlowId);
+        render();
+    });
     flowDeleteBtn?.addEventListener('click', deleteCurrentFlow);
     // Global tag filter removed - now using per-flow filtering only
 

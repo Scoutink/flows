@@ -32,12 +32,18 @@
                         <i class="fa-solid fa-diagram-project"></i> Flow:
                     </label>
                     <select id="flow-select" aria-label="Select flow"></select>
+                    <span id="linked-indicator" class="linked-indicator creation-only" style="display:none;" title="This workflow is linked to others">
+                        <i class="fa-solid fa-link"></i> Linked
+                    </span>
                     <!-- Creation-only management -->
                     <button id="flow-new" class="doc-button creation-only" title="Create flow">
                         <i class="fa-solid fa-plus"></i> New
                     </button>
                     <button id="flow-rename" class="doc-button creation-only" title="Rename flow">
                         <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button id="flow-unlink" class="doc-button creation-only" title="Unlink this workflow" style="display:none;">
+                        <i class="fa-solid fa-link-slash"></i> Unlink
                     </button>
                     <button id="flow-delete" class="doc-button danger creation-only" title="Delete flow">
                         <i class="fa-solid fa-trash"></i>

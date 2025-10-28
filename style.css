@@ -69,6 +69,18 @@ h1 { font-weight: 700; font-size: 1.8rem; letter-spacing: -0.5px; }
 .flows-bar { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
 .flow-label { font-weight: 600; color: var(--text-muted-color); }
 #flow-select { padding: .55rem .7rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--surface-color); color: var(--text-color); min-width: 220px; }
+.linked-indicator { 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 0.4rem; 
+    padding: 0.4rem 0.8rem; 
+    background: rgba(99, 102, 241, 0.1); 
+    border: 1px solid rgba(99, 102, 241, 0.3); 
+    border-radius: 20px; 
+    color: var(--accent-color); 
+    font-size: 0.85rem; 
+    font-weight: 500;
+}
 
 /* --- Mode Switch & Global Settings --- */
 .mode-toggle { display: flex; align-items: center; gap: 0.75rem; }
