@@ -883,14 +883,20 @@ button {
     /* Board View - VERTICAL STACKING */
     .board-container {
         padding: 1rem;
+        height: auto !important;
+        min-height: calc(100vh - 150px);
+        overflow-y: auto !important;
+        overflow-x: visible !important;
     }
     
     .board-columns {
         flex-direction: column;
         overflow-x: visible;
-        overflow-y: auto;
+        overflow-y: visible;
         gap: 1.5rem;
         padding: 1rem;
+        min-height: auto;
+        height: auto;
     }
     
     .board-column {
@@ -898,6 +904,8 @@ button {
         min-width: 100%;
         max-width: 100%;
         margin-bottom: 0;
+        height: auto;
+        max-height: none;
     }
     
     .add-column-container {
@@ -1141,11 +1149,15 @@ button {
     .boards-container,
     .board-container {
         padding: 0.75rem;
+        height: auto !important;
+        overflow-y: auto !important;
     }
     
     /* Typography */
     body {
         font-size: 14px;
+        overflow-y: auto;
+        height: auto;
     }
     
     .board-card-title,
@@ -1161,10 +1173,14 @@ button {
     .board-columns {
         gap: 1rem;
         padding: 0.75rem;
+        height: auto;
+        min-height: auto;
     }
     
     .board-column {
         margin-bottom: 0;
+        height: auto;
+        max-height: none;
     }
     
     /* Column Header */

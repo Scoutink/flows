@@ -305,11 +305,15 @@ body.dark-theme .execution-mode .evidence-node.active { background-color: rgba(9
     body {
         padding: 0.5rem;
         font-size: 15px;
+        overflow-y: auto;
+        height: auto;
     }
     
     #app-container {
         padding: 1rem;
         border-radius: 8px;
+        height: auto;
+        min-height: 100vh;
     }
     
     /* Header */
@@ -398,6 +402,8 @@ body.dark-theme .execution-mode .evidence-node.active { background-color: rgba(9
     .registers-container {
         flex-direction: column;
         min-height: auto;
+        height: auto;
+        overflow: visible;
     }
     
     .action-register-panel,
@@ -405,6 +411,8 @@ body.dark-theme .execution-mode .evidence-node.active { background-color: rgba(9
         width: 100% !important;
         border-right: none;
         border-bottom: 2px solid var(--border-color);
+        min-height: auto;
+        height: auto;
     }
     
     .evidence-register-panel {
@@ -543,10 +551,14 @@ body.dark-theme .execution-mode .evidence-node.active { background-color: rgba(9
     body {
         padding: 0.25rem;
         font-size: 14px;
+        overflow-y: auto;
+        height: auto;
     }
     
     #app-container {
         padding: 0.75rem;
+        height: auto;
+        min-height: 100vh;
     }
     
     .header-title h1 {
