@@ -1,0 +1,26 @@
+{
+  "users": [
+    {
+      "id": "user-default-001",
+      "name": "Default User",
+      "email": "user@company.com",
+      "avatar": "",
+      "role": "admin",
+      "department": "",
+      "position": "",
+      "notifications": {
+        "email": true,
+        "browser": true,
+        "assignments": true,
+        "mentions": true,
+        "reminders": true
+      },
+      "preferences": {
+        "theme": "light",
+        "boardView": "kanban",
+        "timezone": "Europe/Brussels"
+      },
+      "createdAt": "2025-01-01T00:00:00Z"
+    }
+  ]
+}

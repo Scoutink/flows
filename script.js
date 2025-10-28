@@ -614,6 +614,9 @@ document.addEventListener('DOMContentLoaded', () => {
                   <button class="btn-add" title="Clone/Share existing" data-action="import-node" data-path="${path}" data-level="action"><i class="fa-solid fa-copy"></i></button>
                   <button class="btn-delete" title="Delete Control" data-action="delete-node" data-path="${path}" data-level="control"><i class="fa-solid fa-trash-can"></i></button>
                 </div>
+                <div class="controls execution-only">
+                  <button class="btn-export-board" title="Export to Project Board" data-action="export-to-board" data-path="${path}"><i class="fa-solid fa-diagram-project"></i> Create Board</button>
+                </div>
               </div>
               ${renderTags(getObjectByPath(path, flow), path, flow)}
               <div class="progress-bar-container"><div class="progress-bar" style="width: ${controlProgress}%;"></div></div>
@@ -869,7 +872,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Allowed interactions in execution
         const allowedExecution = [
             'toggle-complete','show-link-in-modal','show-image-in-modal','show-note-content','show-view-modal',
-            'select-action','cancel-modal','filter-by-tag','clear-tag-filter'
+            'select-action','cancel-modal','filter-by-tag','clear-tag-filter','export-to-board'
         ];
         if (appState.currentMode === 'execution' && !allowedExecution.includes(action)) return;
 
@@ -954,6 +957,9 @@ document.addEventListener('DOMContentLoaded', () => {
             'delete-tag': () => { ensureTagsArray(node).splice(parseInt(index, 10), 1); },
             'filter-by-tag': () => { appState.activeTag = btn.dataset.tag; },
             'clear-tag-filter': () => { appState.activeTag = null; },
+            
+            // ----- PPM INTEGRATION -----
+            'export-to-board': () => { exportControlToBoard(node, appState.currentFlowId); shouldRender = false; },
         };
 
         if (actions[action]) {
@@ -1489,6 +1495,226 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal close
     modal.closeBtn.addEventListener('click', closeModal);
     modal.backdrop.addEventListener('click', (e) => { if (e.target === modal.backdrop) closeModal(); });
+
+    // --- PPM INTEGRATION ---
+    async function exportControlToBoard(control, flowId) {
+        if (!confirm(`Export "${control.name}" to a new Project Board?\n\nThis will create a Kanban board with tasks from all actions and evidence in this control.`)) {
+            return;
+        }
+        
+        try {
+            // Load PPM data
+            const boardsRes = await fetch(`ppm-boards.json?t=${Date.now()}`);
+            const boardsData = await boardsRes.json();
+            
+            const usersRes = await fetch(`ppm-users.json?t=${Date.now()}`);
+            const usersData = await usersRes.json();
+            
+            // Create board using PPM conversion logic
+            const board = {
+                id: generateId('board'),
+                name: control.name,
+                description: control.text || '',
+                sourceControlId: control.id,
+                sourceFlowId: flowId,
+                createdAt: new Date().toISOString(),
+                createdBy: usersData.users[0]?.id || 'user-default-001',
+                archived: false,
+                members: [{
+                    userId: usersData.users[0]?.id || 'user-default-001',
+                    name: usersData.users[0]?.name || 'Default User',
+                    email: usersData.users[0]?.email || 'user@company.com',
+                    role: 'admin',
+                    avatar: usersData.users[0]?.avatar || '',
+                    joinedAt: new Date().toISOString()
+                }],
+                columns: [
+                    { id: generateId('col'), name: 'Backlog', order: 0, limit: null, color: '#6c757d' },
+                    { id: generateId('col'), name: 'To Do', order: 1, limit: null, color: '#0d6efd' },
+                    { id: generateId('col'), name: 'In Progress', order: 2, limit: 5, color: '#0dcaf0' },
+                    { id: generateId('col'), name: 'Review', order: 3, limit: null, color: '#ffc107' },
+                    { id: generateId('col'), name: 'Done', order: 4, limit: null, color: '#198754' }
+                ],
+                cards: [],
+                labels: [],
+                settings: {
+                    notificationsEnabled: true,
+                    allowGuestView: false,
+                    enforceWIPLimit: false
+                },
+                activity: []
+            };
+            
+            // Convert tags to labels
+            if (control.tags && control.tags.length > 0) {
+                const colors = ['#dc3545', '#0d6efd', '#198754', '#ffc107', '#0dcaf0', '#6c757d'];
+                control.tags.forEach((tag, i) => {
+                    board.labels.push({
+                        id: generateId('label'),
+                        boardId: board.id,
+                        name: tag,
+                        color: colors[i % colors.length],
+                        description: ''
+                    });
+                });
+            }
+            
+            // Convert Actions and Evidence to cards
+            const backlogColumn = board.columns[0];
+            let cardOrder = 0;
+            
+            (control.subcategories || []).forEach(action => {
+                // Create a card for each evidence
+                (action.subcategories || []).forEach(evidence => {
+                    const card = {
+                        id: generateId('card'),
+                        boardId: board.id,
+                        columnId: backlogColumn.id,
+                        order: cardOrder++,
+                        title: evidence.name,
+                        description: evidence.text || '',
+                        sourceType: 'evidence',
+                        sourceId: evidence.id,
+                        sourceGrade: evidence.grade,
+                        assignments: [],
+                        schedule: {
+                            startDate: null,
+                            startMode: 'date',
+                            startDays: null,
+                            startDependency: null,
+                            dueDate: null,
+                            dueMode: 'date',
+                            dueDays: null,
+                            recurrence: {
+                                enabled: false,
+                                pattern: 'monthly',
+                                interval: 1,
+                                startOf: 'month',
+                                endOf: null,
+                                customDays: [],
+                                endMode: 'never',
+                                endOccurrences: null,
+                                endDate: null
+                            },
+                            reminders: []
+                        },
+                        checklist: [],
+                        labels: [...(action.tags || []), ...(evidence.tags || [])],
+                        attachments: convertFooterToAttachments(evidence.footer || {}),
+                        status: {
+                            current: 'pending',
+                            blocked: false,
+                            blockedReason: null,
+                            approvalStatus: null,
+                            approvedBy: null,
+                            approvedAt: null
+                        },
+                        effort: {
+                            estimated: null,
+                            actual: null,
+                            unit: 'hours'
+                        },
+                        activity: [],
+                        createdAt: new Date().toISOString(),
+                        createdBy: usersData.users[0]?.id || 'user-default-001',
+                        updatedAt: new Date().toISOString(),
+                        updatedBy: usersData.users[0]?.id || 'user-default-001'
+                    };
+                    
+                    board.cards.push(card);
+                });
+            });
+            
+            // Add activity log
+            board.activity.push({
+                id: generateId('act'),
+                boardId: board.id,
+                cardId: null,
+                userId: usersData.users[0]?.id || 'user-default-001',
+                type: 'board.created',
+                timestamp: new Date().toISOString(),
+                data: { boardName: board.name },
+                description: `Board "${board.name}" created from workflow control`
+            });
+            
+            // Save board
+            boardsData.boards.push(board);
+            const saveRes = await fetch('save_board.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(boardsData)
+            });
+            
+            const saveJson = await saveRes.json();
+            if (!saveRes.ok || saveJson.status !== 'success') {
+                throw new Error(saveJson.message || 'Failed to save board');
+            }
+            
+            // Redirect to board
+            alert(`Board "${board.name}" created successfully with ${board.cards.length} tasks!`);
+            window.open(`board.html?id=${board.id}`, '_blank');
+            
+        } catch (e) {
+            console.error('Export to board error:', e);
+            alert('Failed to export to board: ' + e.message);
+        }
+    }
+    
+    function convertFooterToAttachments(footer) {
+        const attachments = [];
+        const userId = 'user-default-001';
+        const now = new Date().toISOString();
+        
+        (footer.links || []).forEach(link => {
+            attachments.push({
+                id: generateId('att'),
+                type: 'link',
+                title: link.text,
+                url: link.url,
+                content: null,
+                uploadedBy: userId,
+                uploadedAt: now
+            });
+        });
+        
+        (footer.images || []).forEach(img => {
+            attachments.push({
+                id: generateId('att'),
+                type: 'image',
+                title: 'Image',
+                url: img,
+                content: null,
+                uploadedBy: userId,
+                uploadedAt: now
+            });
+        });
+        
+        (footer.notes || []).forEach(note => {
+            attachments.push({
+                id: generateId('att'),
+                type: 'note',
+                title: note.title,
+                url: null,
+                content: note.content,
+                uploadedBy: userId,
+                uploadedAt: now
+            });
+        });
+        
+        (footer.comments || []).forEach(comment => {
+            attachments.push({
+                id: generateId('att'),
+                type: 'comment',
+                title: 'Comment',
+                url: null,
+                content: comment,
+                uploadedBy: userId,
+                uploadedAt: now
+            });
+        });
+        
+        return attachments;
+    }
 
     // LOAD
     loadAll();
