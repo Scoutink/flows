@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Manual: Project Boards</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.8;
+            color: #343a40;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        main {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 2rem 3rem;
+        }
+        header {
+            text-align: center;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+        }
+        .version {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        h2 {
+            color: #4a6cf7;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-top: 40px;
+            font-size: 1.8rem;
+        }
+        h3 {
+            color: #495057;
+            margin-top: 30px;
+            font-size: 1.3rem;
+        }
+        h4 {
+            color: #495057;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        p, li {
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+            color: #495057;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .tip {
+            background-color: #d1ecf1;
+            border-left: 5px solid #0dcaf0;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .important {
+            background-color: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .feature {
+            background-color: #e7f5ff;
+            border-left: 5px solid #4a6cf7;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        ul, ol {
+            padding-left: 25px;
+        }
+        ul {
+            list-style-type: none;
+        }
+        ul li {
+            padding-left: 1.4em;
+            text-indent: -1.4em;
+        }
+        ul li::before {
+            content: "\f058"; 
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 10px;
+            color: #10b981;
+        }
+        ol li {
+            margin-bottom: 10px;
+        }
+        strong {
+            color: #343a40;
+        }
+        .app-button {
+            display: inline-block;
+            margin: 20px 10px 10px 0;
+            padding: 12px 25px;
+            background-color: #4a6cf7;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            font-size: 1.05rem;
+        }
+        .app-button:hover {
+            opacity: 0.85;
+        }
+        .icon-example {
+            font-size: 1em;
+            width: 24px;
+            display: inline-block;
+            text-align: center;
+            color: #4a6cf7;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            color: #6366f1;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .role-card {
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .role-card h4 {
+            margin-top: 0;
+            color: #4a6cf7;
+        }
+        .role-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        .toc {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .toc h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .toc ul {
+            margin-bottom: 0;
+        }
+        .toc li::before {
+            content: "\f0da";
+            color: #4a6cf7;
+        }
+        .toc a {
+            color: #4a6cf7;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .workflow-visual {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+            line-height: 2;
+        }
+        .example-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #4a6cf7;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .example-box h4 {
+            margin-top: 0;
+            color: #4a6cf7;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <header>
+            <h1>📋 Project Boards User Manual</h1>
+            <p>Complete guide to managing projects with Kanban boards</p>
+            <div class="version">Version 1.0 - PPM System</div>
+            <a href="boards.html" class="app-button"><i class="fa-solid fa-arrow-right"></i> Open Boards</a>
+            <a href="documentation.html" class="app-button"><i class="fa-solid fa-book"></i> Workflow Manual</a>
+        </header>
+
+        <div class="toc">
+            <h3>📑 Quick Navigation</h3>
+            <ul>
+                <li><a href="#introduction">Introduction & Getting Started</a></li>
+                <li><a href="#creating-boards">Creating Boards from Workflows</a></li>
+                <li><a href="#board-interface">Understanding the Board Interface</a></li>
+                <li><a href="#managing-cards">Managing Cards (Tasks)</a></li>
+                <li><a href="#team-assignments">Assigning Team Members</a></li>
+                <li><a href="#deadlines">Setting Deadlines & Schedules</a></li>
+                <li><a href="#columns">Customizing Columns</a></li>
+                <li><a href="#labels">Working with Labels</a></li>
+                <li><a href="#tracking-progress">Tracking Progress</a></li>
+                <li><a href="#collaboration">Team Collaboration</a></li>
+                <li><a href="#tips">Tips & Best Practices</a></li>
+                <li><a href="#faq">Frequently Asked Questions</a></li>
+            </ul>
+        </div>
+
+        <section id="introduction">
+            <h2>1. Introduction & Getting Started</h2>
+            
+            <h3>What are Project Boards?</h3>
+            <p>Project Boards transform your compliance workflows into actionable project management tasks using a visual Kanban system (similar to Trello). While workflows define <em>what</em> needs to be done, boards help you manage <em>how</em> and <em>when</em> to do it.</p>
+
+            <div class="feature">
+                <strong><i class="fa-solid fa-lightbulb"></i> Key Benefit:</strong> Export a workflow Control once, then manage its execution as a real project with deadlines, team assignments, and progress tracking - all without touching the original workflow template.
+            </div>
+
+            <h3>Workflow vs. Board: Understanding the Difference</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Workflow</th>
+                        <th>Project Board</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Template of requirements</td>
+                        <td>Active project execution</td>
+                    </tr>
+                    <tr>
+                        <td>What needs to be done</td>
+                        <td>How and when to do it</td>
+                    </tr>
+                    <tr>
+                        <td>Reusable structure</td>
+                        <td>One-time instance</td>
+                    </tr>
+                    <tr>
+                        <td>Hierarchical (Control→Action→Evidence)</td>
+                        <td>Flat (Cards in Columns)</td>
+                    </tr>
+                    <tr>
+                        <td>Single-user focused</td>
+                        <td>Team collaboration</td>
+                    </tr>
+                    <tr>
+                        <td>No deadlines</td>
+                        <td>Due dates and scheduling</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>When to Use Boards</h3>
+            <p>Use boards when you need to:</p>
+            <ul>
+                <li>Execute a workflow with specific deadlines</li>
+                <li>Assign tasks to different team members</li>
+                <li>Track progress visually</li>
+                <li>Collaborate with multiple people</li>
+                <li>Manage approval workflows</li>
+                <li>Monitor ongoing compliance activities</li>
+                <li>Keep separate execution instances (e.g., Q1, Q2, Q3 projects)</li>
+            </ul>
+
+            <div class="example-box">
+                <h4>💡 Real-World Example</h4>
+                <p><strong>Workflow:</strong> "ID.AM - Asset Management" (template with 20 requirements)</p>
+                <p><strong>Boards:</strong></p>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>"Q1 2025 Asset Audit" - Due March 31</li>
+                    <li>"Q2 2025 Asset Audit" - Due June 30</li>
+                    <li>"Emergency Asset Review" - Due ASAP</li>
+                </ul>
+                <p>Same workflow, three different execution instances with different teams and timelines.</p>
+            </div>
+        </section>
+
+        <section id="creating-boards">
+            <h2>2. Creating Boards from Workflows</h2>
+            
+            <h3>Method 1: Export Control from Workflow</h3>
+            <p>Export a single Control as a complete project board:</p>
+            
+            <ol>
+                <li>Open your workflow in the <strong>Workflow Manager</strong></li>
+                <li>Switch to <strong>Execution Mode</strong> (toggle at the top)</li>
+                <li>Find the Control you want to execute as a project</li>
+                <li>Click the <strong>"<i class="fa-solid fa-diagram-project"></i> Create Board"</strong> button in the Control header</li>
+                <li>Confirm the export in the dialog</li>
+                <li>The board opens automatically in a new tab</li>
+            </ol>
+            
+            <h3>Method 1b: Export by Tag from Workflow (NEW!)</h3>
+            <p>Create a board from all items across the workflow that share a specific tag:</p>
+            
+            <ol>
+                <li>Open your workflow in <strong>Execution Mode</strong></li>
+                <li>Click any tag (e.g., #firewall, #high-priority, #it-team)</li>
+                <li>The workflow filters to show only items with that tag</li>
+                <li>Click the <strong>"<i class="fa-solid fa-diagram-project"></i> Create Board from Tag"</strong> button in the tag filter banner</li>
+                <li>Confirm the export</li>
+                <li>Board is created with ALL tagged items from across multiple Controls</li>
+            </ol>
+            
+            <div class="feature">
+                <strong><i class="fa-solid fa-magic"></i> Tag Export Power:</strong>
+                <p>Unlike Control export which gives you one Control's tasks, tag export collects tasks from the <strong>entire workflow</strong>:</p>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>If a <strong>Control</strong> has the tag → ALL its Evidence becomes cards</li>
+                    <li>If an <strong>Action</strong> has the tag → ALL its Evidence becomes cards</li>
+                    <li>If <strong>Evidence</strong> has the tag → That Evidence becomes a card</li>
+                    <li>System automatically deduplicates (same Evidence never added twice)</li>
+                </ul>
+            </div>
+            
+            <div class="example-box">
+                <h4>💡 Tag Export Example</h4>
+                <p><strong>Scenario:</strong> You have a workflow with 5 Controls. Various items are tagged #firewall.</p>
+                <p><strong>Tagged Items:</strong></p>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>Control "ID.AM" has #firewall → 8 Evidence items</li>
+                    <li>Action "ID.RA-5" has #firewall → 5 Evidence items</li>
+                    <li>Action "ID.SC-7" has #firewall → 12 Evidence items</li>
+                    <li>Individual Evidence "ID.BE-1.3" has #firewall → 1 Evidence item</li>
+                </ul>
+                <p><strong>Result:</strong> Board created with 26 firewall-related tasks from 3 different Controls!</p>
+            </div>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-info-circle"></i> What Gets Exported:</strong>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li><strong>Control Name</strong> → Board Name</li>
+                    <li><strong>Control Description</strong> → Board Description</li>
+                    <li><strong>Each Evidence</strong> → Individual Card (task)</li>
+                    <li><strong>Tags</strong> → Labels</li>
+                    <li><strong>Attachments</strong> → Card Attachments (links, images, notes, comments)</li>
+                </ul>
+            </div>
+
+            <h3>Method 2: Create Board from Scratch</h3>
+            <p>To create an empty board not linked to any workflow:</p>
+            
+            <ol>
+                <li>Go to <strong>Boards</strong> page</li>
+                <li>Click <strong>"+ Create Board"</strong></li>
+                <li>Enter a board name</li>
+                <li>Click <strong>Create</strong></li>
+                <li>Manually add cards as needed</li>
+            </ol>
+            
+            <h3>Choosing the Right Export Method</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Export Method</th>
+                        <th>When to Use</th>
+                        <th>What You Get</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Control Export</strong></td>
+                        <td>Execute one compliance area as a project</td>
+                        <td>All tasks from that Control</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tag Export</strong></td>
+                        <td>Organize by priority, department, or topic</td>
+                        <td>All tasks with that tag, from multiple Controls</td>
+                    </tr>
+                    <tr>
+                        <td><strong>From Scratch</strong></td>
+                        <td>Non-compliance projects</td>
+                        <td>Empty board you build manually</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight">
+                <strong>⚠️ Important:</strong> Boards exported from workflows maintain a link to their source Control. This means you can potentially sync progress back to the workflow in future versions. Manually created boards don't have this connection.
+            </div>
+
+            <h3>Initial Board Setup</h3>
+            <p>When a board is created, it comes with five default columns:</p>
+            
+            <div class="workflow-visual">
+                <strong>[ Backlog ]</strong> → <strong>[ To Do ]</strong> → <strong>[ In Progress ]</strong> → <strong>[ Review ]</strong> → <strong>[ Done ]</strong>
+            </div>
+
+            <p>All exported cards start in the <strong>Backlog</strong> column. From there, you can:</p>
+            <ul>
+                <li>Prioritize which tasks to work on first</li>
+                <li>Assign team members</li>
+                <li>Set due dates</li>
+                <li>Move cards to "To Do" when ready to start</li>
+            </ul>
+        </section>
+
+        <section id="board-interface">
+            <h2>3. Understanding the Board Interface</h2>
+            
+            <h3>Board Navigation Bar</h3>
+            <p>At the top of every board, you'll find:</p>
+            
+            <ul>
+                <li><strong>Back Arrow (←)</strong> - Returns to boards list</li>
+                <li><strong>Board Name</strong> - Click to view board details</li>
+                <li><strong>Board Menu (⋯)</strong> - Rename, archive, or delete board</li>
+                <li><strong>Member Avatars</strong> - Shows who's on the team</li>
+                <li><strong>Add Member</strong> - Invite people to collaborate</li>
+                <li><strong>Filter Button</strong> - Filter cards by labels or assignees</li>
+                <li><strong>Theme Toggle</strong> - Switch between light/dark mode</li>
+            </ul>
+
+            <h3>The Kanban Board Layout</h3>
+            <p>The main board area is divided into columns (vertical sections). Each column represents a stage in your workflow:</p>
+
+            <div class="workflow-visual">
+                ┌─────────────┐   ┌─────────────┐   ┌─────────────┐<br>
+                │   Backlog   │   │   To Do     │   │ In Progress │<br>
+                ├─────────────┤   ├─────────────┤   ├─────────────┤<br>
+                │ [Card 1]    │   │ [Card 5]    │   │ [Card 8]    │<br>
+                │ [Card 2]    │   │ [Card 6]    │   │             │<br>
+                │ [Card 3]    │   │             │   │             │<br>
+                │ [Card 4]    │   │             │   │             │<br>
+                │             │   │             │   │             │<br>
+                └─────────────┘   └─────────────┘   └─────────────┘
+            </div>
+
+            <h3>Understanding Cards</h3>
+            <p>Each card represents a single task. Cards display:</p>
+            
+            <ul>
+                <li><strong>Title</strong> - Task name</li>
+                <li><strong>Labels</strong> - Color-coded tags (e.g., #firewall, #high-priority)</li>
+                <li><strong>Description</strong> - Brief preview (if any)</li>
+                <li><strong>Due Date</strong> - With color coding:
+                    <ul style="list-style-type: disc; padding-left: 20px;">
+                        <li><span style="color: #721c24; background: #f8d7da; padding: 2px 6px; border-radius: 3px;">Red = Overdue</span></li>
+                        <li><span style="color: #856404; background: #fff3cd; padding: 2px 6px; border-radius: 3px;">Yellow = Due Soon (within 3 days)</span></li>
+                        <li>Gray = On track</li>
+                    </ul>
+                </li>
+                <li><strong>Checklist Progress</strong> - e.g., "3/5" items completed</li>
+                <li><strong>Attachments Count</strong> - e.g., "📎 4"</li>
+                <li><strong>Assignee Avatars</strong> - Who's responsible</li>
+            </ul>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-mouse-pointer"></i> Interaction Tip:</strong> Hover over any card to see it highlight. Click to open detailed view. Drag to move between columns.
+            </div>
+        </section>
+
+        <section id="managing-cards">
+            <h2>4. Managing Cards (Tasks)</h2>
+            
+            <h3>Creating a New Card</h3>
+            <ol>
+                <li>Click <strong>"+ Add task"</strong> at the bottom of any column</li>
+                <li>Enter task title (required)</li>
+                <li>Enter description (optional)</li>
+                <li>Click <strong>"Add Task"</strong></li>
+            </ol>
+
+            <h3>Moving Cards Between Columns</h3>
+            <p>There are two ways to move cards:</p>
+            
+            <h4>Method 1: Drag and Drop (Recommended)</h4>
+            <ol>
+                <li>Click and hold on a card</li>
+                <li>Drag it to the desired column</li>
+                <li>Release to drop</li>
+            </ol>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-magic"></i> Visual Feedback:</strong> While dragging, the target column highlights to show where the card will drop. The card becomes semi-transparent to indicate it's being moved.
+            </div>
+
+            <h4>Method 2: Edit Card Details</h4>
+            <ol>
+                <li>Click on a card to open detail view</li>
+                <li>Change column from dropdown menu</li>
+                <li>Changes save automatically</li>
+            </ol>
+
+            <h3>Editing Card Details</h3>
+            <p>Click any card to open its detail modal, where you can:</p>
+            
+            <ul>
+                <li><strong>Edit Title</strong> - Click the title to edit inline</li>
+                <li><strong>Update Description</strong> - Full rich text editing</li>
+                <li><strong>Manage Checklist</strong> - Add sub-tasks and check them off</li>
+                <li><strong>View Attachments</strong> - See links, images, notes, and comments from workflow</li>
+                <li><strong>Assign People</strong> - Add team members (covered in next section)</li>
+                <li><strong>Set Due Date</strong> - Add deadline with calendar picker</li>
+                <li><strong>Add Labels</strong> - Tag with keywords</li>
+            </ul>
+
+            <div class="feature">
+                <strong><i class="fa-solid fa-check-square"></i> Checklist Feature:</strong> Cards exported from workflows include checklist items. As you complete sub-tasks, the progress shows on the card (e.g., "4/7" completed). This is perfect for breaking down complex tasks.
+            </div>
+
+            <h3>Deleting Cards</h3>
+            <ol>
+                <li>Open card detail view</li>
+                <li>Scroll to bottom</li>
+                <li>Click <strong>"🗑️ Delete Task"</strong> button</li>
+                <li>Confirm deletion</li>
+            </ol>
+
+            <div class="important">
+                <strong>⚠️ Warning:</strong> Deleting a card is permanent and cannot be undone. The card is removed from the board entirely.
+            </div>
+
+            <h3>Card Activity History</h3>
+            <p>Every card tracks its activity history automatically:</p>
+            <ul>
+                <li>When created and by whom</li>
+                <li>When moved between columns</li>
+                <li>Who was assigned or unassigned</li>
+                <li>When description was edited</li>
+                <li>Changes to due dates</li>
+            </ul>
+        </section>
+
+        <section id="team-assignments">
+            <h2>5. Assigning Team Members</h2>
+            
+            <h3>Understanding the Four Assignment Roles</h3>
+            <p>The board system supports four distinct roles for task assignment. Each role serves a different purpose:</p>
+
+            <div class="role-grid">
+                <div class="role-card">
+                    <div class="role-icon">👷</div>
+                    <h4>Executor</h4>
+                    <p>The person responsible for completing the task. They do the actual work.</p>
+                    <small><strong>Example:</strong> John completes the firewall audit</small>
+                </div>
+                
+                <div class="role-card">
+                    <div class="role-icon">✅</div>
+                    <h4>Approver</h4>
+                    <p>Reviews and approves the completed work. Quality assurance role.</p>
+                    <small><strong>Example:</strong> Sarah reviews John's audit results</small>
+                </div>
+                
+                <div class="role-card">
+                    <div class="role-icon">👁️</div>
+                    <h4>Follower</h4>
+                    <p>Observes progress. Receives updates but doesn't actively participate.</p>
+                    <small><strong>Example:</strong> Management stays informed</small>
+                </div>
+                
+                <div class="role-card">
+                    <div class="role-icon">📊</div>
+                    <h4>Supervisor</h4>
+                    <p>Monitors ongoing impact and continuous compliance over time.</p>
+                    <small><strong>Example:</strong> Compliance officer tracks long-term adherence</small>
+                </div>
+            </div>
+
+            <h3>How to Assign Someone to a Card</h3>
+            <ol>
+                <li>Click on a card to open detail view</li>
+                <li>Find the role section (Executors, Approvers, etc.)</li>
+                <li>Click <strong>"+ Assign [Role]"</strong> button</li>
+                <li>Enter the person's name</li>
+                <li>Click <strong>OK</strong></li>
+            </ol>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-user-plus"></i> Creating Users:</strong> When you enter a new name, the system automatically creates a user profile. The first time you assign someone, they're added to your organization's user list and the board's member list.
+            </div>
+
+            <h3>Multiple Assignments</h3>
+            <p>A single card can have:</p>
+            <ul>
+                <li><strong>Multiple Executors</strong> - For collaborative work</li>
+                <li><strong>Multiple Approvers</strong> - For multi-level approval</li>
+                <li><strong>Multiple Followers</strong> - For broad visibility</li>
+                <li><strong>Multiple Supervisors</strong> - For shared oversight</li>
+            </ul>
+
+            <div class="example-box">
+                <h4>💡 Example Assignment</h4>
+                <p><strong>Task:</strong> "Complete Firewall Configuration Audit"</p>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li><strong>Executors:</strong> John (Network Admin), Sarah (Security Engineer)</li>
+                    <li><strong>Approver:</strong> Mike (CISO)</li>
+                    <li><strong>Followers:</strong> IT Director, Compliance Manager</li>
+                    <li><strong>Supervisor:</strong> Security Team Lead</li>
+                </ul>
+            </div>
+
+            <h3>Viewing Who's Assigned</h3>
+            <ul>
+                <li><strong>On card:</strong> Avatars show at bottom (executors only)</li>
+                <li><strong>In detail view:</strong> Full list of all roles and assignees</li>
+                <li><strong>Board members:</strong> Top navigation shows all people on the board</li>
+            </ul>
+
+            <h3>Removing Assignments</h3>
+            <p>Currently, to remove an assignment, you need to delete the card and recreate it without that person, or edit the JSON directly (advanced users only). A future update will add a remove button.</p>
+
+            <h3>Typical Workflow with Assignments</h3>
+            <div class="workflow-visual">
+                1. Card created in <strong>Backlog</strong><br>
+                2. Executor assigned → moves to <strong>To Do</strong><br>
+                3. Executor starts work → moves to <strong>In Progress</strong><br>
+                4. Work completed → moves to <strong>Review</strong><br>
+                5. Approver reviews → either:<br>
+                &nbsp;&nbsp;&nbsp;→ Approves → moves to <strong>Done</strong><br>
+                &nbsp;&nbsp;&nbsp;→ Rejects → moves back to <strong>In Progress</strong><br>
+                6. Supervisor monitors over time
+            </div>
+        </section>
+
+        <section id="deadlines">
+            <h2>6. Setting Deadlines & Schedules</h2>
+            
+            <h3>Adding a Due Date</h3>
+            <ol>
+                <li>Open card detail view</li>
+                <li>Find <strong>"Due Date"</strong> field in right sidebar</li>
+                <li>Click the date picker</li>
+                <li>Select a date from the calendar</li>
+                <li>Date saves automatically</li>
+            </ol>
+
+            <h3>Understanding Date Indicators</h3>
+            <p>Cards with due dates show colored indicators:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Color</th>
+                        <th>Meaning</th>
+                        <th>Timeframe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span style="color: #721c24; background: #f8d7da; padding: 4px 8px; border-radius: 3px; font-weight: bold;">🔴 Red</span></td>
+                        <td><strong>Overdue</strong></td>
+                        <td>Past the due date</td>
+                    </tr>
+                    <tr>
+                        <td><span style="color: #856404; background: #fff3cd; padding: 4px 8px; border-radius: 3px; font-weight: bold;">🟡 Yellow</span></td>
+                        <td><strong>Due Soon</strong></td>
+                        <td>Within 3 days</td>
+                    </tr>
+                    <tr>
+                        <td><span style="color: #495057; background: #e9ecef; padding: 4px 8px; border-radius: 3px; font-weight: bold;">⚪ Gray</span></td>
+                        <td><strong>On Track</strong></td>
+                        <td>More than 3 days away</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-clock"></i> Visual Priority:</strong> Overdue tasks naturally stand out with their red badges, making it easy to identify what needs immediate attention when scanning your board.
+            </div>
+
+            <h3>Changing or Removing Due Dates</h3>
+            <ul>
+                <li><strong>To change:</strong> Open card, select new date</li>
+                <li><strong>To remove:</strong> Open card, clear the date field</li>
+            </ul>
+
+            <h3>Sorting by Due Date</h3>
+            <p>Cards within each column are ordered by:</p>
+            <ol>
+                <li>Manual order (drag to rearrange)</li>
+                <li>Due date proximity (coming in future update)</li>
+            </ol>
+
+            <h3>Future Scheduling Features (Coming Soon)</h3>
+            <p>The foundation is ready for these advanced features in upcoming releases:</p>
+            
+            <ul>
+                <li><strong>Start Dates</strong> - When work should begin</li>
+                <li><strong>Recurrence</strong> - Repeating tasks (daily, weekly, monthly)
+                    <ul style="list-style-type: circle; padding-left: 20px;">
+                        <li>End of every week reviews</li>
+                        <li>Monthly compliance checks</li>
+                        <li>Quarterly audits</li>
+                    </ul>
+                </li>
+                <li><strong>Reminders</strong> - Notifications before due dates</li>
+                <li><strong>Dependencies</strong> - Tasks that must wait for others</li>
+                <li><strong>Calendar View</strong> - See tasks on a calendar</li>
+                <li><strong>Timeline View</strong> - Gantt-style visualization</li>
+            </ul>
+
+            <div class="example-box">
+                <h4>💡 Real-World Deadline Example</h4>
+                <p><strong>Scenario:</strong> Quarterly compliance audit due March 31, 2025</p>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li><strong>Week 1-2:</strong> Cards in "To Do" with Feb 28 review date</li>
+                    <li><strong>Week 3-4:</strong> Cards in "In Progress"</li>
+                    <li><strong>Week 5:</strong> Cards moving to "Review" (yellow badges appear)</li>
+                    <li><strong>Week 6:</strong> Final approvals, cards move to "Done"</li>
+                    <li><strong>March 31:</strong> All cards completed before deadline</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="columns">
+            <h2>7. Customizing Columns</h2>
+            
+            <h3>Default Columns</h3>
+            <p>Every board starts with these five columns:</p>
+            <ul>
+                <li><strong>Backlog</strong> - Future tasks, not yet ready</li>
+                <li><strong>To Do</strong> - Ready to start, prioritized</li>
+                <li><strong>In Progress</strong> - Currently being worked on</li>
+                <li><strong>Review</strong> - Completed, awaiting approval</li>
+                <li><strong>Done</strong> - Approved and finished</li>
+            </ul>
+
+            <h3>Adding Custom Columns</h3>
+            <ol>
+                <li>Click <strong>"+ Add Column"</strong> button (at the right of the board)</li>
+                <li>Enter column name (e.g., "Testing", "Blocked", "Waiting")</li>
+                <li>Click <strong>Create</strong></li>
+                <li>New column appears at the end</li>
+            </ol>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-lightbulb"></i> Custom Column Ideas:</strong>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li><strong>Blocked</strong> - Tasks waiting on external factors</li>
+                    <li><strong>Testing</strong> - For QA processes</li>
+                    <li><strong>Waiting for Approval</strong> - Different from Review</li>
+                    <li><strong>Deployed</strong> - For tech implementations</li>
+                    <li><strong>On Hold</strong> - Paused temporarily</li>
+                </ul>
+            </div>
+
+            <h3>Column Menu Options</h3>
+            <p>Click the <strong>⋯</strong> button in any column header to access:</p>
+            
+            <h4>Rename Column</h4>
+            <ul>
+                <li>Change column name</li>
+                <li>Example: "To Do" → "Ready to Start"</li>
+            </ul>
+
+            <h4>Set WIP Limit</h4>
+            <p><strong>WIP (Work In Progress) Limit</strong> restricts how many cards can be in a column at once. This prevents overload and maintains focus.</p>
+            
+            <ul>
+                <li>Set a number limit (e.g., 5 cards maximum)</li>
+                <li>Column shows count as "3/5"</li>
+                <li>When exceeded, count turns <strong style="color: #dc3545;">red</strong></li>
+                <li>Helps teams avoid taking on too much work</li>
+            </ul>
+
+            <div class="feature">
+                <strong><i class="fa-solid fa-chart-line"></i> WIP Limit Benefits:</strong>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>Prevents work overload</li>
+                    <li>Encourages finishing tasks before starting new ones</li>
+                    <li>Identifies bottlenecks (column always at limit)</li>
+                    <li>Improves team focus and efficiency</li>
+                </ul>
+            </div>
+
+            <h4>Delete Column</h4>
+            <ul>
+                <li>Removes the column from the board</li>
+                <li>All cards in that column move to the first column (Backlog)</li>
+                <li>Cannot be undone</li>
+            </ul>
+
+            <div class="important">
+                <strong>⚠️ Warning:</strong> Deleting a column doesn't delete cards. They automatically move to the Backlog so you don't lose any work.
+            </div>
+
+            <h3>Reordering Columns</h3>
+            <p>Currently, column order is fixed. Drag-and-drop column reordering is planned for a future update.</p>
+
+            <h3>Column Best Practices</h3>
+            <ul>
+                <li><strong>Keep it simple:</strong> 5-7 columns is ideal. Too many gets confusing.</li>
+                <li><strong>Clear names:</strong> Everyone should understand what each column means</li>
+                <li><strong>Consistent flow:</strong> Columns should represent clear progression left-to-right</li>
+                <li><strong>Use WIP limits:</strong> Especially on "In Progress" to prevent overcommitment</li>
+            </ul>
+
+            <div class="example-box">
+                <h4>💡 Example: Tech Team Board</h4>
+                <p><strong>Columns:</strong> Backlog → To Do → In Progress (WIP: 3) → Code Review → Testing → Done</p>
+                <p><strong>Why:</strong> Separates code review and testing phases, limits work in progress to 3 tasks, ensures quality gates.</p>
+            </div>
+        </section>
+
+        <section id="labels">
+            <h2>8. Working with Labels</h2>
+            
+            <h3>What are Labels?</h3>
+            <p>Labels are color-coded tags that help categorize and filter cards. They're automatically created when you export a workflow (from workflow tags), or you can add them manually.</p>
+
+            <h3>Labels on Cards</h3>
+            <p>Labels appear as colored badges at the top of each card:</p>
+            <ul>
+                <li>Small, pill-shaped badges</li>
+                <li>Show the label name (e.g., "#firewall", "#high-priority")</li>
+                <li>Color-coded for quick visual scanning</li>
+            </ul>
+
+            <h3>How Labels are Created</h3>
+            
+            <h4>Automatic (from Workflow Export):</h4>
+            <p>When you export a Control to a board, all tags become labels:</p>
+            <ul>
+                <li>Control tags → Board labels</li>
+                <li>Action tags → Card labels</li>
+                <li>Evidence tags → Card labels</li>
+                <li>Colors assigned automatically</li>
+            </ul>
+
+            <h4>Manual (Future Feature):</h4>
+            <p>Label management UI is coming in a future update, where you can:</p>
+            <ul>
+                <li>Create new labels</li>
+                <li>Choose colors</li>
+                <li>Edit label names</li>
+                <li>Delete unused labels</li>
+            </ul>
+
+            <h3>Filtering by Labels</h3>
+            <p>While label filtering is in the works, you can currently:</p>
+            <ul>
+                <li>Visually scan cards by color</li>
+                <li>Group related cards mentally</li>
+                <li>Use naming conventions (all firewall tasks start with [FW])</li>
+            </ul>
+
+            <h3>Label Strategy & Best Practices</h3>
+            
+            <div class="tip">
+                <strong><i class="fa-solid fa-sparkles"></i> Pro Tip: Tags → Boards:</strong>
+                <p>Remember: Tags in your workflow become labels in boards. But more importantly, you can CREATE BOARDS from tags! Click any tag in Execution Mode to filter, then "Create Board from Tag" to get a board with all tagged items from across the entire workflow.</p>
+            </div>
+            
+            <h4>Categorize by Type:</h4>
+            <ul>
+                <li><strong>Technical:</strong> #firewall, #network, #database</li>
+                <li><strong>Administrative:</strong> #documentation, #training, #policy</li>
+                <li><strong>Compliance:</strong> #gdpr, #iso27001, #soc2</li>
+            </ul>
+
+            <h4>Indicate Priority:</h4>
+            <ul>
+                <li><strong>#critical</strong> - Must be done immediately</li>
+                <li><strong>#high-priority</strong> - Important, due soon</li>
+                <li><strong>#low-priority</strong> - Can wait if needed</li>
+            </ul>
+
+            <h4>Show Status:</h4>
+            <ul>
+                <li><strong>#blocked</strong> - Waiting on external factors</li>
+                <li><strong>#needs-review</strong> - Ready for approval</li>
+                <li><strong>#in-progress</strong> - Currently being worked</li>
+            </ul>
+
+            <h4>Identify Ownership:</h4>
+            <ul>
+                <li><strong>#it-team</strong></li>
+                <li><strong>#security</strong></li>
+                <li><strong>#hr</strong></li>
+                <li><strong>#finance</strong></li>
+            </ul>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-palette"></i> Color Coding Suggestion:</strong>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li><span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 3px;">Red</span> - Critical, urgent, blocked</li>
+                    <li><span style="background: #ffc107; color: #333; padding: 2px 8px; border-radius: 3px;">Yellow</span> - Warnings, needs attention</li>
+                    <li><span style="background: #198754; color: white; padding: 2px 8px; border-radius: 3px;">Green</span> - Approved, safe, compliant</li>
+                    <li><span style="background: #0d6efd; color: white; padding: 2px 8px; border-radius: 3px;">Blue</span> - Information, documentation</li>
+                    <li><span style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 3px;">Gray</span> - Standard, routine</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="tracking-progress">
+            <h2>9. Tracking Progress</h2>
+            
+            <h3>Board-Level Progress</h3>
+            <p>The boards list view shows progress for each board:</p>
+            <ul>
+                <li><strong>Total tasks:</strong> Count of all cards</li>
+                <li><strong>Completion %:</strong> Based on cards in "Done" column</li>
+                <li><strong>Progress bar:</strong> Visual representation</li>
+            </ul>
+
+            <p><strong>Formula:</strong> Progress % = (Cards in "Done" / Total Cards) × 100</p>
+
+            <div class="example-box">
+                <h4>💡 Example Progress</h4>
+                <p><strong>Board:</strong> "Q1 2025 Compliance Audit"</p>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>Total Cards: 25</li>
+                    <li>In Done: 15</li>
+                    <li>Progress: 60%</li>
+                </ul>
+                <p>Visual: <code>[████████████████▢▢▢▢▢▢▢▢] 60%</code></p>
+            </div>
+
+            <h3>Card-Level Progress (Checklists)</h3>
+            <p>Individual cards show checklist completion:</p>
+            <ul>
+                <li>Displayed as "3/7" (3 out of 7 items complete)</li>
+                <li>Visible on card without opening it</li>
+                <li>Useful for breaking down complex tasks</li>
+            </ul>
+
+            <h3>Column Distribution</h3>
+            <p>Looking at how cards are distributed across columns tells you:</p>
+            
+            <ul>
+                <li><strong>Many in Backlog:</strong> Lots of upcoming work, good planning</li>
+                <li><strong>Many in To Do:</strong> Work is prioritized and ready</li>
+                <li><strong>Many in In Progress:</strong> Team is busy (check WIP limits!)</li>
+                <li><strong>Many in Review:</strong> Potential bottleneck in approval process</li>
+                <li><strong>Many in Done:</strong> Great progress! 🎉</li>
+            </ul>
+
+            <h3>Identifying Bottlenecks</h3>
+            <p>A bottleneck is when work piles up in one column. Signs to watch:</p>
+            <ul>
+                <li>Column consistently at or over WIP limit</li>
+                <li>Cards not moving for several days</li>
+                <li>Overdue cards stuck in same column</li>
+            </ul>
+
+            <p><strong>Solutions:</strong></p>
+            <ul>
+                <li>Assign more people to that stage</li>
+                <li>Reduce WIP limit on previous column</li>
+                <li>Investigate and remove blockers</li>
+                <li>Simplify the process for that stage</li>
+            </ul>
+
+            <h3>Velocity Tracking (Manual)</h3>
+            <p>Track how many cards your team completes per week:</p>
+            <ol>
+                <li>Count cards moved to "Done" this week</li>
+                <li>Compare to previous weeks</li>
+                <li>Use to estimate future completion dates</li>
+            </ol>
+
+            <div class="feature">
+                <strong><i class="fa-solid fa-chart-bar"></i> Future Analytics:</strong> Upcoming versions will include automatic dashboards showing:
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>Burndown charts</li>
+                    <li>Velocity graphs</li>
+                    <li>Time-in-column metrics</li>
+                    <li>Team performance stats</li>
+                    <li>Export to CSV/PDF reports</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="collaboration">
+            <h2>10. Team Collaboration</h2>
+            
+            <h3>Board Members</h3>
+            <p>A board member is someone who has access to view and work on the board. There are three member roles:</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Role</th>
+                        <th>Permissions</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Admin</strong></td>
+                        <td>Full control: edit board, add members, delete</td>
+                        <td>Project manager, team lead</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Member</strong></td>
+                        <td>Create/edit cards, move tasks, assign people</td>
+                        <td>Team contributors</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Viewer</strong></td>
+                        <td>Read-only access, can view but not edit</td>
+                        <td>Stakeholders, management</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Adding Team Members to a Board</h3>
+            <ol>
+                <li>Open the board</li>
+                <li>Click <strong>"<i class="fa-solid fa-user-plus"></i> Add Member"</strong> button</li>
+                <li>Enter person's name and email</li>
+                <li>Select their role (Admin/Member/Viewer)</li>
+                <li>Click <strong>Add</strong></li>
+            </ol>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-users"></i> Member Visibility:</strong> Board members appear as avatar circles at the top of the board. Hover over an avatar to see the person's name.
+            </div>
+
+            <h3>Assignment vs. Membership</h3>
+            <p>It's important to understand the difference:</p>
+            
+            <ul>
+                <li><strong>Board Member:</strong> Has access to the entire board (can see all cards)</li>
+                <li><strong>Card Assignment:</strong> Responsible for a specific task (executor, approver, etc.)</li>
+            </ul>
+
+            <p><strong>Example:</strong> Sarah is a board member (can view everything), but is only assigned as executor on 5 specific cards.</p>
+
+            <h3>Collaboration Workflow</h3>
+            
+            <div class="workflow-visual">
+                1. <strong>Admin</strong> creates board from workflow<br>
+                2. <strong>Admin</strong> adds team as members<br>
+                3. <strong>Admin</strong> assigns executors to cards<br>
+                4. <strong>Executors</strong> move cards to "In Progress"<br>
+                5. <strong>Executors</strong> complete work, move to "Review"<br>
+                6. <strong>Approvers</strong> review and move to "Done"<br>
+                7. <strong>Supervisors</strong> monitor ongoing compliance<br>
+                8. <strong>Viewers</strong> (stakeholders) track progress
+            </div>
+
+            <h3>Communication Best Practices</h3>
+            <p>While the board doesn't have built-in chat (coming in future), use these strategies:</p>
+            
+            <ul>
+                <li><strong>Card descriptions:</strong> Document requirements and context</li>
+                <li><strong>Attachments:</strong> Link to relevant documentation</li>
+                <li><strong>Activity log:</strong> Shows who did what and when</li>
+                <li><strong>External tools:</strong> Use Slack/Teams for discussions, link cards in messages</li>
+            </ul>
+
+            <h3>Handling Disagreements</h3>
+            <p>If an approver rejects work:</p>
+            <ol>
+                <li>Move card back to "In Progress"</li>
+                <li>Update description with feedback</li>
+                <li>Executor addresses issues</li>
+                <li>Move back to "Review" when ready</li>
+                <li>Repeat until approved</li>
+            </ol>
+
+            <div class="example-box">
+                <h4>💡 Example: Multi-Department Collaboration</h4>
+                <p><strong>Scenario:</strong> Security audit requires IT and Compliance teams</p>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li><strong>Board Members:</strong> 5 IT staff, 3 Compliance staff, CISO (admin)</li>
+                    <li><strong>IT Tasks:</strong> Assigned to IT executors, Compliance as followers</li>
+                    <li><strong>Compliance Tasks:</strong> Assigned to Compliance executors, IT as followers</li>
+                    <li><strong>Approver:</strong> CISO approves all tasks</li>
+                    <li><strong>Result:</strong> Both teams see full picture, collaborate on shared goals</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="tips">
+            <h2>11. Tips & Best Practices</h2>
+            
+            <h3>🚀 Getting Started Tips</h3>
+            <ul>
+                <li><strong>Start with one board:</strong> Don't export everything at once. Master one project first.</li>
+                <li><strong>Use default columns:</strong> They work well for most projects. Customize only if needed.</li>
+                <li><strong>Assign immediately:</strong> Don't create 20 cards without assignees. Assign as you create.</li>
+                <li><strong>Set realistic deadlines:</strong> Better to extend later than constantly miss deadlines.</li>
+            </ul>
+
+            <h3>📋 Daily Board Management</h3>
+            <ul>
+                <li><strong>Morning routine:</strong> Check overdue cards (red badges), prioritize your day</li>
+                <li><strong>End of day:</strong> Move completed cards to "Done", update descriptions with notes</li>
+                <li><strong>Weekly review:</strong> Look at overall progress, adjust deadlines if needed</li>
+            </ul>
+
+            <h3>👥 Team Coordination</h3>
+            <ul>
+                <li><strong>Daily standup:</strong> Use board as visual during team meetings</li>
+                <li><strong>Clear assignments:</strong> Every card in "To Do" or "In Progress" should have an executor</li>
+                <li><strong>Limit WIP:</strong> Set "In Progress" limit to match team capacity (typically 1-2 tasks per person)</li>
+                <li><strong>Move cards frequently:</strong> Keep the board current. If you're working on it, it should be "In Progress"</li>
+            </ul>
+
+            <h3>🎯 Productivity Hacks</h3>
+            <ul>
+                <li><strong>Batch similar tasks:</strong> Group cards with same labels, work on them together</li>
+                <li><strong>Break down large cards:</strong> If a card takes more than 2 days, split it into smaller cards</li>
+                <li><strong>Use checklists liberally:</strong> Sub-tasks give you micro-wins and clearer progress</li>
+                <li><strong>Archive completed boards:</strong> Keep your boards list clean, archive old projects</li>
+            </ul>
+
+            <h3>⚠️ Common Mistakes to Avoid</h3>
+            <ul>
+                <li><strong>Don't:</strong> Let cards pile up in one column (especially "Review")</li>
+                <li><strong>Don't:</strong> Forget to set due dates on time-sensitive tasks</li>
+                <li><strong>Don't:</strong> Assign too many tasks to one person</li>
+                <li><strong>Don't:</strong> Create cards without clear, actionable titles</li>
+                <li><strong>Don't:</strong> Ignore overdue cards (fix or extend deadline)</li>
+            </ul>
+
+            <h3>🔄 Workflow Optimization</h3>
+            <ul>
+                <li><strong>Monitor bottlenecks:</strong> If "Review" is always full, add more approvers or streamline approval</li>
+                <li><strong>Adjust WIP limits:</strong> If team finishes quickly, increase limit. If overwhelmed, decrease it.</li>
+                <li><strong>Color-code urgency:</strong> Use labels consistently (#critical, #urgent, #routine)</li>
+                <li><strong>Review completed boards:</strong> What worked? What didn't? Apply lessons to next project.</li>
+            </ul>
+
+            <h3>📊 For Managers</h3>
+            <ul>
+                <li><strong>Use Supervisor role:</strong> Monitor without micromanaging</li>
+                <li><strong>Focus on trends:</strong> Are cards moving? Are deadlines being met?</li>
+                <li><strong>Recognize blockers:</strong> Cards stuck for days indicate problems</li>
+                <li><strong>Celebrate progress:</strong> Acknowledge when milestones hit (50% done, etc.)</li>
+            </ul>
+
+            <div class="feature">
+                <strong><i class="fa-solid fa-star"></i> Pro Tip: The Two-Minute Rule</strong>
+                <p>If a card takes less than 2 minutes to complete, do it immediately instead of moving it through columns. This keeps your board focused on meaningful work.</p>
+            </div>
+        </section>
+
+        <section id="faq">
+            <h2>12. Frequently Asked Questions</h2>
+            
+            <h3>Can I sync board progress back to the workflow?</h3>
+            <p>Not yet, but it's planned! Currently, boards are independent execution instances. Future versions will optionally sync completion status back to the workflow.</p>
+
+            <h3>Can I export the same workflow Control multiple times?</h3>
+            <p>Yes! That's the whole point. Export once for Q1, again for Q2, etc. Each board is independent.</p>
+            
+            <h3>What's the difference between Control export and Tag export?</h3>
+            <p><strong>Control export:</strong> Creates a board from ONE Control with all its Actions and Evidence.</p>
+            <p><strong>Tag export:</strong> Creates a board from ALL items across the ENTIRE workflow that have a specific tag. This can include items from multiple Controls.</p>
+            <p><strong>Example:</strong> Control export gives you "ID.AM" tasks only. Tag export of #firewall gives you firewall tasks from ID.AM, ID.RA, ID.SC, etc.</p>
+
+            <h3>What happens if I delete a workflow after exporting it?</h3>
+            <p>The board continues to work fine. It maintains a reference to the source Control ID (or source tag), but doesn't depend on the workflow existing.</p>
+            
+            <h3>Can I create a board for multiple tags at once?</h3>
+            <p>Not yet. Currently, you can create boards for one tag at a time. Multi-tag boards are planned for a future update. As a workaround, create separate boards per tag, or use a combined tag like #high-priority-firewall.</p>
+            
+            <h3>Will the same task appear twice if it has the filter tag in multiple places?</h3>
+            <p>No! The system automatically deduplicates. If an Evidence item matches through multiple paths (e.g., its parent Action has the tag AND the Evidence itself has the tag), it's only added to the board once.</p>
+
+            <h3>Can I add cards that weren't in the original workflow?</h3>
+            <p>Absolutely! Use the "+ Add task" button to create new cards. Boards can evolve beyond their workflow origins.</p>
+
+            <h3>How many boards can I create?</h3>
+            <p>Unlimited. Create as many as you need.</p>
+
+            <h3>How many cards can a board have?</h3>
+            <p>Technically unlimited, but for performance, keep it under 100-200 cards per board. For larger projects, split into multiple boards.</p>
+
+            <h3>Can I move a card to a different board?</h3>
+            <p>Not directly. You'd need to create a new card on the target board and delete from the source. Card migration is planned for future releases.</p>
+
+            <h3>Can I copy an entire board?</h3>
+            <p>Not yet, but board templates and duplication are coming in future updates.</p>
+
+            <h3>What if someone leaves the team?</h3>
+            <p>Currently, reassign their cards to someone else. Future versions will have better user management and card reassignment tools.</p>
+
+            <h3>Can I see who changed what?</h3>
+            <p>Yes! Each card has an activity log showing all changes with timestamps and user names.</p>
+
+            <h3>Is there a mobile app?</h3>
+            <p>Not yet, but the web interface is mobile-responsive. You can access boards from your phone's browser.</p>
+
+            <h3>Can I get notifications for assignments or deadlines?</h3>
+            <p>Not yet. Notification system (email and browser alerts) is coming in Batch 6 of development.</p>
+
+            <h3>How do I search for specific cards?</h3>
+            <p>Search functionality is coming in Batch 7. For now, use browser search (Ctrl+F / Cmd+F) on the board page.</p>
+
+            <h3>Can I export board data to Excel/CSV?</h3>
+            <p>Not yet, but reporting and export features are planned for Batch 6.</p>
+
+            <h3>What if I accidentally delete something?</h3>
+            <p>Currently there's no undo. Be careful with deletes. Backup functionality is planned for a future update.</p>
+
+            <h3>Can I customize the color of cards or columns?</h3>
+            <p>Not yet, but visual customization is planned. Labels already have colors.</p>
+        </section>
+
+        <section>
+            <h2>13. Keyboard Shortcuts (Coming Soon)</h2>
+            <p>Keyboard shortcuts will be available in a future update. Planned shortcuts include:</p>
+            
+            <ul>
+                <li><strong>N</strong> - New card</li>
+                <li><strong>F</strong> - Filter cards</li>
+                <li><strong>E</strong> - Edit card (when selected)</li>
+                <li><strong>Arrow Keys</strong> - Navigate between cards</li>
+                <li><strong>Escape</strong> - Close modal</li>
+                <li><strong>Ctrl+S</strong> - Quick save</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>14. What's Coming Next</h2>
+            
+            <p>The board system is actively developed in batches. Here's what's planned:</p>
+
+            <h3>Batch 2: Enhanced User Management (Next)</h3>
+            <ul>
+                <li>User profiles with avatars</li>
+                <li>Better member management</li>
+                <li>Role permissions enforcement</li>
+                <li>User preferences</li>
+            </ul>
+
+            <h3>Batch 3: Advanced Scheduling</h3>
+            <ul>
+                <li>Start dates</li>
+                <li>Task dependencies</li>
+                <li>Calendar view</li>
+                <li>Timeline/Gantt view</li>
+            </ul>
+
+            <h3>Batch 4: Recurrence Engine</h3>
+            <ul>
+                <li>Recurring tasks (daily, weekly, monthly)</li>
+                <li>Auto-generation of new cards</li>
+                <li>Recurrence patterns (e.g., "end of every month")</li>
+            </ul>
+
+            <h3>Batch 5: Workflow Integration++</h3>
+            <ul>
+                <li>Bidirectional sync (board → workflow)</li>
+                <li>Progress dashboard in workflow</li>
+                <li>Link multiple boards to one workflow</li>
+            </ul>
+
+            <h3>Batch 6: Notifications & Reporting</h3>
+            <ul>
+                <li>Email notifications</li>
+                <li>Browser alerts</li>
+                <li>Due date reminders</li>
+                <li>Progress reports</li>
+                <li>Export to CSV/PDF</li>
+            </ul>
+
+            <h3>Batch 7: Power Features</h3>
+            <ul>
+                <li>Search and advanced filters</li>
+                <li>Bulk operations</li>
+                <li>Card templates</li>
+                <li>Board templates</li>
+                <li>Custom fields</li>
+            </ul>
+
+            <h3>Batch 8: Polish & Performance</h3>
+            <ul>
+                <li>Keyboard shortcuts</li>
+                <li>Drag-and-drop improvements</li>
+                <li>Mobile app optimization</li>
+                <li>Offline support</li>
+                <li>Performance optimization for large boards</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>15. Getting Help & Support</h2>
+            
+            <h3>Troubleshooting</h3>
+            <ul>
+                <li><strong>Board not loading?</strong> Refresh the page (F5)</li>
+                <li><strong>Can't drag cards?</strong> Make sure you're clicking and holding on the card itself</li>
+                <li><strong>Changes not saving?</strong> Check your internet connection, try again</li>
+                <li><strong>Board looks weird?</strong> Try clearing browser cache, or switch browsers</li>
+            </ul>
+
+            <h3>Best Browsers</h3>
+            <p>Boards work best on:</p>
+            <ul>
+                <li>Chrome 90+</li>
+                <li>Firefox 88+</li>
+                <li>Safari 14+</li>
+                <li>Edge 90+</li>
+            </ul>
+
+            <h3>Feedback & Feature Requests</h3>
+            <p>Found a bug? Have a feature idea? Your feedback helps improve the system!</p>
+
+            <div class="feature" style="text-align: center; margin-top: 40px;">
+                <h3 style="margin-top: 0;">Ready to Start?</h3>
+                <p>You now have everything you need to effectively use Project Boards!</p>
+                <a href="boards.html" class="app-button"><i class="fa-solid fa-rocket"></i> Open Boards</a>
+                <a href="index.html" class="app-button"><i class="fa-solid fa-sitemap"></i> Go to Workflows</a>
+            </div>
+        </section>
+
+        <hr style="margin: 40px 0; border: none; border-top: 2px solid #dee2e6;">
+        <footer style="text-align: center; color: #888; font-size: 0.95rem;">
+            <p><strong>Project Boards</strong> - User Manual v1.0</p>
+            <p>Part of the Compliance Workflow Manager</p>
+            <p>Last Updated: October 2025</p>
+        </footer>
+    </main>
+</body>
+</html>
