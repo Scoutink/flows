@@ -797,20 +797,90 @@ button {
 }
 
 /* ===== RESPONSIVE ===== */
+
+/* Tablet Portrait and Below */
+@media (max-width: 1024px) {
+    .boards-container,
+    .board-container {
+        padding: 1.5rem;
+    }
+    
+    .board-columns {
+        gap: 1.5rem;
+    }
+}
+
+/* Mobile Large (Standard Smartphones) */
 @media (max-width: 768px) {
+    /* Navigation */
     .ppm-navbar {
+        flex-direction: column;
+        align-items: stretch;
         padding: 1rem;
+        gap: 1rem;
+    }
+    
+    .nav-left, .nav-center, .nav-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .nav-left {
         flex-wrap: wrap;
     }
     
+    .nav-brand {
+        font-size: 1.1rem;
+        flex: 1;
+    }
+    
+    .nav-center {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .board-members {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+    
+    .btn-secondary,
+    .btn-primary {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem 1rem;
+    }
+    
+    /* Boards List View */
     .boards-container {
         padding: 1rem;
     }
     
-    .boards-grid {
-        grid-template-columns: 1fr;
+    .boards-header {
+        flex-direction: column;
+        gap: 1rem;
     }
     
+    .header-left,
+    .header-right {
+        width: 100%;
+    }
+    
+    .header-right {
+        display: flex;
+        justify-content: stretch;
+    }
+    
+    .header-right button {
+        width: 100%;
+    }
+    
+    .boards-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    /* Board View - VERTICAL STACKING */
     .board-container {
         padding: 1rem;
     }
@@ -818,19 +888,361 @@ button {
     .board-columns {
         flex-direction: column;
         overflow-x: visible;
+        overflow-y: auto;
+        gap: 1.5rem;
+        padding: 1rem;
     }
     
     .board-column {
         width: 100%;
+        min-width: 100%;
         max-width: 100%;
+        margin-bottom: 0;
+    }
+    
+    .add-column-container {
+        width: 100%;
+    }
+    
+    /* Column Headers */
+    .column-header {
+        padding: 1rem;
+    }
+    
+    .column-title {
+        font-size: 1.1rem;
+    }
+    
+    /* Cards */
+    .card {
+        margin-bottom: 0.75rem;
+    }
+    
+    .card-title {
+        font-size: 0.95rem;
+    }
+    
+    .card-description {
+        font-size: 0.875rem;
+    }
+    
+    /* Card Detail Modal */
+    .card-modal-backdrop .modal-container {
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+        margin: 0;
     }
     
     .card-detail {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
     
-    .modal-container.modal-large {
+    .card-detail-main,
+    .card-detail-sidebar {
+        width: 100%;
+    }
+    
+    .detail-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .detail-section label {
+        font-size: 0.9rem;
+    }
+    
+    /* Regular Modal */
+    .modal-backdrop .modal-container {
+        width: 95%;
+        max-width: 95%;
+        padding: 1.5rem 1rem;
+    }
+    
+    .modal-large {
+        width: 100%;
         max-width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+    
+    /* Forms */
+    .modal-form {
+        padding: 0;
+    }
+    
+    .modal-form input[type="text"],
+    .modal-form input[type="email"],
+    .modal-form input[type="date"],
+    .modal-form textarea,
+    .modal-form select {
+        font-size: 16px; /* Prevents iOS zoom */
+        padding: 0.75rem;
+    }
+    
+    /* Backlog Filter Banner */
+    .backlog-filter-banner {
+        flex-direction: column;
+        padding: 10px 15px;
+        gap: 10px;
+    }
+    
+    .backlog-filter-banner span {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+    
+    .btn-clear-filter {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Backlog Card Actions */
+    .backlog-card-actions {
+        top: 6px;
+        right: 6px;
+        gap: 4px;
+    }
+    
+    .backlog-action-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1rem;
+    }
+    
+    /* Backlog Attachments */
+    .backlog-attachments {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .attachment-preview-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+    }
+    
+    /* Backlog Selector */
+    .backlog-selector {
+        max-height: 250px;
+    }
+    
+    .checkbox-label {
+        padding: 10px 8px;
+    }
+    
+    .checkbox-label input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+    }
+    
+    /* User Selector */
+    .user-selector {
+        max-height: 300px;
+    }
+    
+    .user-select-btn {
+        padding: 14px 12px;
+        font-size: 0.95rem;
+    }
+    
+    /* Touch Targets - ENLARGE ALL INTERACTIVE ELEMENTS */
+    .btn-icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 1.1rem;
+    }
+    
+    button.menu-btn {
+        padding: 1rem;
+        font-size: 1rem;
+        min-height: 52px;
+    }
+    
+    .add-card-btn {
+        padding: 1rem;
+        font-size: 1rem;
+        min-height: 52px;
+    }
+    
+    /* Assignments Display */
+    .assignments {
+        font-size: 0.9rem;
+    }
+    
+    .assignment-item {
+        padding: 0.75rem;
+    }
+    
+    /* Member Avatars */
+    .member-avatar {
+        width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
+    }
+    
+    .assignee-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+    
+    /* Board Card (on boards list) */
+    .board-card {
+        padding: 1.25rem;
+    }
+    
+    .board-card-title {
+        font-size: 1.1rem;
+    }
+    
+    .board-card-menu {
+        width: 40px;
+        height: 40px;
+    }
+    
+    /* Progress Bars */
+    .progress-label {
+        font-size: 0.85rem;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.2rem;
+    }
+}
+
+/* Mobile Small (iPhone SE and smaller) */
+@media (max-width: 480px) {
+    /* Navigation */
+    .ppm-navbar {
+        padding: 0.75rem;
+    }
+    
+    .nav-brand {
+        font-size: 1rem;
+    }
+    
+    /* Containers */
+    .boards-container,
+    .board-container {
+        padding: 0.75rem;
+    }
+    
+    /* Typography */
+    body {
+        font-size: 14px;
+    }
+    
+    .board-card-title,
+    .column-title {
+        font-size: 1rem;
+    }
+    
+    .card-title {
+        font-size: 0.9rem;
+    }
+    
+    /* Spacing */
+    .board-columns {
+        gap: 1rem;
+        padding: 0.75rem;
+    }
+    
+    .board-column {
+        margin-bottom: 0;
+    }
+    
+    /* Column Header */
+    .column-header {
+        padding: 0.875rem;
+    }
+    
+    /* Cards */
+    .card {
+        padding: 0.875rem;
+        margin-bottom: 0.625rem;
+    }
+    
+    /* Modals */
+    .modal-backdrop .modal-container,
+    .card-modal-backdrop .modal-container {
+        padding: 1rem 0.75rem;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    /* Forms */
+    .modal-form label {
+        font-size: 0.9rem;
+    }
+    
+    /* Buttons remain 44x44 for touch but fonts adjust */
+    button {
+        font-size: 0.9rem;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        padding: 0.875rem 1rem;
+    }
+    
+    /* Card Meta */
+    .card-meta {
+        font-size: 0.8rem;
+    }
+    
+    /* Detail Sections */
+    .detail-section {
+        margin-bottom: 1.25rem;
+    }
+    
+    /* Backlog Card - Adjust padding */
+    .backlog-card {
+        padding-top: 52px; /* More space for action buttons */
+    }
+    
+    /* Progress */
+    .progress-bar-container {
+        height: 6px;
+    }
+}
+
+/* Landscape Mode Optimization */
+@media (max-width: 900px) and (orientation: landscape) {
+    .board-columns {
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+    
+    .board-column {
+        width: 300px;
+        min-width: 300px;
+        max-width: 300px;
+        margin-right: 1rem;
+    }
+    
+    .card-modal-backdrop .modal-container {
+        height: 95vh;
+        max-height: 95vh;
+        overflow-y: auto;
     }
 }
 
