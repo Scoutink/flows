@@ -313,6 +313,24 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- TAGS UI ---
+    // Collect all unique tags from current flow for autocomplete
+    const collectCurrentFlowTags = () => {
+        const flow = getCurrentFlow();
+        if (!flow) return [];
+        
+        const tagSet = new Set();
+        (flow.data || []).forEach(ctl => {
+            (ctl.tags || []).forEach(t => tagSet.add(t));
+            (ctl.subcategories || []).forEach(act => {
+                (act.tags || []).forEach(t => tagSet.add(t));
+                (act.subcategories || []).forEach(ev => {
+                    (ev.tags || []).forEach(t => tagSet.add(t));
+                });
+            });
+        });
+        return Array.from(tagSet).sort((a, b) => a.localeCompare(b));
+    };
+
     const renderTags = (node, path, flow) => {
         ensureTagsArray(node);
         const chips = node.tags.map((t, i) => {
@@ -322,9 +340,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 : '';
             return `<span class="tag-item" data-action="${actionName}" data-path="${path}" data-index="${i}" data-tag="${t}">#${t}${suffix}</span>`;
         }).join('');
-        const addInput = appState.currentMode === 'creation'
-            ? `<input class="add-tag-input" data-path="${path}" placeholder="Add tag and press Enter">`
-            : '';
+        
+        // Add input with autocomplete in creation mode
+        let addInput = '';
+        if (appState.currentMode === 'creation') {
+            const existingTags = collectCurrentFlowTags();
+            const datalistId = `tags-datalist-${path.replace(/\./g, '-')}`;
+            const datalistOptions = existingTags.map(t => `<option value="${t}"></option>`).join('');
+            addInput = `
+                <input class="add-tag-input" 
+                       data-path="${path}" 
+                       list="${datalistId}"
+                       placeholder="Add tag and press Enter" 
+                       autocomplete="off">
+                <datalist id="${datalistId}">${datalistOptions}</datalist>
+            `;
+        }
+        
         return `<div class="evidence-tags">${chips}${addInput}</div>`;
     };
 
@@ -685,116 +717,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- GLOBAL FILTER (cross-flow) with tag autocomplete ---
-    const openGlobalTagFilter = () => {
-        const flowChecks = appState.workflow.flows.map(f =>
-            `<label style="display:flex;gap:.5rem;align-items:center;"><input type="checkbox" class="global-flow-check" value="${f.id}" checked> ${f.name}</label>`
-        ).join('');
-
-        const body = `
-            <form id="global-filter-form" class="modal-form">
-                <div><strong>Flows</strong></div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem;margin:.5rem 0 1rem;">${flowChecks}</div>
-                <label>Tags (comma-separated)</label>
-                <input type="text" id="global-tags" placeholder="e.g. firewall, training" autocomplete="off">
-                <datalist id="global-tags-datalist"></datalist>
-                <div class="modal-form-actions">
-                    <button type="button" class="cancel" data-action="cancel-modal">Close</button>
-                    <button type="submit" class="save">Filter</button>
-                </div>
-            </form>
-            <div id="global-results" style="margin-top:1rem;"></div>
-        `;
-        openModal('Cross-flow Tag Filter', body, () => {
-            const form = document.getElementById('global-filter-form');
-            const input = document.getElementById('global-tags');
-            const datalist = document.getElementById('global-tags-datalist');
-
-            const collectTags = (flowIds) => {
-                const set = new Set();
-                appState.workflow.flows.filter(f => flowIds.includes(f.id)).forEach(flow => {
-                    (flow.data || []).forEach(ctl => {
-                        (ctl.tags || []).forEach(t => set.add(t));
-                        (ctl.subcategories || []).forEach(act => {
-                            (act.tags || []).forEach(t => set.add(t));
-                            (act.subcategories || []).forEach(ev => (ev.tags || []).forEach(t => set.add(t)));
-                        });
-                    });
-                });
-                return Array.from(set).sort((a, b) => a.localeCompare(b));
-            };
-
-            const refreshDatalist = () => {
-                const selectedFlows = Array.from(document.querySelectorAll('.global-flow-check:checked')).map(i => i.value);
-                const tags = collectTags(selectedFlows);
-                // Suggest based on last token typed
-                const raw = input.value;
-                const last = raw.split(',').pop().trim().toLowerCase();
-                const candidates = last ? tags.filter(t => t.toLowerCase().includes(last)) : tags;
-                datalist.innerHTML = candidates.map(t => `<option value="${t}"></option>`).join('');
-                input.setAttribute('list', 'global-tags-datalist');
-            };
-
-            document.querySelectorAll('.global-flow-check').forEach(cb => cb.addEventListener('change', refreshDatalist));
-            input.addEventListener('input', refreshDatalist);
-            refreshDatalist();
-
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const selectedFlows = Array.from(document.querySelectorAll('.global-flow-check:checked')).map(i => i.value);
-                const tags = (document.getElementById('global-tags').value || '')
-                    .split(',')
-                    .map(s => s.trim())
-                    .filter(Boolean);
-                runGlobalFilter(selectedFlows, tags);
-            });
-        });
-    };
-
-    const runGlobalFilter = (flowIds, tags) => {
-        const results = new Map(); // key by node shareKey or id
-        const keyFor = (node) => node.shareKey || node.id;
-
-        appState.workflow.flows.filter(f => flowIds.includes(f.id)).forEach(flow => {
-            (flow.data || []).forEach(ctl => {
-                const ctlMatch = tags.length === 0 ? false : (ctl.tags || []).some(t => tags.includes(t));
-                (ctl.subcategories || []).forEach(act => {
-                    const actMatch = tags.length === 0 ? false : (act.tags || []).some(t => tags.includes(t)) || ctlMatch;
-                    (act.subcategories || []).forEach(ev => {
-                        const evMatch = tags.length === 0 ? false : (ev.tags || []).some(t => tags.includes(t)) || actMatch;
-                        if (ctlMatch || actMatch || evMatch) {
-                            const node = evMatch ? ev : (actMatch ? act : ctl);
-                            const k = keyFor(node);
-                            const label = evMatch ? `Evidence: ${ev.name}` : actMatch ? `Action: ${act.name}` : `Control: ${ctl.name}`;
-                            const existing = results.get(k);
-                            const flowName = flow.name;
-                            if (existing) {
-                                existing.flows.add(flowName);
-                            } else {
-                                results.set(k, { label, flows: new Set([flowName]) });
-                            }
-                        }
-                    });
-                });
-            });
-        });
-
-        const target = document.getElementById('global-results');
-        if (!results.size) {
-            target.innerHTML = `<div class="empty-state">No matches.</div>`;
-            return;
-        }
-        target.innerHTML = `
-            <div style="display:flex;flex-direction:column;gap:.5rem;">
-                ${Array.from(results.values()).map(r => `
-                    <div class="modal-item">
-                        <div class="modal-item-text">${r.label}</div>
-                        <div class="modal-item-text" style="font-size:.85rem;color:var(--text-muted-color)">
-                            Shared in: ${Array.from(r.flows).join(', ')}
-                        </div>
-                    </div>`).join('')}
-            </div>
-        `;
-    };
+    // Global tag filter removed - now using per-flow filtering only
+    // Tag filtering works by clicking on any tag, which filters the current board
 
     // --- EVENTS / ACTIONS ---
     function handleAppClick(e) {
