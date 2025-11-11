@@ -445,77 +445,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update cumulative grades before rendering
         updateAllCumulativeGrades(flow.data, template, 0);
 
-        const workflowInfoHtml = renderWorkflowInfo(flow, template);
-        const unitsHtml = renderUnits(flow.data, template, 0);
-        
-        const contentHtml = unitsHtml || `
+        const html = renderUnits(flow.data, template, 0);
+        workflowRoot.innerHTML = html || `
             <div class="empty-state">
                 <i class="fa-solid fa-folder-open" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 1rem;"></i>
                 <h3>No ${template.levels[0].pluralName} Yet</h3>
                 <p>Click the button below to add your first ${template.levels[0].singularName.toLowerCase()}</p>
             </div>
         `;
-        
-        workflowRoot.innerHTML = workflowInfoHtml + contentHtml;
 
         applyModeStyles();
         updateAddButton();
-    };
-
-    const renderWorkflowInfo = (flow, template) => {
-        const isCreation = appState.currentMode === 'creation';
-        const config = template.workflowConfig;
-        
-        // Check if any workflow-level features are enabled
-        const hasAnyFeature = config.enableIcon || config.enableDescription || config.enableSequentialOrder;
-        
-        if (!hasAnyFeature) {
-            return '';
-        }
-
-        return `
-            <div class="workflow-info-section ${isCreation ? '' : 'execution-mode'}">
-                <div class="workflow-info-header">
-                    <h2 class="workflow-title">
-                        ${config.enableIcon && flow.icon ? `
-                            <img src="icons/${flow.icon}" alt="workflow icon" class="workflow-icon" style="width: 32px; height: 32px; margin-right: 0.5rem;">
-                        ` : ''}
-                        ${flow.name}
-                    </h2>
-                    ${isCreation && config.enableIcon ? `
-                        <button class="btn-secondary" onclick="showWorkflowIconPicker()" title="Change workflow icon">
-                            <i class="fa-solid fa-icons"></i> ${flow.icon ? 'Change Icon' : 'Add Icon'}
-                        </button>
-                    ` : ''}
-                </div>
-                
-                ${config.enableDescription ? `
-                    <div class="workflow-description-section">
-                        ${isCreation ? `
-                            <textarea 
-                                class="workflow-description-textarea"
-                                placeholder="Workflow description..."
-                                onblur="updateWorkflowProperty('description', this.value)"
-                            >${flow.description || ''}</textarea>
-                        ` : flow.description ? `
-                            <p class="workflow-description-text">${flow.description}</p>
-                        ` : ''}
-                    </div>
-                ` : ''}
-                
-                ${config.enableSequentialOrder && isCreation ? `
-                    <div class="workflow-sequential-section">
-                        <label class="checkbox-label">
-                            <input type="checkbox" 
-                                   ${flow.enforceSequence ? 'checked' : ''}
-                                   onchange="updateWorkflowProperty('enforceSequence', this.checked)">
-                            <span>Enforce Sequential Order</span>
-                            <i class="fa-solid fa-circle-info" title="Require items to be completed in order"></i>
-                        </label>
-                    </div>
-                ` : ''}
-            </div>
-        `;
     };
 
     const renderUnits = (units, template, depth) => {
@@ -549,23 +489,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderUnitHeader = (unit, level, config, depth, path, isCreation, template, flow) => {
-        const unitIsCompleted = flow ? isCompleted(flow.id, unit.id) : false;
+        const isCompleted = flow ? isCompleted(flow.id, unit.id) : false;
         const progress = config.enableProgressBar ? calculateProgress(unit, template, depth) : 0;
         
         return `
             <div class="unit-header">
-                ${config.enableIcon ? `
-                    <span class="unit-icon-container">
-                        ${unit.icon ? `
-                            <img src="icons/${unit.icon}" alt="icon" style="width: 24px; height: 24px;" class="unit-icon-img">
-                        ` : isCreation ? `
-                            <i class="fa-solid fa-image unit-icon-placeholder"></i>
-                        ` : ''}
-                        ${isCreation ? `
-                            <button class="btn-icon-tiny" onclick="showUnitIconPicker('${path}')" title="Change icon">
-                                <i class="fa-solid fa-icons"></i>
-                            </button>
-                        ` : ''}
+                ${config.enableIcon && unit.icon ? `
+                    <span class="unit-icon">
+                        <img src="icons/${unit.icon}" alt="icon" style="width: 24px; height: 24px;">
                     </span>
                 ` : ''}
                 
@@ -594,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${config.enableDone && !isCreation ? `
                     <label class="checkbox-label">
                         <input type="checkbox" 
-                               ${unitIsCompleted ? 'checked' : ''} 
+                               ${isCompleted ? 'checked' : ''} 
                                onchange="toggleUnitCompletion('${path}', '${unit.id}')">
                         <span>Done</span>
                     </label>
@@ -956,100 +887,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentState = isCompleted(flow.id, unitId);
         setCompleted(flow.id, unitId, !currentState);
         
-        render();
-    };
-
-    // ===== WORKFLOW PROPERTY UPDATES =====
-    window.updateWorkflowProperty = (property, value) => {
-        const flow = getCurrentFlow();
-        if (!flow) return;
-        
-        flow[property] = value;
-        // Don't re-render for these properties to avoid losing focus
-        if (property === 'description') {
-            return;
-        }
-        render();
-    };
-
-    // ===== ICON PICKER =====
-    const getAvailableIcons = async () => {
-        // List of icons from the icons folder
-        // In a real app, this would fetch from server
-        return [
-            '3d-glasses.png', 'application-01.png', 'binocular.png', 'business-man-find.png',
-            'city.png', 'cloud-public-01.png', 'computer-desktop.png', 'data-copy.png',
-            'data-find.png', 'document-find.png', 'document-zoom-in-02.png', 'document-zoom-in-03.png',
-            'document-zoom-out-02.png', 'full-screen-expand.png', 'globe.png', 'id-view.png',
-            'instrument-binoculars.png', 'internet.png', 'lan.png', 'magnifying-glass.png',
-            'mail-server.png', 'message-mail.png', 'messages-information-01.png', 'node.png',
-            'nodes.png', 'polling-finger.png', 'preview.png', 'publish.png', 'row.png',
-            'search-find.png', 'search.png', 'server-01.png', 'server-up.png', 'shop.png',
-            'student-read-02.png', 'view-details-01.png', 'view-details.png', 'view-earth.png',
-            'view-incident.png', 'view-list.png', 'view-medium-icons-01.png', 'view-news.png',
-            'view-reset.png', 'view-settings.png', 'view-small-icons-01.png', 'view-small-icons.png',
-            'view.png', 'virtual-apps.png', 'web-01.png', 'web.png', 'window-01.png',
-            'window-delete.png', 'window-earth.png', 'window-horizontal-split.png', 'window-information.png',
-            'window-new-01.png', 'window-new-02.png', 'window-new-open.png', 'window-new.png',
-            'window-screen.png', 'window.png', 'zoom-in.png', 'zoom-out.png', 'zoom-scroll.png',
-            'zoom.png', 'zooming.png'
-        ];
-    };
-
-    window.showWorkflowIconPicker = async () => {
-        const icons = await getAvailableIcons();
-        const iconsGrid = icons.map(icon => `
-            <div class="icon-picker-item" onclick="selectWorkflowIcon('${icon}')">
-                <img src="icons/${icon}" alt="${icon}" title="${icon}">
-            </div>
-        `).join('');
-
-        const html = `
-            <div class="icon-picker-grid">${iconsGrid}</div>
-            <div style="margin-top: 1rem; text-align: right;">
-                <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-            </div>
-        `;
-
-        openModal('Select Workflow Icon', html);
-    };
-
-    window.selectWorkflowIcon = (iconFilename) => {
-        const flow = getCurrentFlow();
-        if (!flow) return;
-        
-        flow.icon = iconFilename;
-        closeModal();
-        render();
-    };
-
-    window.showUnitIconPicker = async (path) => {
-        const icons = await getAvailableIcons();
-        const iconsGrid = icons.map(icon => `
-            <div class="icon-picker-item" onclick="selectUnitIcon('${path}', '${icon}')">
-                <img src="icons/${icon}" alt="${icon}" title="${icon}">
-            </div>
-        `).join('');
-
-        const html = `
-            <div class="icon-picker-grid">${iconsGrid}</div>
-            <div style="margin-top: 1rem; text-align: right;">
-                <button class="btn-secondary" onclick="closeModal()">Cancel</button>
-            </div>
-        `;
-
-        openModal('Select Unit Icon', html);
-    };
-
-    window.selectUnitIcon = (path, iconFilename) => {
-        const flow = getCurrentFlow();
-        if (!flow) return;
-        
-        const unit = getObjectByPath(path, flow);
-        if (!unit) return;
-        
-        unit.icon = iconFilename;
-        closeModal();
         render();
     };
 
