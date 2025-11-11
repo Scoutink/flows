@@ -1,21 +1,18 @@
+// ===== DYNAMIC WORKFLOW MANAGER =====
+// Version 7.0 - Template-Based Dynamic Workflows
+
 document.addEventListener('DOMContentLoaded', () => {
-    // --- DOM ---
+    // DOM Elements
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
     const workflowRoot = document.getElementById('workflow-root');
     const modeSwitch = document.getElementById('mode-switch-checkbox');
-
     const saveStructureBtn = document.getElementById('save-structure-btn');
     const saveExecutionBtn = document.getElementById('save-execution-btn');
-
     const enforceSequenceCheckbox = document.getElementById('enforce-sequence-checkbox');
-
     const flowSelect = document.getElementById('flow-select');
     const flowNewBtn = document.getElementById('flow-new');
     const flowRenameBtn = document.getElementById('flow-rename');
-    const flowUnlinkBtn = document.getElementById('flow-unlink');
     const flowDeleteBtn = document.getElementById('flow-delete');
-    const linkedIndicator = document.getElementById('linked-indicator');
-
     const modal = {
         backdrop: document.getElementById('modal-backdrop'),
         title: document.getElementById('modal-title'),
@@ -23,38 +20,31 @@ document.addEventListener('DOMContentLoaded', () => {
         closeBtn: document.getElementById('modal-close-btn')
     };
 
-    // --- APP STATE ---
+    // ===== STATE =====
     let appState = {
         theme: 'light',
         currentMode: 'execution',
-        // Structure (creation) data with multi-flows
         workflow: {
             settings: { enforceSequence: true },
-            flows: [] // [{id,name,data:[controls...]}]
+            flows: []
         },
-        // Execution persistence separated by flow & evidence id
         executions: {
-            flows: {
-                // flowId: { completed: { evidenceId: true/false } }
-            }
+            flows: {}
         },
-        // Workflow links for structural synchronization
         workflowLinks: {
-            links: [] // [{groupId, workflows:[flowId1, flowId2]}]
+            links: []
         },
-        // current flow selection
+        templates: [],
         currentFlowId: null,
-        // selection & UI
         selectedActionPaths: {},
         expandedTextAreas: new Set(),
-        activeTag: null // per-flow execution tag filter
+        activeTag: null
     };
 
     let quillEditor = null;
 
-    // --- UTILITIES ---
-    const generateId = (prefix) =>
-        `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    // ===== UTILITIES =====
+    const generateId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
     const getAbsoluteUrl = (url) => {
         if (typeof url !== 'string' || url.trim() === '') return 'about:blank';
@@ -63,339 +53,90 @@ document.addEventListener('DOMContentLoaded', () => {
         return `https://${url}`;
     };
 
-    const ensureTagsArray = (node) => { if (!node.tags) node.tags = []; return node.tags; };
+    const ensureTagsArray = (node) => { 
+        if (!node.tags) node.tags = []; 
+        return node.tags; 
+    };
+
     const nodeHasTag = (node, tag) => (node.tags || []).includes(tag);
 
-    // --- THEME / MODE ---
+    const deepCopy = (obj) => JSON.parse(JSON.stringify(obj));
+
+    // ===== THEME / MODE =====
     const applyTheme = (theme) => {
         document.body.classList.toggle('dark-theme', theme === 'dark');
         appState.theme = theme;
         localStorage.setItem('workflowTheme', theme);
-        render();
     };
+
     const toggleTheme = () => applyTheme(appState.theme === 'light' ? 'dark' : 'light');
 
-    // --- FLOW HELPERS ---
-    const getCurrentFlow = () => appState.workflow.flows.find(f => f.id === appState.currentFlowId) || null;
-
-    const getObjectByPath = (path, flow) => {
-        const root = { data: flow.data };
-        return path.split('.').reduce((acc, key) => acc && acc[key], root);
-    };
-    const getParentAndKey = (path, flow) => {
-        const parts = path.split('.');
-        const key = parseInt(parts.pop(), 10);
-        return { parent: getObjectByPath(parts.join('.'), flow), key };
-    };
-
-    // --- EXECUTION STATE ---
-    const ensureExecFlow = (flowId) => {
-        if (!appState.executions.flows[flowId]) {
-            appState.executions.flows[flowId] = { completed: {} };
-        }
-        return appState.executions.flows[flowId];
-    };
-    const setCompleted = (flowId, evidenceId, value) => {
-        const exec = ensureExecFlow(flowId);
-        exec.completed[evidenceId] = !!value;
-    };
-    const getCompleted = (flowId, evidenceId, fallback) => {
-        const exec = ensureExecFlow(flowId);
-        const v = exec.completed[evidenceId];
-        return (typeof v === 'boolean') ? v : !!fallback;
-    };
-
-    // Build a map: shareKey => [{flowId, evidenceId}]
-    const sharedEvidenceIndex = () => {
-        const map = new Map();
-        appState.workflow.flows.forEach(flow => {
-            (flow.data || []).forEach(ctl => (ctl.subcategories || []).forEach(act => (act.subcategories || []).forEach(ev => {
-                if (ev.shareKey) {
-                    const arr = map.get(ev.shareKey) || [];
-                    arr.push({ flowId: flow.id, evidenceId: ev.id });
-                    map.set(ev.shareKey, arr);
-                }
-            })));
+    const applyModeStyles = () => {
+        const isCreation = appState.currentMode === 'creation';
+        document.querySelectorAll('.creation-only').forEach(el => {
+            el.style.display = isCreation ? '' : 'none';
         });
-        return map;
-    };
-
-    // Propagate an execution change across all flows that share the same shareKey
-    const propagateSharedExecution = (shareKey, value) => {
-        if (!shareKey) return;
-        const idx = sharedEvidenceIndex();
-        const entries = idx.get(shareKey) || [];
-        entries.forEach(({ flowId, evidenceId }) => {
-            setCompleted(flowId, evidenceId, value);
+        document.querySelectorAll('.execution-only').forEach(el => {
+            el.style.display = isCreation ? 'none' : '';
         });
     };
 
-    // Reconcile execution map after structure changes across ALL flows
-    const reconcileAllExecutions = () => {
-        const existingEvidenceIds = new Set();
-        appState.workflow.flows.forEach(flow => {
-            (flow.data || []).forEach(ctl => (ctl.subcategories || []).forEach(act => (act.subcategories || []).forEach(ev => {
-                existingEvidenceIds.add(ev.id);
-            })));
-        });
-        Object.keys(appState.executions.flows).forEach(fid => {
-            const comp = appState.executions.flows[fid]?.completed || {};
-            Object.keys(comp).forEach(eid => {
-                if (!existingEvidenceIds.has(eid)) delete comp[eid];
-            });
-        });
-    };
-
-    // When a flow is created via "share", initialize its execution from source flow
-    const initializeSharedExecutionFromSource = (newFlowId, srcFlowId) => {
-        const newFlow = appState.workflow.flows.find(f => f.id === newFlowId);
-        const srcExec = ensureExecFlow(srcFlowId);
-        (newFlow.data || []).forEach(ctl => (ctl.subcategories || []).forEach(act => (act.subcategories || []).forEach(ev => {
-            if (ev.shareKey) {
-                // find any evidence with same shareKey in src flow
-                const srcFlow = appState.workflow.flows.find(f => f.id === srcFlowId);
-                let srcEv = null;
-                (srcFlow.data || []).forEach(c => (c.subcategories || []).forEach(a => (a.subcategories || []).forEach(evv => {
-                    if (evv.shareKey === ev.shareKey) srcEv = evv;
-                })));
-                if (srcEv && typeof srcExec.completed[srcEv.id] === 'boolean') {
-                    setCompleted(newFlowId, ev.id, srcExec.completed[srcEv.id]);
-                }
-            }
-        })));
-    };
-
-    // reconcile execution when a specific flow structure changes (helper)
-    const reconcileExecution = (flowId) => {
-        const flow = appState.workflow.flows.find(f => f.id === flowId);
-        const exec = ensureExecFlow(flowId);
-        const existingIds = new Set();
-        (flow.data || []).forEach(c => (c.subcategories || []).forEach(a => (a.subcategories || []).forEach(e => existingIds.add(e.id))));
-        for (const id of Object.keys(exec.completed)) {
-            if (!existingIds.has(id)) delete exec.completed[id];
-        }
-    };
-
-    // --- SHARING (STRUCTURE) ---
-    const setShareKeyDeep = (node, shareKey) => {
-        node.shareKey = shareKey;
-        (node.subcategories || []).forEach(ch => setShareKeyDeep(ch, shareKey));
-    };
-    const propagateSharedEdit = (editedNode, level /* 'control'|'action'|'evidence' */) => {
-        if (!editedNode.shareKey) return;
-        appState.workflow.flows.forEach(flow => {
-            (flow.data || []).forEach(ctl => {
-                if (level === 'control' && ctl.shareKey === editedNode.shareKey) {
-                    Object.assign(ctl, { name: editedNode.name, text: editedNode.text, tags: editedNode.tags });
-                }
-                (ctl.subcategories || []).forEach((act) => {
-                    if (level !== 'control' && act.shareKey === editedNode.shareKey) {
-                        Object.assign(act, { name: editedNode.name, text: editedNode.text, tags: editedNode.tags });
-                    }
-                    (act.subcategories || []).forEach((ev) => {
-                        if (level === 'evidence' && ev.shareKey === editedNode.shareKey) {
-                            Object.assign(ev, { name: editedNode.name, text: editedNode.text, tags: editedNode.tags, grade: editedNode.grade });
-                        }
-                    });
-                });
-            });
-        });
-    };
-    const propagateSharedDelete = (shareKey, level) => {
-        appState.workflow.flows.forEach(flow => {
-            if (level === 'control') {
-                flow.data = (flow.data || []).filter(n => n.shareKey !== shareKey);
-            } else if (level === 'action') {
-                (flow.data || []).forEach(ctl => {
-                    ctl.subcategories = (ctl.subcategories || []).filter(a => a.shareKey !== shareKey);
-                });
-            } else if (level === 'evidence') {
-                (flow.data || []).forEach(ctl => (ctl.subcategories || []).forEach(act => {
-                    act.subcategories = (act.subcategories || []).filter(e => e.shareKey !== shareKey);
-                }));
-            }
-        });
-        reconcileAllExecutions();
-    };
-
-    // --- WORKFLOW LINKING ---
-    const getLinkedWorkflows = (flowId) => {
-        for (const linkGroup of appState.workflowLinks.links) {
-            if (linkGroup.workflows.includes(flowId)) {
-                return linkGroup.workflows.filter(id => id !== flowId);
-            }
-        }
-        return [];
-    };
-
-    const isWorkflowLinked = (flowId) => {
-        return appState.workflowLinks.links.some(group => group.workflows.includes(flowId));
-    };
-
-    const createLinkGroup = (sourceFlowId, targetFlowId) => {
-        const linkGroup = {
-            groupId: generateId('link'),
-            workflows: [sourceFlowId, targetFlowId]
-        };
-        appState.workflowLinks.links.push(linkGroup);
-        return linkGroup.groupId;
-    };
-
-    const addToLinkGroup = (flowId, existingFlowId) => {
-        for (const linkGroup of appState.workflowLinks.links) {
-            if (linkGroup.workflows.includes(existingFlowId)) {
-                if (!linkGroup.workflows.includes(flowId)) {
-                    linkGroup.workflows.push(flowId);
-                }
-                return linkGroup.groupId;
-            }
-        }
-        return null;
-    };
-
-    const unlinkWorkflow = (flowId) => {
-        appState.workflowLinks.links = appState.workflowLinks.links.map(group => {
-            return {
-                ...group,
-                workflows: group.workflows.filter(id => id !== flowId)
-            };
-        }).filter(group => group.workflows.length > 1); // Remove groups with only 1 workflow
-        saveWorkflowLinks();
-    };
-
-    const propagateToLinkedWorkflows = (sourceFlowId) => {
-        const linkedFlowIds = getLinkedWorkflows(sourceFlowId);
-        if (linkedFlowIds.length === 0) return;
-
-        const sourceFlow = appState.workflow.flows.find(f => f.id === sourceFlowId);
-        if (!sourceFlow) return;
-
-        linkedFlowIds.forEach(targetFlowId => {
-            const targetFlow = appState.workflow.flows.find(f => f.id === targetFlowId);
-            if (!targetFlow) return;
-
-            // Deep clone the structure from source
-            const clonedData = JSON.parse(JSON.stringify(sourceFlow.data));
-            
-            // Regenerate IDs for the target flow while preserving its execution state
-            const regenerateIds = (node) => {
-                const oldId = node.id;
-                node.id = generateId(node.id.split('-')[0]);
-                
-                // Map old ID to new ID for execution state
-                if (oldId.startsWith('evi-')) {
-                    const targetExec = appState.executions.flows[targetFlowId];
-                    if (targetExec && targetExec.completed[oldId] !== undefined) {
-                        // Preserve completion state with new ID
-                        targetExec.completed[node.id] = targetExec.completed[oldId];
-                        delete targetExec.completed[oldId];
-                    }
-                }
-                
-                (node.subcategories || []).forEach(regenerateIds);
-            };
-            
-            clonedData.forEach(regenerateIds);
-            targetFlow.data = clonedData;
-        });
-    };
-
-    // --- SERVER IO ---
-    async function loadAll() {
+    // ===== DATA LAYER =====
+    const loadTemplates = async () => {
         try {
-            const [wfRes, exRes, linksRes] = await Promise.all([
-                fetch(`workflow.json?t=${Date.now()}`),
-                fetch(`executions.json?t=${Date.now()}`),
-                fetch(`workflow-links.json?t=${Date.now()}`)
-            ]);
-            if (!wfRes.ok) throw new Error('Failed to load workflow.json');
-            appState.workflow = await wfRes.json();
-
-            // MIGRATION: legacy shape -> multi-flow
-            if (!Array.isArray(appState.workflow.flows)) {
-                const legacy = appState.workflow;
-                appState.workflow = {
-                    settings: legacy.settings || { enforceSequence: true },
-                    flows: [{
-                        id: generateId('flow'),
-                        name: 'Default Flow',
-                        data: legacy.data || []
-                    }]
-                };
-            }
-
-            if (exRes.ok) {
-                appState.executions = await exRes.json();
-                if (!appState.executions || !appState.executions.flows) appState.executions = { flows: {} };
-            } else {
-                appState.executions = { flows: {} };
-            }
-
-            if (linksRes.ok) {
-                appState.workflowLinks = await linksRes.json();
-                if (!appState.workflowLinks || !appState.workflowLinks.links) appState.workflowLinks = { links: [] };
-            } else {
-                appState.workflowLinks = { links: [] };
-            }
-
-            if (!appState.currentFlowId || !getCurrentFlow()) {
-                appState.currentFlowId = appState.workflow.flows[0]?.id || null;
-            }
-
-            initializeState();
+            const res = await fetch(`data/templates.json?t=${Date.now()}`);
+            if (!res.ok) throw new Error('Failed to load templates');
+            const data = await res.json();
+            return data.templates || [];
         } catch (e) {
-            console.error(e);
-            workflowRoot.innerHTML = `<div class="empty-state">Could not load data. Ensure <code>workflow.json</code> exists.</div>`;
+            console.error('Load templates error:', e);
+            return [];
         }
-    }
+    };
 
-    async function saveStructure() {
-        const btn = saveStructureBtn;
-        const original = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
-        btn.disabled = true;
+    const loadWorkflow = async () => {
         try {
-            // If in creation mode, propagate changes to linked workflows
-            if (appState.currentMode === 'creation') {
-                propagateToLinkedWorkflows(appState.currentFlowId);
-            }
+            const res = await fetch(`data/workflows.json?t=${Date.now()}`);
+            if (!res.ok) throw new Error('Failed to load workflows');
+            const data = await res.json();
+            appState.workflow = data;
+        } catch (e) {
+            console.error('Load workflow error:', e);
+            appState.workflow = { settings: { enforceSequence: true }, flows: [] };
+        }
+    };
 
+    const saveWorkflow = async () => {
+        try {
             const res = await fetch('save_workflow.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(appState.workflow)
             });
             const json = await res.json();
-            if (!res.ok || json.status !== 'success') throw new Error(json.message || 'Save failed');
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
-            setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 1200);
-        } catch (e) {
-            console.error(e);
-            btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Save Failed';
-            setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 1600);
-        }
-    }
-
-    async function saveWorkflowLinks() {
-        try {
-            const res = await fetch('save_workflow_links.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(appState.workflowLinks)
-            });
-            const json = await res.json();
-            if (!res.ok || json.status !== 'success') throw new Error(json.message || 'Link save failed');
+            if (json.status !== 'success') throw new Error(json.message);
+            alert('Structure saved successfully!');
             return true;
         } catch (e) {
-            console.error('Failed to save workflow links:', e);
+            console.error('Save workflow error:', e);
+            alert('Failed to save: ' + e.message);
             return false;
         }
-    }
-    async function saveExecution() {
-        const btn = saveExecutionBtn;
-        const original = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
-        btn.disabled = true;
+    };
+
+    const loadExecutions = async () => {
+        try {
+            const res = await fetch(`data/executions.json?t=${Date.now()}`);
+            if (!res.ok) throw new Error('Failed to load executions');
+            const data = await res.json();
+            appState.executions = data;
+        } catch (e) {
+            console.error('Load executions error:', e);
+            appState.executions = { flows: {} };
+        }
+    };
+
+    const saveExecutions = async () => {
         try {
             const res = await fetch('save_executions.php', {
                 method: 'POST',
@@ -403,1250 +144,1298 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(appState.executions)
             });
             const json = await res.json();
-            if (!res.ok || json.status !== 'success') throw new Error(json.message || 'Save failed');
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
-            setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 1200);
+            if (json.status !== 'success') throw new Error(json.message);
+            alert('Execution state saved!');
+            return true;
         } catch (e) {
-            console.error(e);
-            btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Save Failed';
-            setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 1600);
+            console.error('Save executions error:', e);
+            alert('Failed to save executions: ' + e.message);
+            return false;
         }
-    }
-
-    // --- MODAL ---
-    const openModal = (title, body, onOpen = () => {}) => {
-        modal.title.innerHTML = title;
-        modal.body.innerHTML = body;
-        modal.backdrop.classList.remove('hidden');
-        document.body.classList.add('modal-open');
-        onOpen();
-    };
-    const closeModal = () => {
-        modal.backdrop.classList.add('hidden');
-        modal.body.innerHTML = '';
-        document.body.classList.remove('modal-open');
-        quillEditor = null;
     };
 
-    // --- TAGS UI ---
-    // Collect all unique tags from current flow for autocomplete
-    const collectCurrentFlowTags = () => {
-        const flow = getCurrentFlow();
-        if (!flow) return [];
-        
-        const tagSet = new Set();
-        (flow.data || []).forEach(ctl => {
-            (ctl.tags || []).forEach(t => tagSet.add(t));
-            (ctl.subcategories || []).forEach(act => {
-                (act.tags || []).forEach(t => tagSet.add(t));
-                (act.subcategories || []).forEach(ev => {
-                    (ev.tags || []).forEach(t => tagSet.add(t));
-                });
+    const loadWorkflowLinks = async () => {
+        try {
+            const res = await fetch(`data/workflow-links.json?t=${Date.now()}`);
+            if (!res.ok) throw new Error('Failed to load workflow links');
+            const data = await res.json();
+            appState.workflowLinks = data;
+        } catch (e) {
+            console.error('Load workflow links error:', e);
+            appState.workflowLinks = { links: [] };
+        }
+    };
+
+    const saveWorkflowLinks = async () => {
+        try {
+            const res = await fetch('save_workflow_links.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(appState.workflowLinks)
             });
-        });
-        return Array.from(tagSet).sort((a, b) => a.localeCompare(b));
+            const json = await res.json();
+            if (json.status !== 'success') throw new Error(json.message);
+            return true;
+        } catch (e) {
+            console.error('Save workflow links error:', e);
+            return false;
+        }
     };
 
-    const renderTags = (node, path, flow) => {
-        ensureTagsArray(node);
-        const chips = node.tags.map((t, i) => {
-            const actionName = appState.currentMode === 'execution' ? 'filter-by-tag' : 'edit-tag';
-            const suffix = appState.currentMode === 'creation'
-                ? ` <button class="tag-delete" data-action="delete-tag" data-path="${path}" data-index="${i}" title="Remove tag">&times;</button>`
-                : '';
-            return `<span class="tag-item" data-action="${actionName}" data-path="${path}" data-index="${i}" data-tag="${t}">#${t}${suffix}</span>`;
-        }).join('');
-        
-        // Add input with autocomplete in creation mode
-        let addInput = '';
-        if (appState.currentMode === 'creation') {
-            const existingTags = collectCurrentFlowTags();
-            const datalistId = `tags-datalist-${path.replace(/\./g, '-')}`;
-            const datalistOptions = existingTags.map(t => `<option value="${t}"></option>`).join('');
-            addInput = `
-                <input class="add-tag-input" 
-                       data-path="${path}" 
-                       list="${datalistId}"
-                       placeholder="Add tag and press Enter" 
-                       autocomplete="off">
-                <datalist id="${datalistId}">${datalistOptions}</datalist>
-            `;
-        }
-        
-        return `<div class="evidence-tags">${chips}${addInput}</div>`;
+    // ===== FLOW HELPERS =====
+    const getCurrentFlow = () => {
+        return appState.workflow.flows.find(f => f.id === appState.currentFlowId) || null;
     };
 
-    // --- FILTERING (per-flow, with downward inheritance and original path preservation) ---
-    function copyActionWithAllEvidencePaths(action, actPath) {
-        return {
-            ...action,
-            _path: actPath,
-            subcategories: (action.subcategories || []).map((ev, ei) => ({
-                ...ev,
-                _path: `${actPath}.subcategories.${ei}`
-            }))
-        };
-    }
-    function filterWorkflowByTag(data, tag, basePath = 'data') {
-        const filteredControls = [];
-        (data || []).forEach((ctl, ci) => {
-            const ctlPath = `${basePath}.${ci}`;
-
-            if (nodeHasTag(ctl, tag)) {
-                const fullActions = (ctl.subcategories || []).map((act, ai) =>
-                    copyActionWithAllEvidencePaths(act, `${ctlPath}.subcategories.${ai}`));
-                filteredControls.push({ ...ctl, _path: ctlPath, subcategories: fullActions });
-                return;
-            }
-            const keptActions = [];
-            (ctl.subcategories || []).forEach((act, ai) => {
-                const actPath = `${ctlPath}.subcategories.${ai}`;
-                if (nodeHasTag(act, tag)) {
-                    keptActions.push(copyActionWithAllEvidencePaths(act, actPath));
-                    return;
-                }
-                const keptEvidence = [];
-                (act.subcategories || []).forEach((ev, ei) => {
-                    const evPath = `${actPath}.subcategories.${ei}`;
-                    if (nodeHasTag(ev, tag)) keptEvidence.push({ ...ev, _path: evPath });
-                });
-                if (keptEvidence.length > 0) {
-                    keptActions.push({ ...act, _path: actPath, subcategories: keptEvidence });
-                }
-            });
-            if (keptActions.length > 0) filteredControls.push({ ...ctl, _path: ctlPath, subcategories: keptActions });
-        });
-        return filteredControls;
-    }
-
-    // --- RENDERING ---
-    const render = () => {
-        document.body.className = `${appState.currentMode}-mode ${appState.theme}-theme`;
-
-        // flow select
-        flowSelect.innerHTML = appState.workflow.flows.map(f =>
-            `<option value="${f.id}" ${f.id === appState.currentFlowId ? 'selected' : ''}>${f.name}</option>`
-        ).join('');
-        const currentFlow = getCurrentFlow();
-        if (!currentFlow) {
-            workflowRoot.innerHTML = `<div class="empty-state">No flows. Create one to get started.</div>`;
-            return;
-        }
-
-        // Show linked indicator if current flow is linked
-        const isLinked = isWorkflowLinked(appState.currentFlowId);
-        if (linkedIndicator) {
-            linkedIndicator.style.display = isLinked ? 'inline-flex' : 'none';
-        }
-        if (flowUnlinkBtn) {
-            flowUnlinkBtn.style.display = isLinked ? 'inline-block' : 'none';
-        }
-
-        // top toggles
-        modeSwitch.checked = appState.currentMode === 'execution';
-        enforceSequenceCheckbox.checked = appState.workflow.settings.enforceSequence;
-
-        // tag banner
-        const banner = document.getElementById('tag-filter-banner');
-        const label = document.getElementById('active-tag-label');
-        const exportTagBtn = document.getElementById('export-tag-to-board');
-        if (appState.activeTag) {
-            label.textContent = `#${appState.activeTag}`;
-            banner.classList.remove('hidden');
-            if (exportTagBtn) exportTagBtn.classList.remove('hidden');
-        } else {
-            banner.classList.add('hidden');
-            if (exportTagBtn) exportTagBtn.classList.add('hidden');
-        }
-
-        // data (filtered or raw)
-        const rawData = currentFlow.data || [];
-        const filteredData = appState.activeTag ? filterWorkflowByTag(rawData, appState.activeTag) : null;
-        const dataToRender = filteredData || rawData;
-
-        workflowRoot.innerHTML = '';
-        if (dataToRender.length === 0) {
-            workflowRoot.innerHTML = `<div class="empty-state">${appState.activeTag ? 'No items match this tag.' : 'This flow is empty. Add a rule.'}</div>`;
-            return;
-        }
-
-        const frag = document.createDocumentFragment();
-        dataToRender.forEach((control, index) => {
-            const pathForControl = filteredData ? control._path : `data.${index}`;
-            frag.appendChild(renderControlNode(control, pathForControl, !!filteredData, currentFlow));
-        });
-        workflowRoot.appendChild(frag);
+    const getTemplate = (flow) => {
+        if (!flow || !flow.templateSnapshot) return null;
+        return flow.templateSnapshot;
     };
 
-    const calculateActionProgress = (action) => {
-        if (!action.subcategories || action.subcategories.length === 0) return { percent: 0, totalGrade: 0 };
-        const totalGrade = action.subcategories.reduce((s, ev) => s + (ev.grade || 0), 0);
-        const completedGrade = action.subcategories.reduce((s, ev) => {
-            const c = getCompleted(appState.currentFlowId, ev.id, ev.completed);
-            return s + (c ? (ev.grade || 0) : 0);
+    const getObjectByPath = (path, flow) => {
+        const root = { data: flow.data };
+        return path.split('.').reduce((acc, key) => acc && acc[key], root);
+    };
+
+    const getParentAndKey = (path, flow) => {
+        const parts = path.split('.');
+        const key = parseInt(parts.pop(), 10);
+        return { parent: getObjectByPath(parts.join('.'), flow), key };
+    };
+
+    // ===== EXECUTION STATE =====
+    const ensureExecFlow = (flowId) => {
+        if (!appState.executions.flows[flowId]) {
+            appState.executions.flows[flowId] = { completed: {} };
+        }
+        return appState.executions.flows[flowId];
+    };
+
+    const setCompleted = (flowId, unitId, value) => {
+        const exec = ensureExecFlow(flowId);
+        exec.completed[unitId] = !!value;
+    };
+
+    const isCompleted = (flowId, unitId) => {
+        const exec = ensureExecFlow(flowId);
+        return exec.completed[unitId] === true;
+    };
+
+    // ===== CUMULATIVE GRADE CALCULATOR =====
+    const calculateCumulativeGrade = (unit, template, depth) => {
+        const level = template.levels[depth];
+        if (!level) return unit.grade || 0;
+
+        // If not cumulative or no children, return own grade
+        if (!level.unitConfig.gradeCumulative || depth >= template.levels.length - 1) {
+            return unit.grade || 0;
+        }
+
+        // Cumulative: sum of children
+        if (!unit.subcategories || unit.subcategories.length === 0) {
+            return 0;
+        }
+
+        return unit.subcategories.reduce((sum, child) => {
+            return sum + calculateCumulativeGrade(child, template, depth + 1);
         }, 0);
-        const percent = totalGrade > 0 ? (completedGrade / totalGrade) * 100 : 0;
-        return { percent, totalGrade };
-    };
-    const calculateControlProgress = (control) => {
-        if (!control.subcategories || control.subcategories.length === 0) return 0;
-        const totalProgress = control.subcategories.reduce((sum, action) => sum + calculateActionProgress(action).percent, 0);
-        return totalProgress / control.subcategories.length;
     };
 
-    function renderControlNode(control, path, isFiltered, flow) {
-        if (!appState.selectedActionPaths[path]) {
-            const firstAction = (control.subcategories || [])[0];
-            if (firstAction) {
-                appState.selectedActionPaths[path] = isFiltered && firstAction._path ? firstAction._path : `${path}.subcategories.0`;
+    const updateAllCumulativeGrades = (units, template, depth = 0) => {
+        if (!units || !template) return;
+
+        units.forEach(unit => {
+            const level = template.levels[depth];
+            if (level && level.unitConfig.gradeCumulative) {
+                unit.grade = calculateCumulativeGrade(unit, template, depth);
             }
-        }
-        const controlOriginal = isFiltered ? getObjectByPath(path, flow) : control;
-        const controlProgress = calculateControlProgress(controlOriginal);
 
-        const el = document.createElement('div');
-        el.className = 'control-node';
-        el.dataset.path = path;
-        el.innerHTML = `
-            <div class="control-header">
-              <div class="control-header-top">
-                <div class="control-title">${control.name}</div>
-                <div class="controls creation-only">
-                  <button class="btn-add" title="Add Action" data-action="add-action" data-path="${path}"><i class="fa-solid fa-plus"></i></button>
-                  <button class="btn-edit" title="Edit Control Name" data-action="edit-name" data-path="${path}" data-level="control"><i class="fa-solid fa-pen"></i></button>
-                  <button class="btn-add" title="Clone/Share existing" data-action="import-node" data-path="${path}" data-level="action"><i class="fa-solid fa-copy"></i></button>
-                  <button class="btn-delete" title="Delete Control" data-action="delete-node" data-path="${path}" data-level="control"><i class="fa-solid fa-trash-can"></i></button>
-                </div>
-                <div class="controls execution-only">
-                  <button class="btn-export-board" title="Export to Project Board" data-action="export-to-board" data-path="${path}"><i class="fa-solid fa-diagram-project"></i> Create Board</button>
-                </div>
-              </div>
-              ${renderTags(getObjectByPath(path, flow), path, flow)}
-              <div class="progress-bar-container"><div class="progress-bar" style="width: ${controlProgress}%;"></div></div>
-            </div>
-            <div class="registers-container">
-                ${renderActionPanel(control, path, isFiltered, flow)}${renderEvidencePanel(control, path, isFiltered, flow)}
-            </div>`;
-        return el;
-    }
-
-    function renderActionPanel(control, controlPath, isFiltered, flow) {
-        const actions = control.subcategories || [];
-        let itemsHtml = actions.map(action => {
-            const actionPath = isFiltered && action._path ? action._path :
-                `${controlPath}.subcategories.${(getObjectByPath(controlPath, flow).subcategories || []).indexOf(action)}`;
-            const isSelected = appState.selectedActionPaths[controlPath] === actionPath;
-
-            const { percent, totalGrade } = calculateActionProgress(getObjectByPath(actionPath, flow));
-            const validationError = totalGrade !== 5.0 && (getObjectByPath(actionPath, flow).subcategories || []).length > 0
-                ? `<div class="validation-error">Grade total is ${totalGrade.toFixed(1)}/5.0</div>` : '';
-            const tagsHtml = renderTags(getObjectByPath(actionPath, flow), actionPath, flow);
-
-            return `
-              <div class="action-item ${isSelected ? 'selected' : ''}" data-action="select-action" data-path="${actionPath}" data-control-path="${controlPath}">
-                <div class="action-item-header">
-                  <div class="action-name">${action.name}</div>
-                  <div class="controls creation-only">
-                    <button class="btn-add" title="Add Evidence" data-action="add-evidence" data-path="${actionPath}"><i class="fa-solid fa-plus"></i></button>
-                    <button class="btn-edit" title="Edit Action" data-action="edit-name" data-path="${actionPath}" data-level="action"><i class="fa-solid fa-pen"></i></button>
-                    <button class="btn-add" title="Clone/Share existing" data-action="import-node" data-path="${actionPath}" data-level="evidence"><i class="fa-solid fa-copy"></i></button>
-                    <button class="btn-delete" title="Delete Action" data-action="delete-node" data-path="${actionPath}" data-level="action"><i class="fa-solid fa-trash-can"></i></button>
-                  </div>
-                </div>
-                <div class="action-text creation-only">${getObjectByPath(actionPath, flow).text || ''}</div>
-                ${tagsHtml}
-                <div class="progress-bar-container"><div class="progress-bar" style="width: ${percent}%;"></div></div>
-                ${validationError}
-              </div>`;
-        }).join('');
-        if (itemsHtml === '') itemsHtml = `<div class="empty-state">No actions yet.</div>`;
-        return `<div class="action-register-panel"><h3 class="panel-title creation-only"><i class="fa-solid fa-person-running"></i> Actions</h3>${itemsHtml}</div>`;
-    }
-
-    function renderEvidencePanel(controlFilteredOrFull, controlPath, isFiltered, flow) {
-        let selectedActionPath = appState.selectedActionPaths[controlPath];
-        if (isFiltered) {
-            const filteredActions = controlFilteredOrFull.subcategories || [];
-            const filteredActionPaths = new Set(filteredActions.map(a => a._path));
-            if (!filteredActionPaths.has(selectedActionPath)) {
-                const first = filteredActions[0];
-                selectedActionPath = first ? first._path : null;
-                appState.selectedActionPaths[controlPath] = selectedActionPath;
+            if (unit.subcategories && depth < template.levels.length - 1) {
+                updateAllCumulativeGrades(unit.subcategories, template, depth + 1);
             }
-        }
-        if (!selectedActionPath) {
-            return `<div class="evidence-register-panel"><div class="empty-state">Select an action, or add evidence.</div></div>`;
-        }
-
-        let evidenceItems = [];
-        if (isFiltered) {
-            const filteredAction = (controlFilteredOrFull.subcategories || []).find(a => a._path === selectedActionPath);
-            evidenceItems = filteredAction ? (filteredAction.subcategories || []) : [];
-        } else {
-            const fullAction = getObjectByPath(selectedActionPath, flow);
-            evidenceItems = (fullAction && fullAction.subcategories) ? fullAction.subcategories : [];
-        }
-
-        const itemsHtml = evidenceItems.map(evidence => {
-            const evidencePath = isFiltered && evidence._path ? evidence._path :
-                selectedActionPath + `.subcategories.${(getObjectByPath(selectedActionPath, flow).subcategories || []).indexOf(evidence)}`;
-            return renderEvidenceNode(getObjectByPath(evidencePath, flow), evidencePath);
-        }).join('') || `<div class="empty-state">No evidence for this action${appState.activeTag ? ' with this tag' : ''}.</div>`;
-
-        return `<div class="evidence-register-panel"><h3 class="panel-title creation-only"><i class="fa-solid fa-receipt"></i> Evidence</h3>${itemsHtml}</div>`;
-    }
-
-    function renderEvidenceNode(node, path) {
-        const isDone = getCompleted(appState.currentFlowId, node.id, node.completed);
-        const containerClasses = ['evidence-node'];
-        if (appState.currentMode === 'execution') {
-            if (node.isLocked) containerClasses.push('locked');
-            if (node.isActive) containerClasses.push('active');
-        }
-        const gradeOptions = [0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0];
-        const gradeSelector = `
-            <div class="evidence-grade-selector creation-only">
-                <label for="grade-${node.id}">Grade:</label>
-                <select id="grade-${node.id}" data-action="change-grade" data-path="${path}">
-                    ${gradeOptions.map(g => `<option value="${g}" ${node.grade === g ? 'selected' : ''}>${g.toFixed(1)}</option>`).join('')}
-                </select>
-            </div>`;
-        let descriptionHtml = '';
-        if (appState.currentMode === 'creation') {
-            descriptionHtml = `<textarea class="evidence-text-creation" data-action="edit-text" data-path="${path}" placeholder="Enter description...">${node.text || ''}</textarea>`;
-        } else if (node.text) {
-            descriptionHtml = `<p class="evidence-text-execution">${node.text}</p>`;
-        }
-        const tagsHtml = renderTags(node, path, getCurrentFlow());
-        const footerControlsHtml = `
-            <div class="footer-controls creation-only">
-                <button title="Add Link" data-action="add-attachment" data-type="link" data-path="${path}"><i class="fa-solid fa-link"></i></button>
-                <button title="Add Image URL" data-action="add-attachment" data-type="image" data-path="${path}"><i class="fa-solid fa-image"></i></button>
-                <button title="Add Note" data-action="add-attachment" data-type="note" data-path="${path}"><i class="fa-solid fa-book-open"></i></button>
-                <button title="Add Comment" data-action="add-attachment" data-type="comment" data-path="${path}"><i class="fa-solid fa-comment"></i></button>
-            </div>`;
-        return `
-          <div class="${containerClasses.join(' ')}" data-path="${path}">
-            <div class="evidence-header">
-              <div class="evidence-title ${isDone ? 'completed' : ''}">
-                <input type="checkbox" class="evidence-checkbox execution-only" data-action="toggle-complete" data-path="${path}" ${isDone ? 'checked' : ''} id="checkbox-${node.id}">
-                <label for="checkbox-${node.id}" class="title-label">${node.name}</label>
-              </div>
-              ${gradeSelector}
-              <div class="controls creation-only">
-                <button class="btn-manage" title="Manage Attachments" data-action="manage-attachments" data-path="${path}"><i class="fa-solid fa-gear"></i></button>
-                <button class="btn-edit" title="Edit Evidence Name" data-action="edit-name" data-path="${path}" data-level="evidence"><i class="fa-solid fa-pen"></i></button>
-                <button class="btn-delete" title="Delete Evidence" data-action="delete-node" data-path="${path}" data-level="evidence"><i class="fa-solid fa-trash-can"></i></button>
-              </div>
-            </div>
-            ${descriptionHtml}
-            ${tagsHtml}
-            <div class="evidence-footer">
-              <div class="footer-item-list">
-                ${(node.footer?.links || []).map((link, i) => `<div class="footer-item" title="${getAbsoluteUrl(link.url)}" data-action="show-link-in-modal" data-path="${path}" data-index="${i}"><i class="fa-solid fa-link"></i> ${link.text}</div>`).join('')}
-                ${(node.footer?.images || []).map((img, i) => `<div class="footer-item" title="View Image" data-action="show-image-in-modal" data-path="${path}" data-index="${i}"><i class="fa-solid fa-image"></i> Image ${i+1}</div>`).join('')}
-                ${(node.footer?.notes || []).map((note, i) => `<div class="footer-item" title="View Note" data-action="show-note-content" data-path="${path}" data-index="${i}"><i class="fa-solid fa-book-open"></i> ${note.title}</div>`).join('')}
-                <span class="execution-only">
-                  ${(node.footer?.comments || []).length > 0 ? `<div class="footer-item" data-action="show-view-modal" data-type="comments" data-path="${path}"><i class="fa-solid fa-comment"></i> Comments (${node.footer.comments.length})</div>` : ''}
-                </span>
-              </div>
-              ${footerControlsHtml}
-            </div>
-          </div>`;
-    }
-
-    // --- EXECUTION LOCKING (sequence) ---
-    function updateAllExecutionStates(flow) {
-        const enforce = appState.workflow.settings?.enforceSequence;
-        (flow.data || []).forEach(control => {
-            (control.subcategories || []).forEach(action => {
-                let foundFirstIncomplete = false;
-                (action.subcategories || []).forEach(ev => {
-                    const done = getCompleted(appState.currentFlowId, ev.id, ev.completed);
-                    if (!enforce) {
-                        ev.isLocked = false; ev.isActive = false; return;
-                    }
-                    if (!foundFirstIncomplete && !done) {
-                        ev.isLocked = false; ev.isActive = true; foundFirstIncomplete = true;
-                    } else {
-                        ev.isActive = false; ev.isLocked = foundFirstIncomplete;
-                    }
-                });
-            });
         });
-    }
-
-    // --- ATTACHMENTS & VIEWERS ---
-    const showLinkModal = (path, index) => {
-        const node = getObjectByPath(path, getCurrentFlow());
-        const link = node.footer.links[index];
-        const safeUrl = getAbsoluteUrl(link.url);
-        openModal(link.text, `
-            <div class="modal-link-container">
-                <iframe src="${safeUrl}" class="modal-link-frame" sandbox="allow-scripts allow-same-origin"></iframe>
-                <div class="modal-link-actions">
-                    <a href="${safeUrl}" target="_blank" class="open-external"><i class="fa-solid fa-up-right-from-square"></i> Open in New Tab</a>
-                </div>
-            </div>
-        `);
-    };
-    const showViewOnlyModal = (path, type) => {
-        const node = getObjectByPath(path, getCurrentFlow());
-        const { images = [], comments = [] } = node.footer || {};
-        if (type === 'images') {
-            openModal(`Images for: ${node.name}`, `<div class="modal-gallery">${images.map(img => `<img class="modal-gallery-image" src="${getAbsoluteUrl(img)}" alt="Workflow Image">`).join('')}</div>`);
-        } else if (type === 'comments') {
-            openModal(`Comments for: ${node.name}`, `<ul class="modal-list">${comments.map(c => `<li class="modal-item"><span class="modal-item-text">${c}</span></li>`).join('')}</ul>`);
-        }
     };
 
-    function renderModalList(items, path, type) {
-        if (!items || items.length === 0) return `<div class="empty-state">No ${type}s added yet.</div>`;
-        return `<ul class="modal-list">${
-            items.map((item, index) => {
-                let itemText;
-                if (type === 'link') itemText = `<a href="${getAbsoluteUrl(item.url)}" target="_blank">${item.text}</a> <span class="url-preview">(${item.url})</span>`;
-                else if (type === 'image') itemText = `<div class="image-preview"><img src="${getAbsoluteUrl(item)}" alt="preview" /> ${item}</div>`;
-                else if (type === 'note') itemText = item.title || 'Untitled Note';
-                else itemText = item;
-                return `
-                    <li class="modal-item">
-                        <div class="modal-item-text">${itemText}</div>
-                        <div class="modal-item-controls">
-                            <button class="btn-edit" title="Edit" data-action="edit-${type}" data-path="${path}" data-index="${index}"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn-delete" title="Delete" data-action="delete-${type}" data-path="${path}" data-index="${index}"><i class="fa-solid fa-trash-can"></i></button>
-                        </div>
-                    </li>`;
-            }).join('')
-        }</ul>`;
-    }
-    const showManagementModal = (path) => {
-        const node = getObjectByPath(path, getCurrentFlow());
-        const { links = [], images = [], notes = [], comments = [] } = node.footer || {};
-        const linksHtml = `<div class="modal-section"><h4><i class="fa-solid fa-link"></i> Links</h4>${renderModalList(links, path, 'link')}</div>`;
-        const imagesHtml = `<div class="modal-section"><h4><i class="fa-solid fa-image"></i> Images</h4>${renderModalList(images, path, 'image')}</div>`;
-        const notesHtml = `<div class="modal-section"><h4><i class="fa-solid fa-book-open"></i> Notes</h4>${renderModalList(notes, path, 'note')}</div>`;
-        const commentsHtml = `<div class="modal-section"><h4><i class="fa-solid fa-comment"></i> Comments</h4>${renderModalList(comments, path, 'comment')}</div>`;
-        openModal(`Manage Attachments for: ${node.name}`, linksHtml + imagesHtml + notesHtml + commentsHtml);
-    };
-    const showAddAttachmentModal = (path, type) => {
-        const title = `Add New ${type==='note'?'Note':type[0].toUpperCase()+type.slice(1)}`;
-        let formHtml = `<form class="modal-form" data-action="submit-attachment" data-path="${path}" data-type="${type}">`;
-        if (type === 'link') {
-            formHtml += `<label for="modal-input-url">URL</label><input type="text" id="modal-input-url" placeholder="e.g., google.com" required>
-                         <label for="modal-input-text">Link Text</label><input type="text" id="modal-input-text" placeholder="e.g., Google Search" required>`;
-        } else if (type === 'image') {
-            formHtml += `<label for="modal-input-url">Image URL or Path</label><input type="text" id="modal-input-url" placeholder="https://example.com/image.png" required>`;
-        } else if (type === 'comment') {
-            formHtml += `<label for="modal-input-text">Comment</label><textarea id="modal-input-text" required></textarea>`;
-        } else if (type === 'note') {
-            formHtml += `<label for="modal-input-text">Note Title</label><input type="text" id="modal-input-text" placeholder="e.g., Important Details" required>
-                         <div id="quill-editor-container"><div id="quill-editor"></div></div>`;
+    // ===== PROGRESS BAR CALCULATOR =====
+    const calculateProgress = (unit, template, depth) => {
+        if (!unit.subcategories || unit.subcategories.length === 0) {
+            return 0;
         }
-        formHtml += `<div class="modal-form-actions"><button type="button" class="cancel" data-action="cancel-modal">Cancel</button><button type="submit" class="save">Save</button></div></form>`;
-        openModal(title, formHtml, () => { if (type === 'note') { quillEditor = new Quill('#quill-editor', { theme: 'snow' }); } });
+
+        const childLevel = template.levels[depth + 1];
+        if (!childLevel || !childLevel.unitConfig.enableDone) {
+            return 0;
+        }
+
+        const flow = getCurrentFlow();
+        if (!flow) return 0;
+
+        const total = unit.subcategories.length;
+        const completed = unit.subcategories.filter(child => 
+            childLevel.unitConfig.enableDone && isCompleted(flow.id, child.id)
+        ).length;
+
+        return Math.round((completed / total) * 100);
     };
 
-    // --- GLOBAL FILTER (cross-flow) with tag autocomplete ---
-    // Global tag filter removed - now using per-flow filtering only
-    // Tag filtering works by clicking on any tag, which filters the current board
-
-    // --- EVENTS / ACTIONS ---
-    function handleAppClick(e) {
-        const btn = e.target.closest('[data-action]');
-        if (!btn) return;
-
-        const action = btn.dataset.action;
-        const path = btn.dataset.path;
-        const index = btn.dataset.index;
-        const type = btn.dataset.type;
-        const level = btn.dataset.level;
-        const controlPath = btn.dataset.controlPath;
-        const flow = getCurrentFlow();
-
-        // Restrict: creation-only actions are gated also in JS
-        const creationOnlyActions = new Set([
-            'add-category', 'add-action', 'add-evidence',
-            'edit-name', 'delete-node',
-            'add-attachment', 'manage-attachments', 'import-node'
-        ]);
-        if (appState.currentMode !== 'creation' && creationOnlyActions.has(action)) return;
-
-        // Allowed interactions in execution
-        const allowedExecution = [
-            'toggle-complete','show-link-in-modal','show-image-in-modal','show-note-content','show-view-modal',
-            'select-action','cancel-modal','filter-by-tag','clear-tag-filter','export-to-board'
-        ];
-        if (appState.currentMode === 'execution' && !allowedExecution.includes(action)) return;
-
-        let shouldRender = true;
-        const node = path ? getObjectByPath(path, flow) : null;
-
-        const actions = {
-            // ----- STRUCTURE -----
-            'add-category': () => {
-                const n = prompt("Enter new Control name:");
-                if (!n) return;
-                flow.data = flow.data || [];
-                const ctl = { id: generateId('cat'), name: n, text: '', tags: [], subcategories: [] };
-                flow.data.push(ctl);
-                openDistributeNewNodeModal({ node: ctl, level: 'control', flow });
-            },
-            'add-action': () => {
-                const n = prompt("Enter new Action name:");
-                if (!n) return;
-                node.subcategories = node.subcategories || [];
-                const act = { id: generateId('act'), name: n, text: '', tags: [], completed: false, subcategories: [] };
-                node.subcategories.push(act);
-                openDistributeNewNodeModal({ node: act, level: 'action', flow, parentPath: path });
-            },
-            'add-evidence': () => {
-                const n = prompt("Enter new Evidence name:");
-                if (!n) return;
-                node.subcategories = node.subcategories || [];
-                const evi = {
-                    id: generateId('evi'),
-                    name: n, text: '', completed: false, grade: 1.0, tags: [],
-                    footer: { links: [], images: [], notes: [], comments: [] },
-                    subcategories: []
-                };
-                node.subcategories.push(evi);
-                openDistributeNewNodeModal({ node: evi, level: 'evidence', flow, parentPath: path });
-            },
-            'edit-name': () => {
-                const n = prompt("Enter new name:", node.name);
-                if (n === null) return;
-                node.name = n;
-                const lvl = btn.dataset.level;
-                if (lvl) propagateSharedEdit(node, lvl);
-            },
-            'delete-node': () => {
-                const { parent, key } = getParentAndKey(path, flow);
-                if (!confirm(`Delete "${node.name}"?`)) return;
-                const shareKey = node.shareKey;
-                const lvl = btn.dataset.level;
-                parent.splice(key, 1);
-                if (shareKey) propagateSharedDelete(shareKey, lvl);
-                reconcileExecution(appState.currentFlowId);
-                reconcileAllExecutions();
-            },
-            'select-action': () => { appState.selectedActionPaths[controlPath] = path; },
-
-            // ----- IMPORT / CLONE / SHARE (creation only) -----
-            'import-node': () => {
-                const lvl = btn.dataset.level; // import actions into control OR evidences into action
-                openImportModal(path, lvl);
-                shouldRender = false;
-            },
-
-            // ----- ATTACHMENTS -----
-            'add-attachment': () => { showAddAttachmentModal(path, type); shouldRender = false; },
-            'manage-attachments': () => { showManagementModal(path); shouldRender = false; },
-            'show-link-in-modal': () => { showLinkModal(path, index); shouldRender = false; },
-            'show-image-in-modal': () => { showViewOnlyModal(path, 'images'); shouldRender = false; },
-            'show-note-content': () => {
-                const nNote = node.footer.notes[index];
-                openModal(nNote.title, `<div class="note-view-content ql-snow"><div class="ql-editor">${nNote.content}</div></div>`);
-                shouldRender = false;
-            },
-            'show-view-modal': () => {
-                const modalType = btn.dataset.type;
-                showViewOnlyModal(path, modalType);
-                shouldRender = false;
-            },
-            'cancel-modal': () => { closeModal(); shouldRender = false; },
-
-            // ----- TAGS -----
-            'delete-tag': () => { ensureTagsArray(node).splice(parseInt(index, 10), 1); },
-            'filter-by-tag': () => { appState.activeTag = btn.dataset.tag; },
-            'clear-tag-filter': () => { appState.activeTag = null; },
-            
-            // ----- PPM INTEGRATION -----
-            'export-to-board': () => { exportControlToBoard(node, appState.currentFlowId); shouldRender = false; },
-        };
-
-        if (actions[action]) {
-            actions[action]();
-            updateAllExecutionStates(flow);
-            if (shouldRender) render();
-        }
-    }
-
-    function handleAppChange(e) {
-        const t = e.target;
-        const target = t.closest('[data-action]');
-        const flow = getCurrentFlow();
-        if (!target) return;
-
-        const action = target.dataset.action;
-        if (action === 'toggle-complete') {
-            const node = getObjectByPath(target.dataset.path, flow);
-            setCompleted(appState.currentFlowId, node.id, t.checked);
-            // synchronize across flows if shared
-            if (node.shareKey) {
-                propagateSharedExecution(node.shareKey, t.checked);
-            }
-            updateAllExecutionStates(flow);
-            render();
-        } else if (action === 'change-grade') {
-            // Grade is structural (creation) and syncs for shared nodes
-            const node = getObjectByPath(target.dataset.path, flow);
-            node.grade = parseFloat(t.value);
-            propagateSharedEdit(node, 'evidence');
-            render();
-        }
-    }
-
-    // text edit (creation)
-    document.addEventListener('input', (e) => {
-        const ta = e.target.closest('textarea[data-action="edit-text"]');
-        if (!ta) return;
-        const flow = getCurrentFlow();
-        const node = getObjectByPath(ta.dataset.path, flow);
-        node.text = ta.value;
-        const parts = ta.dataset.path.split('.');
-        const lvl = parts.includes('subcategories') ? (parts.filter(p=>p==='subcategories').length===2?'evidence':'action') : 'control';
-        propagateSharedEdit(node, lvl);
-    });
-
-    // tag add (enter)
-    document.addEventListener('keydown', (e) => {
-        const input = e.target;
-        if (input && input.matches('.add-tag-input') && e.key === 'Enter') {
-            e.preventDefault();
-            const flow = getCurrentFlow();
-            const path = input.dataset.path;
-            const node = getObjectByPath(path, flow);
-            const val = (input.value || '').trim();
-            if (!val) return;
-            const tags = ensureTagsArray(node);
-            if (!tags.includes(val)) tags.push(val);
-            input.value = '';
-            const parts = path.split('.');
-            const lvl = parts.filter(p => p === 'subcategories').length === 0 ? 'control'
-                : parts.filter(p => p === 'subcategories').length === 1 ? 'action' : 'evidence';
-            propagateSharedEdit(node, lvl);
-            render();
-        }
-    });
-
-    // attachment forms
-    document.addEventListener('submit', (e) => {
-        const form = e.target.closest('form[data-action="submit-attachment"]');
-        if (!form) return;
-        e.preventDefault();
-        const flow = getCurrentFlow();
-        const path = form.dataset.path;
-        const type = form.dataset.type;
-        const node = getObjectByPath(path, flow);
-        node.footer = node.footer || { links: [], images: [], notes: [], comments: [] };
-        if (type === 'link') {
-            const url = document.getElementById('modal-input-url').value.trim();
-            const text = document.getElementById('modal-input-text').value.trim();
-            if (url && text) node.footer.links.push({ url, text });
-        } else if (type === 'image') {
-            const url = document.getElementById('modal-input-url').value.trim();
-            if (url) node.footer.images.push(url);
-        } else if (type === 'comment') {
-            const text = document.getElementById('modal-input-text').value.trim();
-            if (text) node.footer.comments.push(text);
-        } else if (type === 'note') {
-            const title = document.getElementById('modal-input-text').value.trim();
-            const content = quillEditor ? quillEditor.root.innerHTML : '';
-            node.footer.notes.push({ title, content });
-        }
-        closeModal();
-        render();
-    });
-
-    // edit/delete inside modal lists
-    document.addEventListener('click', (e) => {
-        const btn = e.target.closest('.modal-item-controls [data-action]');
-        if (!btn) return;
-        const { action, path, index } = btn.dataset;
-        const flow = getCurrentFlow();
-        const node = getObjectByPath(path, flow);
-        if (!node || !node.footer) return;
-
-        if (action === 'delete-link') node.footer.links.splice(index, 1);
-        else if (action === 'delete-image') node.footer.images.splice(index, 1);
-        else if (action === 'delete-comment') node.footer.comments.splice(index, 1);
-        else if (action === 'delete-note') node.footer.notes.splice(index, 1);
-        else if (action === 'edit-link') {
-            const item = node.footer.links[index];
-            const newUrl = prompt('Edit URL:', item.url);
-            const newText = prompt('Edit text:', item.text);
-            if (newUrl !== null && newText !== null) { item.url = newUrl; item.text = newText; }
-        } else if (action === 'edit-image') {
-            const newUrl = prompt('Edit image URL:', node.footer.images[index]);
-            if (newUrl !== null) node.footer.images[index] = newUrl;
-        } else if (action === 'edit-comment') {
-            const newText = prompt('Edit comment:', node.footer.comments[index]);
-            if (newText !== null) node.footer.comments[index] = newText;
-        } else if (action === 'edit-note') {
-            const note = node.footer.notes[index];
-            openModal('Edit Note', `
-              <form class="modal-form" data-action="submit-edit-note" data-path="${path}" data-index="${index}">
-                <label for="modal-input-text">Note Title</label>
-                <input type="text" id="modal-input-text" value="${note.title}">
-                <div id="quill-editor-container"><div id="quill-editor"></div></div>
-                <div class="modal-form-actions">
-                  <button type="button" class="cancel" data-action="cancel-modal">Cancel</button>
-                  <button type="submit" class="save">Save</button>
-                </div>
-              </form>
-            `, () => { quillEditor = new Quill('#quill-editor', { theme: 'snow' }); quillEditor.root.innerHTML = note.content; });
+    // ===== TEMPLATE-BASED WORKFLOW CREATION =====
+    const createFlowFromTemplate = async (name, templateId) => {
+        const template = appState.templates.find(t => t.id === templateId);
+        if (!template) {
+            alert('Template not found!');
             return;
         }
-        showManagementModal(path);
-    });
 
-    document.addEventListener('submit', (e) => {
-        const form = e.target.closest('form[data-action="submit-edit-note"]');
-        if (!form) return;
-        e.preventDefault();
-        const flow = getCurrentFlow();
-        const path = form.dataset.path;
-        const idx = parseInt(form.dataset.index, 10);
-        const node = getObjectByPath(path, flow);
-        const title = document.getElementById('modal-input-text').value.trim();
-        const content = quillEditor ? quillEditor.root.innerHTML : '';
-        node.footer.notes[idx] = { title, content };
-        closeModal();
-        showManagementModal(path);
-    });
+        const flow = {
+            id: generateId('flow'),
+            name: name,
+            templateId: template.id,
+            templateSnapshot: deepCopy(template),
+            data: [],
+            icon: null,
+            description: '',
+            enforceSequence: template.workflowConfig.enableSequentialOrder ? false : null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
 
-    // --- IMPORT MODAL (clone/share existing nodes at same level into current flow) ---
-    function openImportModal(targetPath, level) {
-        const items = [];
-        appState.workflow.flows.forEach(flow => {
-            if (level === 'action') {
-                (flow.data || []).forEach(ctl => items.push({ flow, level, node: ctl }));
-            } else if (level === 'evidence') {
-                (flow.data || []).forEach(ctl => (ctl.subcategories || []).forEach(act => items.push({ flow, level, node: act })));
-            }
-        });
-        const rows = items.map((it, i) => `<option value="${i}">${it.flow.name} • ${it.level === 'action' ? 'Control' : 'Action'}: ${it.node.name}</option>`).join('');
-        const body = `
-            <form id="import-form" class="modal-form">
-                <label>Select source ${level === 'action' ? 'Control' : 'Action'}</label>
-                <select id="import-source">${rows}</select>
-                <div style="display:flex;gap:.5rem;margin-top:.5rem;">
-                    <label><input type="radio" name="import-mode" value="clone" checked> Clone</label>
-                    <label><input type="radio" name="import-mode" value="share"> Share</label>
+        appState.workflow.flows.push(flow);
+        appState.currentFlowId = flow.id;
+        populateFlowSelect();
+        render();
+        await saveWorkflow();
+    };
+
+    const showCreateFlowDialog = async () => {
+        if (appState.templates.length === 0) {
+            alert('No templates available. Please create a template first in Template Builder.');
+            return;
+        }
+
+        const existingFlows = appState.workflow.flows.map(f => 
+            `<option value="${f.id}">${f.name}</option>`
+        ).join('');
+
+        const html = `
+            <form id="create-flow-form" class="modal-form">
+                <label for="creation-mode">Creation Mode</label>
+                <select id="creation-mode" required onchange="toggleCreationMode(this.value)">
+                    <option value="template">From Template</option>
+                    <option value="copy">Copy Existing Workflow</option>
+                </select>
+                
+                <div id="template-section">
+                    <label for="flow-name">Workflow Name <span style="color: #ef4444;">*</span></label>
+                    <input type="text" id="flow-name" required autofocus placeholder="e.g., NIST CSF Compliance 2025">
+                    
+                    <label for="flow-template">Based on Template <span style="color: #ef4444;">*</span></label>
+                    <select id="flow-template" required>
+                        ${appState.templates.map(t => `
+                            <option value="${t.id}" ${t.isDefault ? 'selected' : ''}>
+                                ${t.name} (${t.levels.length} level${t.levels.length !== 1 ? 's' : ''})
+                            </option>
+                        `).join('')}
+                    </select>
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                        <i class="fa-solid fa-info-circle"></i> The template defines the structure and available properties for your workflow
+                    </p>
                 </div>
-                <div class="modal-form-actions">
-                    <button type="button" class="cancel" data-action="cancel-modal">Cancel</button>
-                    <button type="submit" class="save">Import</button>
+                
+                <div id="copy-section" style="display: none;">
+                    <label for="copy-name">New Workflow Name <span style="color: #ef4444;">*</span></label>
+                    <input type="text" id="copy-name" placeholder="e.g., Copy of Workflow">
+                    
+                    <label for="copy-source">Copy From <span style="color: #ef4444;">*</span></label>
+                    <select id="copy-source">
+                        ${existingFlows || '<option value="">No workflows available</option>'}
+                    </select>
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                        <i class="fa-solid fa-info-circle"></i> Creates a complete copy with all units and settings
+                    </p>
                 </div>
-            </form>
-        `;
-        openModal(`Import ${level === 'action' ? 'Action group from Control' : 'Evidence from Action'}`, body, () => {
-            const form = document.getElementById('import-form');
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const idx = parseInt(document.getElementById('import-source').value, 10);
-                const mode = form.querySelector('input[name="import-mode"]:checked').value;
-                const source = items[idx];
-                const targetFlow = getCurrentFlow();
-
-                if (level === 'action') {
-                    const targetCtl = getObjectByPath(targetPath, targetFlow);
-                    targetCtl.subcategories = targetCtl.subcategories || [];
-                    (source.node.subcategories || []).forEach(act => {
-                        const newNode = JSON.parse(JSON.stringify(act));
-                        if (mode === 'clone') {
-                            newNode.id = generateId('act');
-                            (newNode.subcategories || []).forEach(ev => ev.id = generateId('evi'));
-                            delete newNode.shareKey;
-                        } else {
-                            setShareKeyDeep(newNode, act.shareKey || act.id);
-                        }
-                        targetCtl.subcategories.push(newNode);
-                    });
-                } else if (level === 'evidence') {
-                    const targetAct = getObjectByPath(targetPath, targetFlow);
-                    targetAct.subcategories = targetAct.subcategories || [];
-                    (source.node.subcategories || []).forEach(ev => {
-                        const newNode = JSON.parse(JSON.stringify(ev));
-                        if (mode === 'clone') {
-                            newNode.id = generateId('evi');
-                            delete newNode.shareKey;
-                        } else {
-                            setShareKeyDeep(newNode, ev.shareKey || ev.id);
-                        }
-                        targetAct.subcategories.push(newNode);
-                    });
-                }
-                closeModal();
-                render();
-            });
-        });
-    }
-
-    // --- DISTRIBUTE NEW NODE (copy/share to other flows) ---
-    function openDistributeNewNodeModal({ node, level, flow, parentPath }) {
-        const otherFlows = appState.workflow.flows.filter(f => f.id !== flow.id);
-        if (otherFlows.length === 0) return; // nothing to distribute to
-
-        const rows = otherFlows.map(f => `<label style="display:flex;gap:.5rem;align-items:center;"><input type="checkbox" class="dist-flow" value="${f.id}"> ${f.name}</label>`).join('');
-        const body = `
-            <form id="dist-form" class="modal-form">
-                <div><strong>Distribute "${node.name}" to:</strong></div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.5rem;margin:.5rem 0 1rem;">${rows}</div>
-                <div style="display:flex;gap:.5rem;margin-top:.5rem;">
-                    <label><input type="radio" name="dist-mode" value="copy" checked> Copy</label>
-                    <label><input type="radio" name="dist-mode" value="share"> Share</label>
-                </div>
-                <div class="modal-form-actions">
-                    <button type="button" class="cancel" data-action="cancel-modal">Skip</button>
-                    <button type="submit" class="save">Apply</button>
-                </div>
-            </form>
-            <div id="dist-result" style="margin-top:1rem;"></div>
-        `;
-        openModal(`Distribute new ${level}`, body, () => {
-            const form = document.getElementById('dist-form');
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const mode = form.querySelector('input[name="dist-mode"]:checked').value;
-                const selected = Array.from(document.querySelectorAll('.dist-flow:checked')).map(i => i.value);
-                const result = { added: [], skipped: [] };
-
-                // helper: find chain in target flow
-                const findControlIn = (targetFlow, srcCtl) => {
-                    // prefer shareKey; fallback name
-                    const key = srcCtl.shareKey;
-                    let found = (targetFlow.data || []).find(c => key ? c.shareKey === key : c.name === srcCtl.name);
-                    return found || null;
-                };
-                const findActionIn = (targetFlow, srcCtl, srcAct) => {
-                    const ctl = findControlIn(targetFlow, srcCtl);
-                    if (!ctl) return null;
-                    const key = srcAct.shareKey;
-                    let found = (ctl.subcategories || []).find(a => key ? a.shareKey === key : a.name === srcAct.name);
-                    return found || null;
-                };
-
-                // resolve parent chain from parentPath (for action/evidence levels)
-                let srcCtl = null, srcAct = null;
-                if (level !== 'control' && parentPath) {
-                    const parts = parentPath.split('.');
-                    if (level === 'action') {
-                        // parent is control at parentPath
-                        srcCtl = getObjectByPath(parentPath, flow);
-                    } else if (level === 'evidence') {
-                        // parentPath is action path; need action + its control
-                        srcAct = getObjectByPath(parentPath, flow);
-                        const ctlIndex = parentPath.split('.').slice(0, 2).join('.');
-                        // ctlIndex is "data.X" but we need the actual node; derive properly:
-                        // parentPath: data.ci.subcategories.ai
-                        const ci = parseInt(parentPath.split('.')[1], 10);
-                        srcCtl = (flow.data || [])[ci];
-                    }
-                }
-
-                selected.forEach(fid => {
-                    const targetFlow = appState.workflow.flows.find(f => f.id === fid);
-                    if (!targetFlow) return;
-
-                    if (level === 'control') {
-                        const newNode = JSON.parse(JSON.stringify(node));
-                        if (mode === 'copy') {
-                            newNode.id = generateId('cat');
-                            (newNode.subcategories || []).forEach(a => { a.id = generateId('act'); (a.subcategories || []).forEach(e => e.id = generateId('evi')); });
-                            delete newNode.shareKey; (newNode.subcategories || []).forEach(a => { delete a.shareKey; (a.subcategories||[]).forEach(e=>delete e.shareKey); });
-                        } else {
-                            setShareKeyDeep(newNode, node.shareKey || node.id);
-                        }
-                        targetFlow.data = targetFlow.data || [];
-                        targetFlow.data.push(newNode);
-                        // execution share: if "share", also mirror completed states for any evidence inside
-                        if (mode === 'share') {
-                            (newNode.subcategories || []).forEach(a => (a.subcategories || []).forEach(ev => {
-                                const idx = sharedEvidenceIndex();
-                                const group = idx.get(ev.shareKey);
-                                const srcEntry = group?.find(g => g.flowId === flow.id);
-                                if (srcEntry) {
-                                    const val = ensureExecFlow(flow.id).completed[srcEntry.evidenceId];
-                                    if (typeof val === 'boolean') setCompleted(fid, ev.id, val);
-                                }
-                            }));
-                        }
-                        result.added.push(`${targetFlow.name}`);
-                    } else if (level === 'action') {
-                        const ctlInTarget = findControlIn(targetFlow, srcCtl);
-                        if (!ctlInTarget) {
-                            result.skipped.push(`${targetFlow.name} (missing parent Control)`);
-                            return;
-                        }
-                        const newNode = JSON.parse(JSON.stringify(node));
-                        if (mode === 'copy') {
-                            newNode.id = generateId('act');
-                            (newNode.subcategories || []).forEach(e => e.id = generateId('evi'));
-                            delete newNode.shareKey; (newNode.subcategories || []).forEach(e=>delete e.shareKey);
-                        } else {
-                            setShareKeyDeep(newNode, node.shareKey || node.id);
-                        }
-                        ctlInTarget.subcategories = ctlInTarget.subcategories || [];
-                        ctlInTarget.subcategories.push(newNode);
-                        if (mode === 'share') {
-                            (newNode.subcategories || []).forEach(ev => {
-                                const idx = sharedEvidenceIndex();
-                                const group = idx.get(ev.shareKey);
-                                const srcEntry = group?.find(g => g.flowId === flow.id);
-                                if (srcEntry) {
-                                    const val = ensureExecFlow(flow.id).completed[srcEntry.evidenceId];
-                                    if (typeof val === 'boolean') setCompleted(fid, ev.id, val);
-                                }
-                            });
-                        }
-                        result.added.push(`${targetFlow.name}`);
-                    } else if (level === 'evidence') {
-                        const actInTarget = findActionIn(targetFlow, srcCtl, srcAct);
-                        if (!actInTarget) {
-                            result.skipped.push(`${targetFlow.name} (missing parent Control/Action)`);
-                            return;
-                        }
-                        const newNode = JSON.parse(JSON.stringify(node));
-                        if (mode === 'copy') {
-                            newNode.id = generateId('evi'); delete newNode.shareKey;
-                        } else {
-                            setShareKeyDeep(newNode, node.shareKey || node.id);
-                        }
-                        actInTarget.subcategories = actInTarget.subcategories || [];
-                        actInTarget.subcategories.push(newNode);
-
-                        if (mode === 'share') {
-                            // mirror current completion to target
-                            const curVal = ensureExecFlow(flow.id).completed[node.id];
-                            if (typeof curVal === 'boolean') setCompleted(fid, newNode.id, curVal);
-                        }
-                        result.added.push(`${targetFlow.name}`);
-                    }
-                });
-
-                // Show summary
-                const out = [];
-                if (result.added.length) out.push(`<div class="modal-item"><div class="modal-item-text"><strong>Added to:</strong> ${result.added.join(', ')}</div></div>`);
-                if (result.skipped.length) out.push(`<div class="modal-item"><div class="modal-item-text"><strong>Skipped:</strong> ${result.skipped.join('; ')}</div></div>`);
-                document.getElementById('dist-result').innerHTML = out.join('') || `<div class="empty-state">No target flow selected.</div>`;
-            });
-        });
-    }
-
-    // --- FLOW MANAGEMENT (new / clone / share / rename / delete) ---
-    function openNewFlowModal() {
-        if (appState.currentMode !== 'creation') return; // guard
-        const flowsOptions = appState.workflow.flows.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
-        const body = `
-            <form id="new-flow-form" class="modal-form">
-                <label>Flow name</label>
-                <input type="text" id="new-flow-name" placeholder="My Flow" required>
-                <div style="margin-top:.5rem;">
-                    <label><input type="radio" name="new-flow-mode" value="empty" checked> 
-                        <strong>Empty</strong> - Create new empty workflow</label><br>
-                    <label><input type="radio" name="new-flow-mode" value="copy"> 
-                        <strong>Copy</strong> - Duplicate existing workflow (independent)</label><br>
-                    <label><input type="radio" name="new-flow-mode" value="linked"> 
-                        <strong>Linked</strong> - Create linked workflow (stays synchronized)</label>
-                </div>
-                <div id="source-flow-block" style="margin-top:.5rem;">
-                    <label>Source flow (for copy/linked)</label>
-                    <select id="source-flow-select">${flowsOptions}</select>
-                </div>
-                <div class="modal-form-actions">
-                    <button type="button" class="cancel" data-action="cancel-modal">Cancel</button>
-                    <button type="submit" class="save">Create</button>
+                
+                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fa-solid fa-plus"></i> Create Workflow
+                    </button>
                 </div>
             </form>
         `;
-        openModal('Create Flow', body, () => {
-            const form = document.getElementById('new-flow-form');
+
+        openModal('Create New Workflow', html, () => {
+            window.toggleCreationMode = (mode) => {
+                document.getElementById('template-section').style.display = mode === 'template' ? 'block' : 'none';
+                document.getElementById('copy-section').style.display = mode === 'copy' ? 'block' : 'none';
+            };
+
+            const form = document.getElementById('create-flow-form');
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const name = (document.getElementById('new-flow-name').value || '').trim();
-                const mode = form.querySelector('input[name="new-flow-mode"]:checked').value;
-                const srcId = document.getElementById('source-flow-select').value;
-                const id = generateId('flow');
-
-                let data = [];
-                if (mode === 'copy' || mode === 'linked') {
-                    const src = appState.workflow.flows.find(f => f.id === srcId);
-                    data = JSON.parse(JSON.stringify(src.data || []));
-                    
-                    // Always regenerate IDs for new flow
-                    data.forEach(ctl => {
-                        ctl.id = generateId('cat');
-                        (ctl.subcategories || []).forEach(act => {
-                            act.id = generateId('act');
-                            (act.subcategories || []).forEach(ev => ev.id = generateId('evi'));
-                        });
-                        delete ctl.shareKey;
-                        (ctl.subcategories || []).forEach(a => { delete a.shareKey; (a.subcategories||[]).forEach(e=>delete e.shareKey); });
-                    });
-
-                    // For linked mode, create link group
-                    if (mode === 'linked') {
-                        // Check if source is already linked
-                        if (isWorkflowLinked(srcId)) {
-                            addToLinkGroup(id, srcId);
-                        } else {
-                            createLinkGroup(srcId, id);
-                        }
-                        await saveWorkflowLinks();
-                    }
-                }
+                const mode = document.getElementById('creation-mode').value;
                 
-                appState.workflow.flows.push({ id, name, data });
-                appState.currentFlowId = id;
-
+                if (mode === 'template') {
+                    const name = document.getElementById('flow-name').value.trim();
+                    const templateId = document.getElementById('flow-template').value;
+                    await createFlowFromTemplate(name, templateId);
+                } else {
+                    const name = document.getElementById('copy-name').value.trim();
+                    const sourceId = document.getElementById('copy-source').value;
+                    await copyWorkflow(name, sourceId);
+                }
                 closeModal();
-                render();
             });
         });
-    }
+    };
 
-    function renameCurrentFlow() {
-        if (appState.currentMode !== 'creation') return; // guard
+    const copyWorkflow = async (newName, sourceFlowId) => {
+        const sourceFlow = appState.workflow.flows.find(f => f.id === sourceFlowId);
+        if (!sourceFlow) {
+            alert('Source workflow not found!');
+            return;
+        }
+
+        // Deep clone the source flow
+        const newFlow = deepCopy(sourceFlow);
+        newFlow.id = generateId('flow');
+        newFlow.name = newName;
+        newFlow.createdAt = new Date().toISOString();
+        newFlow.updatedAt = new Date().toISOString();
+
+        // Regenerate all unit IDs to avoid conflicts
+        const regenerateUnitIds = (unit) => {
+            const oldId = unit.id;
+            unit.id = generateId('unit');
+            
+            // Update execution state mapping
+            const exec = ensureExecFlow(sourceFlowId);
+            if (exec.completed[oldId]) {
+                ensureExecFlow(newFlow.id).completed[unit.id] = exec.completed[oldId];
+            }
+            
+            if (unit.subcategories) {
+                unit.subcategories.forEach(regenerateUnitIds);
+            }
+        };
+
+        newFlow.data.forEach(regenerateUnitIds);
+
+        appState.workflow.flows.push(newFlow);
+        appState.currentFlowId = newFlow.id;
+        populateFlowSelect();
+        render();
+        await saveWorkflow();
+        await saveExecutions();
+    };
+
+    // ===== DYNAMIC RENDERING =====
+    const render = () => {
+        const flow = getCurrentFlow();
+        if (!flow) {
+            workflowRoot.innerHTML = '<div class="loading-state">Select or create a workflow</div>';
+            return;
+        }
+
+        const template = getTemplate(flow);
+        if (!template) {
+            workflowRoot.innerHTML = '<div class="loading-state">Error: Template not found</div>';
+            return;
+        }
+
+        // Update cumulative grades before rendering
+        updateAllCumulativeGrades(flow.data, template, 0);
+
+        const html = renderUnits(flow.data, template, 0);
+        workflowRoot.innerHTML = html || `
+            <div class="empty-state">
+                <i class="fa-solid fa-folder-open" style="font-size: 3rem; color: var(--text-tertiary); margin-bottom: 1rem;"></i>
+                <h3>No ${template.levels[0].pluralName} Yet</h3>
+                <p>Click the button below to add your first ${template.levels[0].singularName.toLowerCase()}</p>
+            </div>
+        `;
+
+        applyModeStyles();
+        updateAddButton();
+    };
+
+    const renderUnits = (units, template, depth) => {
+        if (!units || units.length === 0) return '';
+        if (depth >= template.levels.length) return '';
+
+        // Filter by active tag if set
+        let filtered = units;
+        if (appState.activeTag) {
+            filtered = filterUnitsByTag(units, appState.activeTag, template, depth);
+        }
+
+        return filtered.map((unit, index) => 
+            renderUnit(unit, template, depth, `data.${index}`)
+        ).join('');
+    };
+
+    const renderUnit = (unit, template, depth, path) => {
+        const level = template.levels[depth];
+        const config = level.unitConfig;
+        const isCreation = appState.currentMode === 'creation';
+        const flow = getCurrentFlow();
+
+        return `
+            <div class="unit level-${depth}" data-path="${path}" data-level="${depth}" data-unit-id="${unit.id}">
+                ${renderUnitHeader(unit, level, config, depth, path, isCreation, template, flow)}
+                ${renderUnitBody(unit, level, config, path, isCreation)}
+                ${depth < template.levels.length - 1 ? renderUnitChildren(unit, template, depth, path) : ''}
+            </div>
+        `;
+    };
+
+    const renderUnitHeader = (unit, level, config, depth, path, isCreation, template, flow) => {
+        const isCompleted = flow ? isCompleted(flow.id, unit.id) : false;
+        const progress = config.enableProgressBar ? calculateProgress(unit, template, depth) : 0;
+        
+        return `
+            <div class="unit-header">
+                ${config.enableIcon && unit.icon ? `
+                    <span class="unit-icon">
+                        <img src="icons/${unit.icon}" alt="icon" style="width: 24px; height: 24px;">
+                    </span>
+                ` : ''}
+                
+                ${config.enableUnitId && isCreation ? `
+                    <input type="text" 
+                           class="unit-id-input" 
+                           value="${unit.unitId || ''}" 
+                           placeholder="ID" 
+                           onblur="updateUnitProperty('${path}', 'unitId', this.value)">
+                ` : config.enableUnitId && unit.unitId ? `
+                    <span class="unit-id-display">${unit.unitId}</span>
+                ` : ''}
+                
+                ${isCreation ? `
+                    <input type="text" 
+                           class="unit-name-input" 
+                           value="${unit.name || ''}" 
+                           placeholder="${level.singularName} name" 
+                           onblur="updateUnitProperty('${path}', 'name', this.value)">
+                ` : `
+                    <span class="unit-name-display">${unit.name || level.singularName}</span>
+                `}
+                
+                ${config.enableTags ? renderUnitTags(unit, path, isCreation) : ''}
+                
+                ${config.enableDone && !isCreation ? `
+                    <label class="checkbox-label">
+                        <input type="checkbox" 
+                               ${isCompleted ? 'checked' : ''} 
+                               onchange="toggleUnitCompletion('${path}', '${unit.id}')">
+                        <span>Done</span>
+                    </label>
+                ` : ''}
+                
+                ${config.enableGrade ? renderGradeInput(unit, config, path, isCreation) : ''}
+                
+                ${config.enableProgressBar && unit.subcategories && unit.subcategories.length > 0 ? `
+                    <div class="progress-bar-container" title="${progress}% complete">
+                        <div class="progress-bar" style="width: ${progress}%;"></div>
+                        <span class="progress-text">${progress}%</span>
+                    </div>
+                ` : ''}
+                
+                ${isCreation ? `
+                    <button class="btn-icon btn-delete" onclick="deleteUnit('${path}')" title="Delete ${level.singularName}">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                ` : ''}
+                
+                ${!isCreation && unit.subcategories && unit.subcategories.length > 0 ? `
+                    <button class="btn-export-board" onclick="exportUnitToBoard('${path}')" title="Export to Project Board">
+                        <i class="fa-solid fa-diagram-project"></i> Board
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    };
+
+    const renderUnitBody = (unit, level, config, path, isCreation) => {
+        if (!config.enableDescription && !hasAttachments(unit, config)) {
+            return '';
+        }
+
+        return `
+            <div class="unit-body">
+                ${config.enableDescription ? `
+                    <div class="unit-description">
+                        ${isCreation ? `
+                            <textarea 
+                                class="unit-desc-textarea"
+                                placeholder="${level.singularName} description"
+                                onblur="updateUnitProperty('${path}', 'description', this.value)"
+                            >${unit.description || ''}</textarea>
+                        ` : unit.description ? `
+                            <p>${unit.description}</p>
+                        ` : ''}
+                    </div>
+                ` : ''}
+                
+                ${renderAttachments(unit, config, path, isCreation)}
+            </div>
+        `;
+    };
+
+    const renderUnitChildren = (unit, template, depth, path) => {
+        const nextLevel = template.levels[depth + 1];
+        if (!nextLevel) return '';
+
+        const isCreation = appState.currentMode === 'creation';
+        const childrenHtml = renderUnits(unit.subcategories || [], template, depth + 1);
+
+        return `
+            <div class="unit-children">
+                ${childrenHtml}
+                ${isCreation ? `
+                    <button class="btn-add-child" onclick="addChildUnit('${path}', ${depth + 1})">
+                        <i class="fa-solid fa-plus"></i> Add ${nextLevel.singularName}
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    };
+
+    const renderGradeInput = (unit, config, path, isCreation) => {
+        const isCumulative = config.gradeCumulative;
+        const grade = unit.grade || 0;
+
+        return `
+            <div class="grade-input-group">
+                ${isCumulative ? '<span title="Cumulative grade (sum of children)">Σ</span>' : ''}
+                <input type="number" 
+                       class="grade-input" 
+                       value="${grade}" 
+                       step="0.01"
+                       ${isCumulative || !isCreation ? 'readonly' : ''}
+                       ${!isCreation ? 'disabled' : ''}
+                       ${!isCumulative && isCreation ? `onblur="updateUnitProperty('${path}', 'grade', parseFloat(this.value) || 0)"` : ''}
+                       title="${isCumulative ? 'Cumulative grade (read-only)' : 'Grade'}">
+            </div>
+        `;
+    };
+
+    const renderUnitTags = (unit, path, isCreation) => {
+        const tags = unit.tags || [];
+        return `
+            <div class="unit-tags">
+                ${tags.map(tag => `
+                    <span class="tag-badge" onclick="${isCreation ? '' : `filterByTag('${tag}')`}">
+                        ${tag}
+                        ${isCreation ? `<i class="fa-solid fa-xmark" onclick="removeTag('${path}', '${tag}'); event.stopPropagation();"></i>` : ''}
+                    </span>
+                `).join('')}
+                ${isCreation ? `
+                    <button class="btn-add-tag" onclick="showAddTagDialog('${path}')" title="Add tag">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    };
+
+    const hasAttachments = (unit, config) => {
+        if (!unit.footer) return false;
+        return (config.enableLinks && unit.footer.links && unit.footer.links.length > 0) ||
+               (config.enableImages && unit.footer.images && unit.footer.images.length > 0) ||
+               (config.enableNotes && unit.footer.notes && unit.footer.notes.length > 0) ||
+               (config.enableComments && unit.footer.comments && unit.footer.comments.length > 0);
+    };
+
+    const renderAttachments = (unit, config, path, isCreation) => {
+        if (!config.enableLinks && !config.enableImages && !config.enableNotes && !config.enableComments) {
+            return '';
+        }
+
+        const footer = unit.footer || { links: [], images: [], notes: [], comments: [] };
+        
+        return `
+            <div class="unit-attachments">
+                ${config.enableLinks ? renderLinks(footer.links, path, isCreation) : ''}
+                ${config.enableImages ? renderImages(footer.images, path, isCreation) : ''}
+                ${config.enableNotes ? renderNotes(footer.notes, path, isCreation) : ''}
+                ${config.enableComments ? renderComments(footer.comments, path, isCreation) : ''}
+            </div>
+        `;
+    };
+
+    const renderLinks = (links, path, isCreation) => {
+        return `
+            <div class="attachment-section">
+                ${links && links.length > 0 ? `
+                    <div class="attachment-list">
+                        ${links.map((link, idx) => `
+                            <div class="attachment-item">
+                                <a href="${getAbsoluteUrl(link.url)}" target="_blank" rel="noopener">
+                                    <i class="fa-solid fa-link"></i> ${link.text}
+                                </a>
+                                ${isCreation ? `<i class="fa-solid fa-trash" onclick="removeLink('${path}', ${idx})"></i>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                ${isCreation ? `
+                    <button class="btn-add-attachment" onclick="showAddLinkDialog('${path}')">
+                        <i class="fa-solid fa-link"></i> Add Link
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    };
+
+    const renderImages = (images, path, isCreation) => {
+        return `
+            <div class="attachment-section">
+                ${images && images.length > 0 ? `
+                    <div class="attachment-list images">
+                        ${images.map((img, idx) => `
+                            <div class="attachment-item image">
+                                <img src="${img}" alt="attachment" onclick="openImageModal('${img}')">
+                                ${isCreation ? `<i class="fa-solid fa-trash" onclick="removeImage('${path}', ${idx})"></i>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                ${isCreation ? `
+                    <button class="btn-add-attachment" onclick="showAddImageDialog('${path}')">
+                        <i class="fa-solid fa-image"></i> Add Image
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    };
+
+    const renderNotes = (notes, path, isCreation) => {
+        return `
+            <div class="attachment-section">
+                ${notes && notes.length > 0 ? `
+                    <div class="attachment-list">
+                        ${notes.map((note, idx) => `
+                            <div class="attachment-item note">
+                                <div class="note-title">${note.title}</div>
+                                <div class="note-content">${note.content}</div>
+                                ${isCreation ? `<i class="fa-solid fa-trash" onclick="removeNote('${path}', ${idx})"></i>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                ${isCreation ? `
+                    <button class="btn-add-attachment" onclick="showAddNoteDialog('${path}')">
+                        <i class="fa-solid fa-book-open"></i> Add Note
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    };
+
+    const renderComments = (comments, path, isCreation) => {
+        return `
+            <div class="attachment-section">
+                ${comments && comments.length > 0 ? `
+                    <div class="attachment-list">
+                        ${comments.map((comment, idx) => `
+                            <div class="attachment-item comment">
+                                <p>${comment}</p>
+                                ${isCreation ? `<i class="fa-solid fa-trash" onclick="removeComment('${path}', ${idx})"></i>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+                ${isCreation ? `
+                    <button class="btn-add-attachment" onclick="showAddCommentDialog('${path}')">
+                        <i class="fa-solid fa-comment"></i> Add Comment
+                    </button>
+                ` : ''}
+            </div>
+        `;
+    };
+
+    const filterUnitsByTag = (units, tag, template, depth) => {
+        return units.filter(unit => {
+            if (nodeHasTag(unit, tag)) return true;
+            
+            if (unit.subcategories && depth < template.levels.length - 1) {
+                const hasTaggedChild = unit.subcategories.some(child => 
+                    hasDescendantWithTag(child, tag, template, depth + 1)
+                );
+                if (hasTaggedChild) return true;
+            }
+            
+            return false;
+        });
+    };
+
+    const hasDescendantWithTag = (unit, tag, template, depth) => {
+        if (nodeHasTag(unit, tag)) return true;
+        if (!unit.subcategories || depth >= template.levels.length) return false;
+        return unit.subcategories.some(child => hasDescendantWithTag(child, tag, template, depth + 1));
+    };
+
+    const updateAddButton = () => {
+        const flow = getCurrentFlow();
+        const template = getTemplate(flow);
+        const container = document.getElementById('add-category-btn-container');
+        
+        if (!container || !template || appState.currentMode !== 'creation') return;
+
+        const level = template.levels[0];
+        const button = container.querySelector('#add-category-btn');
+        if (button) {
+            button.innerHTML = `<i class="fa-solid fa-plus"></i> Add New ${level.singularName}`;
+        }
+    };
+
+    // ===== UNIT OPERATIONS =====
+    window.addChildUnit = (parentPath, childDepth) => {
+        const flow = getCurrentFlow();
+        const template = getTemplate(flow);
+        const level = template.levels[childDepth];
+        
+        const parent = getObjectByPath(parentPath, flow);
+        if (!parent) return;
+
+        if (!parent.subcategories) {
+            parent.subcategories = [];
+        }
+
+        const newUnit = {
+            id: generateId('unit'),
+            levelId: level.id,
+            name: '',
+            subcategories: []
+        };
+
+        // Initialize properties based on level config
+        if (level.unitConfig.enableIcon) newUnit.icon = null;
+        if (level.unitConfig.enableUnitId) newUnit.unitId = '';
+        if (level.unitConfig.enableDescription) newUnit.description = '';
+        if (level.unitConfig.enableTags) newUnit.tags = [];
+        if (level.unitConfig.enableGrade) newUnit.grade = 0;
+        
+        // Initialize footer if any attachments enabled
+        if (level.unitConfig.enableLinks || level.unitConfig.enableImages || 
+            level.unitConfig.enableNotes || level.unitConfig.enableComments) {
+            newUnit.footer = {
+                links: [],
+                images: [],
+                notes: [],
+                comments: []
+            };
+        }
+
+        parent.subcategories.push(newUnit);
+        render();
+    };
+
+    window.deleteUnit = (path) => {
+        const flow = getCurrentFlow();
+        const template = getTemplate(flow);
+        const { parent, key } = getParentAndKey(path, flow);
+        
+        if (!parent || !parent[key]) return;
+        
+        const unit = parent[key];
+        const depth = (path.match(/\./g) || []).length / 2;
+        const level = template.levels[depth];
+        
+        if (!confirm(`Delete this ${level.singularName.toLowerCase()}?`)) return;
+        
+        parent.splice(key, 1);
+        render();
+    };
+
+    window.updateUnitProperty = (path, property, value) => {
+        const flow = getCurrentFlow();
+        const unit = getObjectByPath(path, flow);
+        if (!unit) return;
+        
+        unit[property] = value;
+        
+        // If grade is updated and not cumulative, recalculate parent if parent is cumulative
+        if (property === 'grade') {
+            const template = getTemplate(flow);
+            updateAllCumulativeGrades(flow.data, template, 0);
+            render();
+        }
+    };
+
+    window.toggleUnitCompletion = (path, unitId) => {
         const flow = getCurrentFlow();
         if (!flow) return;
-        const n = prompt('Flow name:', flow.name);
-        if (n !== null) { flow.name = n; render(); }
-    }
-
-    function deleteCurrentFlow() {
-        if (appState.currentMode !== 'creation') return; // guard
-        const flow = getCurrentFlow();
-        if (!flow) return;
-        if (!confirm(`Delete flow "${flow.name}"?`)) return;
         
-        // Remove from link groups
-        unlinkWorkflow(flow.id);
+        const unit = getObjectByPath(path, flow);
+        if (!unit) return;
         
-        // clean execution for this flow
-        delete appState.executions.flows[flow.id];
-        appState.workflow.flows = appState.workflow.flows.filter(f => f.id !== flow.id);
-        appState.currentFlowId = appState.workflow.flows[0]?.id || null;
+        const currentState = isCompleted(flow.id, unitId);
+        setCompleted(flow.id, unitId, !currentState);
+        
         render();
-    }
+    };
 
-    // --- INIT ---
-    function initializeState() {
-        // Theme
-        const storedTheme = localStorage.getItem('workflowTheme');
-        applyTheme(storedTheme || 'light');
-
-        // Mode
-        const storedMode = localStorage.getItem('workflowMode');
-        appState.currentMode = storedMode || 'execution';
-        document.body.classList.toggle('creation-mode', appState.currentMode === 'creation');
-        document.body.classList.toggle('execution-mode', appState.currentMode === 'execution');
-
-        const flow = getCurrentFlow();
-        updateAllExecutionStates(flow);
-        reconcileExecution(appState.currentFlowId);
+    // ===== TAG OPERATIONS =====
+    window.filterByTag = (tag) => {
+        appState.activeTag = tag;
         render();
-    }
+        updateTagFilterBanner();
+    };
 
-    // --- TOP-LEVEL WIRING ---
-    themeToggleBtn?.addEventListener('click', toggleTheme);
-    modeSwitch?.addEventListener('change', () => {
-        appState.currentMode = modeSwitch.checked ? 'execution' : 'creation';
-        localStorage.setItem('workflowMode', appState.currentMode);
-        document.body.classList.toggle('creation-mode', appState.currentMode === 'creation');
-        document.body.classList.toggle('execution-mode', appState.currentMode === 'execution');
-        render();
-    });
+    const updateTagFilterBanner = () => {
+        const banner = document.getElementById('tag-filter-banner');
+        if (!banner) return;
+        
+        if (appState.activeTag) {
+            banner.classList.remove('hidden');
+            const label = document.getElementById('active-tag-label');
+            if (label) label.textContent = appState.activeTag;
+            
+            const exportBtn = document.getElementById('export-tag-to-board');
+            if (exportBtn) exportBtn.classList.remove('hidden');
+        } else {
+            banner.classList.add('hidden');
+            const exportBtn = document.getElementById('export-tag-to-board');
+            if (exportBtn) exportBtn.classList.add('hidden');
+        }
+    };
 
-    enforceSequenceCheckbox?.addEventListener('change', () => {
-        if (appState.currentMode !== 'creation') return; // sequence setting is a structure-level toggle
-        appState.workflow.settings.enforceSequence = enforceSequenceCheckbox.checked;
-        updateAllExecutionStates(getCurrentFlow());
-        render();
-    });
-
-    saveStructureBtn?.addEventListener('click', () => { if (appState.currentMode === 'creation') saveStructure(); });
-    saveExecutionBtn?.addEventListener('click', () => { if (appState.currentMode === 'execution') saveExecution(); });
-
-    flowSelect?.addEventListener('change', (e) => {
-        appState.currentFlowId = e.target.value;
+    window.clearTagFilter = () => {
         appState.activeTag = null;
         render();
-    });
-    flowNewBtn?.addEventListener('click', openNewFlowModal);
-    flowRenameBtn?.addEventListener('click', renameCurrentFlow);
-    flowUnlinkBtn?.addEventListener('click', () => {
-        if (appState.currentMode !== 'creation') return;
-        if (!confirm('Unlink this workflow? It will become independent and stop syncing with linked workflows.')) return;
-        unlinkWorkflow(appState.currentFlowId);
-        render();
-    });
-    flowDeleteBtn?.addEventListener('click', deleteCurrentFlow);
-    // Global tag filter removed - now using per-flow filtering only
+        updateTagFilterBanner();
+    };
 
-    // Export tag to board button
-    const exportTagBtn = document.getElementById('export-tag-to-board');
-    exportTagBtn?.addEventListener('click', () => {
-        if (appState.activeTag) {
-            exportTagToBoard(appState.activeTag, appState.currentFlowId);
+    window.showAddTagDialog = (path) => {
+        const html = `
+            <form id="add-tag-form" class="modal-form">
+                <label for="tag-input">Tag Name</label>
+                <input type="text" id="tag-input" required autofocus placeholder="e.g., critical, audit, Q1-2025">
+                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Add Tag</button>
+                </div>
+            </form>
+        `;
+        
+        openModal('Add Tag', html, () => {
+            const form = document.getElementById('add-tag-form');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const tag = document.getElementById('tag-input').value.trim();
+                if (tag) {
+                    const flow = getCurrentFlow();
+                    const unit = getObjectByPath(path, flow);
+                    if (unit) {
+                        ensureTagsArray(unit);
+                        if (!unit.tags.includes(tag)) {
+                            unit.tags.push(tag);
+                            render();
+                        }
+                    }
+                }
+                closeModal();
+            });
+        });
+    };
+
+    window.removeTag = (path, tag) => {
+        const flow = getCurrentFlow();
+        const unit = getObjectByPath(path, flow);
+        if (unit && unit.tags) {
+            unit.tags = unit.tags.filter(t => t !== tag);
+            render();
         }
-    });
+    };
 
-    // banner clear
-    document.addEventListener('click', (e) => {
-        const btn = e.target.closest('#clear-tag-filter');
-        if (btn) { appState.activeTag = null; render(); }
-    });
+    // ===== ATTACHMENT OPERATIONS =====
+    window.showAddLinkDialog = (path) => {
+        const html = `
+            <form id="add-link-form" class="modal-form">
+                <label for="link-text">Link Text</label>
+                <input type="text" id="link-text" required autofocus placeholder="e.g., Policy Document">
+                
+                <label for="link-url">URL</label>
+                <input type="url" id="link-url" required placeholder="https://example.com/document.pdf">
+                
+                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Add Link</button>
+                </div>
+            </form>
+        `;
+        
+        openModal('Add Link', html, () => {
+            const form = document.getElementById('add-link-form');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const text = document.getElementById('link-text').value.trim();
+                const url = document.getElementById('link-url').value.trim();
+                
+                const flow = getCurrentFlow();
+                const unit = getObjectByPath(path, flow);
+                if (unit) {
+                    if (!unit.footer) unit.footer = { links: [], images: [], notes: [], comments: [] };
+                    if (!unit.footer.links) unit.footer.links = [];
+                    unit.footer.links.push({ text, url });
+                    render();
+                }
+                closeModal();
+            });
+        });
+    };
 
-    // Global click/change listeners
-    document.addEventListener('click', handleAppClick);
-    document.addEventListener('change', handleAppChange);
+    window.removeLink = (path, index) => {
+        const flow = getCurrentFlow();
+        const unit = getObjectByPath(path, flow);
+        if (unit && unit.footer && unit.footer.links) {
+            unit.footer.links.splice(index, 1);
+            render();
+        }
+    };
 
-    // Modal close
-    modal.closeBtn.addEventListener('click', closeModal);
-    modal.backdrop.addEventListener('click', (e) => { if (e.target === modal.backdrop) closeModal(); });
+    window.showAddImageDialog = (path) => {
+        const html = `
+            <form id="add-image-form" class="modal-form">
+                <label for="image-url">Image URL</label>
+                <input type="url" id="image-url" required autofocus placeholder="https://example.com/image.png">
+                
+                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Add Image</button>
+                </div>
+            </form>
+        `;
+        
+        openModal('Add Image', html, () => {
+            const form = document.getElementById('add-image-form');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const url = document.getElementById('image-url').value.trim();
+                
+                const flow = getCurrentFlow();
+                const unit = getObjectByPath(path, flow);
+                if (unit) {
+                    if (!unit.footer) unit.footer = { links: [], images: [], notes: [], comments: [] };
+                    if (!unit.footer.images) unit.footer.images = [];
+                    unit.footer.images.push(url);
+                    render();
+                }
+                closeModal();
+            });
+        });
+    };
 
-    // --- PPM INTEGRATION ---
-    async function exportControlToBoard(control, flowId) {
-        if (!confirm(`Export "${control.name}" to a new Project Board?\n\nThis will create a Kanban board with tasks from all actions and evidence in this control.`)) {
+    window.removeImage = (path, index) => {
+        const flow = getCurrentFlow();
+        const unit = getObjectByPath(path, flow);
+        if (unit && unit.footer && unit.footer.images) {
+            unit.footer.images.splice(index, 1);
+            render();
+        }
+    };
+
+    window.showAddCommentDialog = (path) => {
+        const html = `
+            <form id="add-comment-form" class="modal-form">
+                <label for="comment-text">Comment</label>
+                <textarea id="comment-text" required autofocus rows="4" placeholder="Enter your comment"></textarea>
+                
+                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Add Comment</button>
+                </div>
+            </form>
+        `;
+        
+        openModal('Add Comment', html, () => {
+            const form = document.getElementById('add-comment-form');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const text = document.getElementById('comment-text').value.trim();
+                
+                const flow = getCurrentFlow();
+                const unit = getObjectByPath(path, flow);
+                if (unit) {
+                    if (!unit.footer) unit.footer = { links: [], images: [], notes: [], comments: [] };
+                    if (!unit.footer.comments) unit.footer.comments = [];
+                    unit.footer.comments.push(text);
+                    render();
+                }
+                closeModal();
+            });
+        });
+    };
+
+    window.removeComment = (path, index) => {
+        const flow = getCurrentFlow();
+        const unit = getObjectByPath(path, flow);
+        if (unit && unit.footer && unit.footer.comments) {
+            unit.footer.comments.splice(index, 1);
+            render();
+        }
+    };
+
+    window.showAddNoteDialog = (path) => {
+        const html = `
+            <form id="add-note-form" class="modal-form">
+                <label for="note-title">Note Title</label>
+                <input type="text" id="note-title" required autofocus placeholder="e.g., Implementation Guidelines">
+                
+                <label for="note-content">Content (Rich Text)</label>
+                <div id="note-editor-container" style="height: 200px;"></div>
+                
+                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Add Note</button>
+                </div>
+            </form>
+        `;
+        
+        openModal('Add Note', html, () => {
+            // Initialize Quill editor
+            quillEditor = new Quill('#note-editor-container', {
+                theme: 'snow',
+                placeholder: 'Write your note content...'
+            });
+            
+            const form = document.getElementById('add-note-form');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = document.getElementById('note-title').value.trim();
+                const content = quillEditor.root.innerHTML;
+                
+                const flow = getCurrentFlow();
+                const unit = getObjectByPath(path, flow);
+                if (unit) {
+                    if (!unit.footer) unit.footer = { links: [], images: [], notes: [], comments: [] };
+                    if (!unit.footer.notes) unit.footer.notes = [];
+                    unit.footer.notes.push({ title, content });
+                    render();
+                }
+                quillEditor = null;
+                closeModal();
+            });
+        });
+    };
+
+    window.removeNote = (path, index) => {
+        const flow = getCurrentFlow();
+        const unit = getObjectByPath(path, flow);
+        if (unit && unit.footer && unit.footer.notes) {
+            unit.footer.notes.splice(index, 1);
+            render();
+        }
+    };
+
+    window.openImageModal = (imgUrl) => {
+        openModal('Image', `<img src="${imgUrl}" style="max-width: 100%; max-height: 70vh;">`);
+    };
+
+    // ===== MODAL SYSTEM =====
+    const openModal = (title, bodyHTML, onOpen = null) => {
+        modal.title.textContent = title;
+        modal.body.innerHTML = bodyHTML;
+        modal.backdrop.classList.remove('hidden');
+        if (onOpen) onOpen();
+    };
+
+    const closeModal = () => {
+        modal.backdrop.classList.add('hidden');
+        if (quillEditor) quillEditor = null;
+    };
+
+    window.closeModal = closeModal;
+
+    // ===== FLOW OPERATIONS =====
+    const populateFlowSelect = () => {
+        if (!flowSelect) return;
+        
+        flowSelect.innerHTML = appState.workflow.flows.map(flow => 
+            `<option value="${flow.id}" ${flow.id === appState.currentFlowId ? 'selected' : ''}>${flow.name}</option>`
+        ).join('');
+        
+        if (appState.workflow.flows.length === 0) {
+            flowSelect.innerHTML = '<option value="">No workflows yet</option>';
+        }
+    };
+
+    const renameFlow = () => {
+        const flow = getCurrentFlow();
+        if (!flow) return;
+        
+        const newName = prompt('Rename workflow:', flow.name);
+        if (newName && newName.trim()) {
+            flow.name = newName.trim();
+            populateFlowSelect();
+        }
+    };
+
+    const deleteFlow = async () => {
+        const flow = getCurrentFlow();
+        if (!flow) return;
+        
+        if (!confirm(`Delete workflow "${flow.name}"? This cannot be undone.`)) return;
+        
+        appState.workflow.flows = appState.workflow.flows.filter(f => f.id !== flow.id);
+        
+        // Delete execution data
+        delete appState.executions.flows[flow.id];
+        
+        // Set new current flow
+        if (appState.workflow.flows.length > 0) {
+            appState.currentFlowId = appState.workflow.flows[0].id;
+        } else {
+            appState.currentFlowId = null;
+        }
+        
+        populateFlowSelect();
+        render();
+        await saveWorkflow();
+        await saveExecutions();
+    };
+
+    // ===== INITIALIZATION =====
+    const init = async () => {
+        // Load theme
+        const savedTheme = localStorage.getItem('workflowTheme');
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        }
+        
+        // Load data
+        await Promise.all([
+            loadTemplates().then(templates => appState.templates = templates),
+            loadWorkflow(),
+            loadExecutions(),
+            loadWorkflowLinks()
+        ]);
+        
+        // Set current flow
+        if (appState.workflow.flows.length > 0 && !appState.currentFlowId) {
+            appState.currentFlowId = appState.workflow.flows[0].id;
+        }
+        
+        // Populate UI
+        populateFlowSelect();
+        render();
+        
+        // Event listeners
+        if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
+        
+        if (modeSwitch) {
+            modeSwitch.addEventListener('change', (e) => {
+                appState.currentMode = e.target.checked ? 'execution' : 'creation';
+                render();
+            });
+        }
+        
+        if (saveStructureBtn) {
+            saveStructureBtn.addEventListener('click', saveWorkflow);
+        }
+        
+        if (saveExecutionBtn) {
+            saveExecutionBtn.addEventListener('click', saveExecutions);
+        }
+        
+        if (flowSelect) {
+            flowSelect.addEventListener('change', (e) => {
+                appState.currentFlowId = e.target.value;
+                render();
+            });
+        }
+        
+        if (flowNewBtn) {
+            flowNewBtn.addEventListener('click', showCreateFlowDialog);
+        }
+        
+        if (flowRenameBtn) {
+            flowRenameBtn.addEventListener('click', renameFlow);
+        }
+        
+        if (flowDeleteBtn) {
+            flowDeleteBtn.addEventListener('click', deleteFlow);
+        }
+        
+        if (modal.closeBtn) {
+            modal.closeBtn.addEventListener('click', closeModal);
+        }
+        
+        if (modal.backdrop) {
+            modal.backdrop.addEventListener('click', (e) => {
+                if (e.target === modal.backdrop) closeModal();
+            });
+        }
+        
+        // Add category button
+        const addCategoryBtn = document.getElementById('add-category-btn');
+        if (addCategoryBtn) {
+            addCategoryBtn.addEventListener('click', () => {
+                const flow = getCurrentFlow();
+                if (!flow) return;
+                addChildUnit('data', 0);
+            });
+        }
+        
+        // Clear tag filter button
+        const clearTagBtn = document.getElementById('clear-tag-filter');
+        if (clearTagBtn) {
+            clearTagBtn.addEventListener('click', clearTagFilter);
+        }
+        
+        // Export tag to board button
+        const exportTagBtn = document.getElementById('export-tag-to-board');
+        if (exportTagBtn) {
+            exportTagBtn.addEventListener('click', () => {
+                if (appState.activeTag) {
+                    exportTagToBoard(appState.activeTag);
+                }
+            });
+        }
+    };
+
+    // ===== PPM INTEGRATION - EXPORT TO BOARD =====
+    window.exportUnitToBoard = async (unitPath) => {
+        const flow = getCurrentFlow();
+        const unit = getObjectByPath(unitPath, flow);
+        const template = getTemplate(flow);
+        
+        if (!unit || !template) return;
+        
+        const depth = (unitPath.match(/\./g) || []).length / 2;
+        const level = template.levels[depth];
+        
+        if (!confirm(`Export "${unit.name}" to a new Project Board?\n\nThis will create a Kanban board with tasks from all child units.`)) {
             return;
         }
         
         try {
             // Load PPM data
-            const boardsRes = await fetch(`ppm-boards.json?t=${Date.now()}`);
+            const boardsRes = await fetch(`data/ppm-boards.json?t=${Date.now()}`);
             const boardsData = await boardsRes.json();
-            
-            const usersRes = await fetch(`ppm-users.json?t=${Date.now()}`);
+            const usersRes = await fetch(`data/ppm-users.json?t=${Date.now()}`);
             const usersData = await usersRes.json();
             
-            // Create board using PPM conversion logic
             const board = {
                 id: generateId('board'),
-                name: control.name,
-                description: control.text || '',
-                sourceControlId: control.id,
-                sourceFlowId: flowId,
+                name: `${flow.name}: ${unit.name}`,
+                description: unit.description || `Exported from ${level.singularName}`,
                 createdAt: new Date().toISOString(),
-                createdBy: usersData.users[0]?.id || 'user-default-001',
-                archived: false,
-                members: [{
-                    userId: usersData.users[0]?.id || 'user-default-001',
-                    name: usersData.users[0]?.name || 'Default User',
-                    email: usersData.users[0]?.email || 'user@company.com',
-                    role: 'admin',
-                    avatar: usersData.users[0]?.avatar || '',
-                    joinedAt: new Date().toISOString()
-                }],
+                updatedAt: new Date().toISOString(),
                 columns: [
-                    { id: generateId('col'), name: 'Backlog', order: 0, limit: null, color: '#6c757d' },
-                    { id: generateId('col'), name: 'To Do', order: 1, limit: null, color: '#0d6efd' },
-                    { id: generateId('col'), name: 'In Progress', order: 2, limit: 5, color: '#0dcaf0' },
-                    { id: generateId('col'), name: 'Review', order: 3, limit: null, color: '#ffc107' },
-                    { id: generateId('col'), name: 'Done', order: 4, limit: null, color: '#198754' }
+                    { id: 'col-backlog', name: 'Backlog', order: 0, color: '#94a3b8' },
+                    { id: 'col-todo', name: 'To Do', order: 1, color: '#60a5fa' },
+                    { id: 'col-progress', name: 'In Progress', order: 2, color: '#f59e0b' },
+                    { id: 'col-done', name: 'Done', order: 3, color: '#10b981' }
                 ],
                 cards: [],
-                labels: [],
+                labels: [
+                    { id: 'label-high', name: 'High Priority', color: '#ef4444' },
+                    { id: 'label-medium', name: 'Medium Priority', color: '#f59e0b' },
+                    { id: 'label-low', name: 'Low Priority', color: '#10b981' }
+                ],
                 settings: {
-                    notificationsEnabled: true,
-                    allowGuestView: false,
-                    enforceWIPLimit: false
-                },
-                activity: []
+                    theme: 'light',
+                    showArchived: false
+                }
             };
             
-            // Convert tags to labels
-            if (control.tags && control.tags.length > 0) {
-                const colors = ['#dc3545', '#0d6efd', '#198754', '#ffc107', '#0dcaf0', '#6c757d'];
-                control.tags.forEach((tag, i) => {
-                    board.labels.push({
-                        id: generateId('label'),
-                        boardId: board.id,
-                        name: tag,
-                        color: colors[i % colors.length],
-                        description: ''
-                    });
-                });
-            }
+            // Add tags as labels
+            const allTags = new Set();
+            const collectTags = (u) => {
+                (u.tags || []).forEach(tag => allTags.add(tag));
+                (u.subcategories || []).forEach(collectTags);
+            };
+            collectTags(unit);
             
-            // Convert Actions and Evidence to cards
-            const backlogColumn = board.columns[0];
+            allTags.forEach(tag => {
+                board.labels.push({
+                    id: generateId('label'),
+                    name: tag,
+                    color: '#6366f1'
+                });
+            });
+            
+            // Convert units to cards
             let cardOrder = 0;
-            
-            (control.subcategories || []).forEach(action => {
-                // Create a card for each evidence
-                (action.subcategories || []).forEach(evidence => {
-                    const card = {
-                        id: generateId('card'),
-                        boardId: board.id,
-                        columnId: backlogColumn.id,
-                        order: cardOrder++,
-                        title: evidence.name,
-                        description: evidence.text || '',
-                        sourceType: 'evidence',
-                        sourceId: evidence.id,
-                        sourceGrade: evidence.grade,
-                        assignments: [],
-                        schedule: {
-                            startDate: null,
-                            startMode: 'date',
-                            startDays: null,
-                            startDependency: null,
-                            dueDate: null,
-                            dueMode: 'date',
-                            dueDays: null,
-                            recurrence: {
-                                enabled: false,
-                                pattern: 'monthly',
-                                interval: 1,
-                                startOf: 'month',
-                                endOf: null,
-                                customDays: [],
-                                endMode: 'never',
-                                endOccurrences: null,
-                                endDate: null
-                            },
-                            reminders: []
-                        },
-                        checklist: [],
-                        labels: [...(action.tags || []), ...(evidence.tags || [])],
-                        attachments: convertFooterToAttachments(evidence.footer || {}),
-                        status: {
-                            current: 'pending',
-                            blocked: false,
-                            blockedReason: null,
-                            approvalStatus: null,
-                            approvedBy: null,
-                            approvedAt: null
-                        },
-                        effort: {
-                            estimated: null,
-                            actual: null,
-                            unit: 'hours'
-                        },
-                        activity: [],
-                        createdAt: new Date().toISOString(),
-                        createdBy: usersData.users[0]?.id || 'user-default-001',
-                        updatedAt: new Date().toISOString(),
-                        updatedBy: usersData.users[0]?.id || 'user-default-001'
-                    };
+            const convertToCard = (u, parentName, depth) => {
+                const lvl = template.levels[depth];
+                if (!lvl) return;
+                
+                const card = {
+                    id: generateId('card'),
+                    title: u.name || `Untitled ${lvl.singularName}`,
+                    description: u.description || '',
+                    columnId: isCompleted(flow.id, u.id) ? 'col-done' : 'col-backlog',
+                    order: cardOrder++,
+                    labels: (u.tags || []).map(tag => {
+                        const label = board.labels.find(l => l.name === tag);
+                        return label ? label.id : null;
+                    }).filter(Boolean),
+                    assignees: [],
+                    dueDate: null,
+                    attachments: [],
+                    checklist: [],
+                    comments: [],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                // Add metadata
+                if (parentName) {
+                    card.description = `**Parent:** ${parentName}\n\n${card.description}`;
+                }
+                
+                // Add attachments
+                if (u.footer) {
+                    if (u.footer.links && u.footer.links.length > 0) {
+                        u.footer.links.forEach(link => {
+                            card.attachments.push({
+                                id: generateId('attachment'),
+                                type: 'link',
+                                url: link.url,
+                                name: link.text,
+                                addedAt: new Date().toISOString()
+                            });
+                        });
+                    }
                     
-                    board.cards.push(card);
-                });
-            });
+                    if (u.footer.notes && u.footer.notes.length > 0) {
+                        u.footer.notes.forEach(note => {
+                            card.comments.push({
+                                id: generateId('comment'),
+                                text: `**${note.title}**\n\n${note.content}`,
+                                userId: 'system',
+                                createdAt: new Date().toISOString()
+                            });
+                        });
+                    }
+                    
+                    if (u.footer.comments && u.footer.comments.length > 0) {
+                        u.footer.comments.forEach(comment => {
+                            card.comments.push({
+                                id: generateId('comment'),
+                                text: comment,
+                                userId: 'system',
+                                createdAt: new Date().toISOString()
+                            });
+                        });
+                    }
+                }
+                
+                board.cards.push(card);
+                
+                // Recurse to children
+                if (u.subcategories && depth < template.levels.length - 1) {
+                    u.subcategories.forEach(child => convertToCard(child, u.name, depth + 1));
+                }
+            };
             
-            // Add activity log
-            board.activity.push({
-                id: generateId('act'),
-                boardId: board.id,
-                cardId: null,
-                userId: usersData.users[0]?.id || 'user-default-001',
-                type: 'board.created',
-                timestamp: new Date().toISOString(),
-                data: { boardName: board.name },
-                description: `Board "${board.name}" created from workflow control`
-            });
+            // Start conversion
+            if (unit.subcategories) {
+                unit.subcategories.forEach(child => convertToCard(child, unit.name, depth + 1));
+            }
             
             // Save board
             boardsData.boards.push(board);
@@ -1656,12 +1445,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(boardsData)
             });
             
-            const saveJson = await saveRes.json();
-            if (!saveRes.ok || saveJson.status !== 'success') {
-                throw new Error(saveJson.message || 'Failed to save board');
-            }
+            const result = await saveRes.json();
+            if (result.status !== 'success') throw new Error(result.message);
             
-            // Redirect to board
             alert(`Board "${board.name}" created successfully with ${board.cards.length} tasks!`);
             window.open(`board.html?id=${board.id}`, '_blank');
             
@@ -1669,234 +1455,83 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Export to board error:', e);
             alert('Failed to export to board: ' + e.message);
         }
-    }
-    
-    function convertFooterToAttachments(footer) {
-        const attachments = [];
-        const userId = 'user-default-001';
-        const now = new Date().toISOString();
-        
-        (footer.links || []).forEach(link => {
-            attachments.push({
-                id: generateId('att'),
-                type: 'link',
-                title: link.text,
-                url: link.url,
-                content: null,
-                uploadedBy: userId,
-                uploadedAt: now
-            });
-        });
-        
-        (footer.images || []).forEach(img => {
-            attachments.push({
-                id: generateId('att'),
-                type: 'image',
-                title: 'Image',
-                url: img,
-                content: null,
-                uploadedBy: userId,
-                uploadedAt: now
-            });
-        });
-        
-        (footer.notes || []).forEach(note => {
-            attachments.push({
-                id: generateId('att'),
-                type: 'note',
-                title: note.title,
-                url: null,
-                content: note.content,
-                uploadedBy: userId,
-                uploadedAt: now
-            });
-        });
-        
-        (footer.comments || []).forEach(comment => {
-            attachments.push({
-                id: generateId('att'),
-                type: 'comment',
-                title: 'Comment',
-                url: null,
-                content: comment,
-                uploadedBy: userId,
-                uploadedAt: now
-            });
-        });
-        
-        return attachments;
-    }
+    };
 
-    // --- TAG-BASED BOARD EXPORT ---
-    async function exportTagToBoard(tag, flowId) {
-        if (!confirm(`Create Project Board for all items tagged with "#${tag}"?\n\nThis will create a board with tasks from all Controls, Actions, and Evidence that have this tag.`)) {
+    window.exportTagToBoard = async (tag) => {
+        const flow = getCurrentFlow();
+        const template = getTemplate(flow);
+        
+        if (!flow || !template) return;
+        
+        if (!confirm(`Create Project Board for all items tagged with "#${tag}"?\n\nThis will create a board with tasks from all units that have this tag.`)) {
             return;
         }
         
         try {
             // Load PPM data
-            const boardsRes = await fetch(`ppm-boards.json?t=${Date.now()}`);
+            const boardsRes = await fetch(`data/ppm-boards.json?t=${Date.now()}`);
             const boardsData = await boardsRes.json();
             
-            const usersRes = await fetch(`ppm-users.json?t=${Date.now()}`);
-            const usersData = await usersRes.json();
-            
-            // Get current flow
-            const flow = getCurrentFlow();
-            if (!flow) {
-                alert('No workflow selected');
-                return;
-            }
-            
-            // Collect all items with the tag
-            const taggedItems = {
-                controls: [],
-                actions: [],
-                evidence: []
-            };
-            
-            (flow.data || []).forEach(control => {
-                // Check control
-                if (nodeHasTag(control, tag)) {
-                    taggedItems.controls.push(control);
-                }
-                
-                // Check actions
-                (control.subcategories || []).forEach(action => {
-                    if (nodeHasTag(action, tag)) {
-                        taggedItems.actions.push({
-                            action: action,
-                            controlName: control.name
-                        });
-                    }
-                    
-                    // Check evidence
-                    (action.subcategories || []).forEach(evidence => {
-                        if (nodeHasTag(evidence, tag)) {
-                            taggedItems.evidence.push({
-                                evidence: evidence,
-                                actionName: action.name,
-                                controlName: control.name
-                            });
-                        }
-                    });
-                });
-            });
-            
-            // Create board
             const board = {
                 id: generateId('board'),
-                name: `#${tag} - ${flow.name}`,
-                description: `Tasks filtered by tag "#${tag}" from workflow "${flow.name}"`,
-                sourceControlId: null,
-                sourceFlowId: flowId,
-                sourceTag: tag,
+                name: `#${tag}`,
+                description: `Tag-filtered board from ${flow.name}`,
                 createdAt: new Date().toISOString(),
-                createdBy: usersData.users[0]?.id || 'user-default-001',
-                archived: false,
-                members: [{
-                    userId: usersData.users[0]?.id || 'user-default-001',
-                    name: usersData.users[0]?.name || 'Default User',
-                    email: usersData.users[0]?.email || 'user@company.com',
-                    role: 'admin',
-                    avatar: usersData.users[0]?.avatar || '',
-                    joinedAt: new Date().toISOString()
-                }],
+                updatedAt: new Date().toISOString(),
                 columns: [
-                    { id: generateId('col'), name: 'Backlog', order: 0, limit: null, color: '#6c757d' },
-                    { id: generateId('col'), name: 'To Do', order: 1, limit: null, color: '#0d6efd' },
-                    { id: generateId('col'), name: 'In Progress', order: 2, limit: 5, color: '#0dcaf0' },
-                    { id: generateId('col'), name: 'Review', order: 3, limit: null, color: '#ffc107' },
-                    { id: generateId('col'), name: 'Done', order: 4, limit: null, color: '#198754' }
+                    { id: 'col-backlog', name: 'Backlog', order: 0, color: '#94a3b8' },
+                    { id: 'col-todo', name: 'To Do', order: 1, color: '#60a5fa' },
+                    { id: 'col-progress', name: 'In Progress', order: 2, color: '#f59e0b' },
+                    { id: 'col-done', name: 'Done', order: 3, color: '#10b981' }
                 ],
                 cards: [],
-                labels: [
-                    {
-                        id: generateId('label'),
-                        boardId: generateId('board'),
-                        name: tag,
-                        color: '#4a6cf7',
-                        description: 'Primary filter tag'
-                    }
-                ],
-                settings: {
-                    notificationsEnabled: true,
-                    allowGuestView: false,
-                    enforceWIPLimit: false
-                },
-                activity: []
+                labels: [{ id: 'label-tag', name: tag, color: '#6366f1' }],
+                settings: { theme: 'light', showArchived: false }
             };
             
-            const backlogColumn = board.columns[0];
+            // Collect all units with tag
             let cardOrder = 0;
-            
-            // Convert tagged controls to cards (all their evidence)
-            taggedItems.controls.forEach(control => {
-                (control.subcategories || []).forEach(action => {
-                    (action.subcategories || []).forEach(evidence => {
-                        const card = createCardFromEvidence(
-                            evidence,
-                            action,
-                            control,
-                            board,
-                            backlogColumn.id,
-                            cardOrder++,
-                            usersData.users[0]?.id || 'user-default-001'
-                        );
-                        board.cards.push(card);
-                    });
-                });
-            });
-            
-            // Convert tagged actions to cards (all their evidence)
-            taggedItems.actions.forEach(item => {
-                (item.action.subcategories || []).forEach(evidence => {
-                    // Check if already added from control
-                    const exists = board.cards.find(c => c.sourceId === evidence.id);
-                    if (!exists) {
-                        const card = createCardFromEvidence(
-                            evidence,
-                            item.action,
-                            { name: item.controlName },
-                            board,
-                            backlogColumn.id,
-                            cardOrder++,
-                            usersData.users[0]?.id || 'user-default-001'
-                        );
+            const collectTaggedUnits = (units, depth, parentChain = []) => {
+                if (!units || depth >= template.levels.length) return;
+                
+                units.forEach(unit => {
+                    if (nodeHasTag(unit, tag)) {
+                        const level = template.levels[depth];
+                        const card = {
+                            id: generateId('card'),
+                            title: unit.name || `Untitled ${level.singularName}`,
+                            description: unit.description || '',
+                            columnId: isCompleted(flow.id, unit.id) ? 'col-done' : 'col-backlog',
+                            order: cardOrder++,
+                            labels: ['label-tag'],
+                            assignees: [],
+                            dueDate: null,
+                            attachments: [],
+                            checklist: [],
+                            comments: [],
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString()
+                        };
+                        
+                        if (parentChain.length > 0) {
+                            card.description = `**Path:** ${parentChain.join(' → ')}\n\n${card.description}`;
+                        }
+                        
                         board.cards.push(card);
                     }
+                    
+                    if (unit.subcategories) {
+                        collectTaggedUnits(unit.subcategories, depth + 1, [...parentChain, unit.name]);
+                    }
                 });
-            });
+            };
             
-            // Convert tagged evidence to cards
-            taggedItems.evidence.forEach(item => {
-                // Check if already added
-                const exists = board.cards.find(c => c.sourceId === item.evidence.id);
-                if (!exists) {
-                    const card = createCardFromEvidence(
-                        item.evidence,
-                        { name: item.actionName },
-                        { name: item.controlName },
-                        board,
-                        backlogColumn.id,
-                        cardOrder++,
-                        usersData.users[0]?.id || 'user-default-001'
-                    );
-                    board.cards.push(card);
-                }
-            });
+            collectTaggedUnits(flow.data, 0);
             
-            // Add activity log
-            board.activity.push({
-                id: generateId('act'),
-                boardId: board.id,
-                cardId: null,
-                userId: usersData.users[0]?.id || 'user-default-001',
-                type: 'board.created',
-                timestamp: new Date().toISOString(),
-                data: { boardName: board.name, tag: tag },
-                description: `Board created from tag filter "#${tag}"`
-            });
+            if (board.cards.length === 0) {
+                alert(`No units found with tag "#${tag}"`);
+                return;
+            }
             
             // Save board
             boardsData.boards.push(board);
@@ -1906,92 +1541,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(boardsData)
             });
             
-            const saveJson = await saveRes.json();
-            if (!saveRes.ok || saveJson.status !== 'success') {
-                throw new Error(saveJson.message || 'Failed to save board');
-            }
+            const result = await saveRes.json();
+            if (result.status !== 'success') throw new Error(result.message);
             
-            // Redirect to board
-            const totalControls = taggedItems.controls.length;
-            const totalActions = taggedItems.actions.length;
-            const totalEvidence = taggedItems.evidence.length;
-            const summary = [];
-            if (totalControls > 0) summary.push(`${totalControls} Control${totalControls > 1 ? 's' : ''}`);
-            if (totalActions > 0) summary.push(`${totalActions} Action${totalActions > 1 ? 's' : ''}`);
-            if (totalEvidence > 0) summary.push(`${totalEvidence} Evidence item${totalEvidence > 1 ? 's' : ''}`);
-            
-            alert(`Board "#${tag}" created successfully!\n\nIncluded:\n- ${summary.join('\n- ')}\n- Total: ${board.cards.length} tasks`);
+            alert(`Board "#${tag}" created successfully with ${board.cards.length} tasks!`);
             window.open(`board.html?id=${board.id}`, '_blank');
             
         } catch (e) {
             console.error('Export tag to board error:', e);
             alert('Failed to create board from tag: ' + e.message);
         }
-    }
-    
-    function createCardFromEvidence(evidence, action, control, board, columnId, order, userId) {
-        const now = new Date().toISOString();
-        
-        return {
-            id: generateId('card'),
-            boardId: board.id,
-            columnId: columnId,
-            order: order,
-            title: evidence.name,
-            description: `**From:** ${control.name} → ${action.name}\n\n${evidence.text || ''}`,
-            sourceType: 'evidence',
-            sourceId: evidence.id,
-            sourceGrade: evidence.grade,
-            sourceContext: {
-                controlName: control.name,
-                actionName: action.name
-            },
-            assignments: [],
-            schedule: {
-                startDate: null,
-                startMode: 'date',
-                startDays: null,
-                startDependency: null,
-                dueDate: null,
-                dueMode: 'date',
-                dueDays: null,
-                recurrence: {
-                    enabled: false,
-                    pattern: 'monthly',
-                    interval: 1,
-                    startOf: 'month',
-                    endOf: null,
-                    customDays: [],
-                    endMode: 'never',
-                    endOccurrences: null,
-                    endDate: null
-                },
-                reminders: []
-            },
-            checklist: [],
-            labels: evidence.tags || [],
-            attachments: convertFooterToAttachments(evidence.footer || {}),
-            status: {
-                current: 'pending',
-                blocked: false,
-                blockedReason: null,
-                approvalStatus: null,
-                approvedBy: null,
-                approvedAt: null
-            },
-            effort: {
-                estimated: null,
-                actual: null,
-                unit: 'hours'
-            },
-            activity: [],
-            createdAt: now,
-            createdBy: userId,
-            updatedAt: now,
-            updatedBy: userId
-        };
-    }
-    
-    // LOAD
-    loadAll();
+    };
+
+    // Start the app
+    init();
 });

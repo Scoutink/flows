@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 
-$filename = 'ppm-boards.json';
+$filename = 'data/ppm-boards.json';
 $json_data = file_get_contents('php://input');
 
 if (empty($json_data)) {
