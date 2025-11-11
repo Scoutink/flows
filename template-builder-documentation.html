@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Manual: Workflow Template Builder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.8;
+            color: #343a40;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        main {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 2rem 3rem;
+        }
+        header {
+            text-align: center;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+        }
+        .version {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        h2 {
+            color: #4a6cf7;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-top: 40px;
+            font-size: 1.8rem;
+        }
+        h3 {
+            color: #495057;
+            margin-top: 30px;
+            font-size: 1.3rem;
+        }
+        h4 {
+            color: #495057;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        p, li {
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+            color: #495057;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .tip {
+            background-color: #d1ecf1;
+            border-left: 5px solid #0dcaf0;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .important {
+            background-color: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .feature {
+            background-color: #e7f5ff;
+            border-left: 5px solid #4a6cf7;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .new-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        ul, ol {
+            padding-left: 25px;
+        }
+        ul {
+            list-style-type: none;
+        }
+        ul li {
+            padding-left: 1.4em;
+            text-indent: -1.4em;
+        }
+        ul li:before {
+            content: "✓ ";
+            color: #4a6cf7;
+            font-weight: bold;
+            margin-right: 0.5em;
+        }
+        ol {
+            list-style-type: decimal;
+        }
+        ol li {
+            padding-left: 0.5em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table th, table td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        .app-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4a6cf7 0%, #667eea 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin: 10px 5px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .app-button:hover {
+            transform: translateY(-2px);
+        }
+        .toc {
+            background-color: #f8f9fa;
+            border-left: 4px solid #4a6cf7;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+        .toc h3 {
+            margin-top: 0;
+            color: #4a6cf7;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            padding: 5px 0;
+            text-indent: 0;
+        }
+        .toc li:before {
+            content: "→ ";
+            color: #4a6cf7;
+        }
+        .toc a {
+            color: #4a6cf7;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .workflow-visual {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+            line-height: 2;
+        }
+        .example-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #4a6cf7;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .example-box h4 {
+            margin-top: 0;
+            color: #4a6cf7;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.95em;
+        }
+        .property-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .property-card {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .property-icon {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #4a6cf7;
+        }
+        .property-card h4 {
+            margin: 10px 0;
+            color: #4a6cf7;
+        }
+        .property-card p {
+            font-size: 0.95rem;
+            margin: 10px 0;
+        }
+        .structure-diagram {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+        .checkbox-demo {
+            display: inline-block;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 5px;
+            border: 2px solid #dee2e6;
+        }
+        .level-example {
+            background-color: #e7f5ff;
+            border: 2px solid #4a6cf7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <header>
+            <h1>🏗️ Workflow Template Builder Manual</h1>
+            <p>Complete guide to creating dynamic, reusable workflow templates</p>
+            <div class="version">Version 7.0 - Dynamic Templates System</div>
+            <a href="template-builder.html" class="app-button"><i class="fa-solid fa-layer-group"></i> Open Template Builder</a>
+            <a href="index.html" class="app-button"><i class="fa-solid fa-sitemap"></i> Open Workflows</a>
+        </header>
+
+        <div class="toc">
+            <h3>📑 Quick Navigation</h3>
+            <ul>
+                <li><a href="#introduction">Introduction & Concepts</a></li>
+                <li><a href="#why-templates">Why Use Templates?</a></li>
+                <li><a href="#getting-started">Getting Started</a></li>
+                <li><a href="#template-identity">Template Identity (Name & Description)</a></li>
+                <li><a href="#workflow-config">Workflow-Level Configuration</a></li>
+                <li><a href="#levels">Defining Workflow Levels</a></li>
+                <li><a href="#unit-config">Unit Properties Configuration</a></li>
+                <li><a href="#validation">Template Validation & Rules</a></li>
+                <li><a href="#creating-workflow">Creating Workflows from Templates</a></li>
+                <li><a href="#examples">Template Examples & Use Cases</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+                <li><a href="#tips">Tips & Tricks</a></li>
+                <li><a href="#faq">Frequently Asked Questions</a></li>
+            </ul>
+        </div>
+
+        <div class="highlight">
+            <strong><i class="fa-solid fa-star"></i> New in Version 7.0:</strong>
+            <ul>
+                <li><strong>Dynamic Templates</strong> - Define any workflow structure, not limited to 3 levels</li>
+                <li><strong>Customizable Properties</strong> - Choose which features appear at each level</li>
+                <li><strong>Template Snapshots</strong> - Workflows preserve their template even if you edit the template later</li>
+                <li><strong>Icon Support</strong> - Add visual icons to workflows and units</li>
+                <li><strong>Cumulative Grading</strong> - Automatic grade calculations from children to parents</li>
+            </ul>
+        </div>
+
+        <section id="introduction">
+            <h2>1. Introduction & Concepts</h2>
+            
+            <h3>What Are Workflow Templates?</h3>
+            <p>Workflow templates are <strong>reusable blueprints</strong> that define the structure and properties of your workflows. Instead of building every workflow from scratch, you create a template once and use it to generate multiple workflows with consistent structure.</p>
+
+            <div class="feature">
+                <strong><i class="fa-solid fa-lightbulb"></i> Key Concept:</strong> Think of templates like cookie cutters. The template is the cutter shape, and workflows are the cookies you make from it. Change the cutter, and all new cookies have the new shape - but cookies you already made stay the same.
+            </div>
+
+            <h3>Templates vs. Workflows: The Relationship</h3>
+            
+            <div class="structure-diagram">
+<strong>Template</strong> (The Blueprint)<br>
+    ↓ Creates ↓<br>
+<strong>Workflow 1</strong> (Instance for Project A)<br>
+<strong>Workflow 2</strong> (Instance for Project B)<br>
+<strong>Workflow 3</strong> (Instance for Project C)<br>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Template</th>
+                        <th>Workflow (Instance)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Blueprint/structure definition</td>
+                        <td>Actual work instance</td>
+                    </tr>
+                    <tr>
+                        <td>Defines what <em>can</em> exist</td>
+                        <td>Contains actual data</td>
+                    </tr>
+                    <tr>
+                        <td>Reusable (create many workflows from it)</td>
+                        <td>Unique (specific to one project/use case)</td>
+                    </tr>
+                    <tr>
+                        <td>Edited in Template Builder</td>
+                        <td>Edited in Workflow Manager</td>
+                    </tr>
+                    <tr>
+                        <td>Defines levels (1 to 10)</td>
+                        <td>Contains units at those levels</td>
+                    </tr>
+                    <tr>
+                        <td>Example: "NIST CSF Template"</td>
+                        <td>Example: "NIST CSF - Q1 2025 Audit"</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>The Old Way vs. The New Way</h3>
+            
+            <h4>Old System (Version 6):</h4>
+            <p>All workflows had the same fixed structure:</p>
+            <ul style="list-style-type: disc; padding-left: 20px;">
+                <li><strong>Level 1:</strong> Rules (Controls)</li>
+                <li><strong>Level 2:</strong> Actions</li>
+                <li><strong>Level 3:</strong> Evidence</li>
+                <li>Properties were hardcoded - couldn't customize</li>
+                <li>Couldn't add more levels or fewer levels</li>
+            </ul>
+
+            <h4>New System (Version 7 - Templates):</h4>
+            <p>You decide everything:</p>
+            <ul style="list-style-type: disc; padding-left: 20px;">
+                <li><strong>Levels:</strong> 1 to 10 levels, you name them</li>
+                <li><strong>Properties:</strong> Choose which features each level has</li>
+                <li><strong>Workflow Options:</strong> Icon, description, sequential order - all optional</li>
+                <li><strong>Flexibility:</strong> One template for audits, another for projects, another for checklists</li>
+            </ul>
+
+            <div class="example-box">
+                <h4>💡 Real-World Analogy</h4>
+                <p><strong>Old System:</strong> All buildings must have 3 floors (basement, ground, first floor) with fixed room layouts.</p>
+                <p><strong>New System:</strong> You're the architect. Design a 1-story house, 5-story office building, or 10-story apartment complex. Decide which floors have elevators, balconies, or parking.</p>
+            </div>
+        </section>
+
+        <section id="why-templates">
+            <h2>2. Why Use Templates?</h2>
+            
+            <h3>Benefits of Template-Based Workflows</h3>
+            
+            <h4>1. Consistency</h4>
+            <p>Every workflow created from the same template has the same structure. Your team always knows what to expect.</p>
+            
+            <div class="example-box">
+                <h4>💡 Example</h4>
+                <p><strong>Template:</strong> "Quarterly Audit"</p>
+                <p><strong>Workflows:</strong> Q1 Audit, Q2 Audit, Q3 Audit, Q4 Audit</p>
+                <p><strong>Result:</strong> All four audits have identical structure - same levels, same properties. Team learns it once.</p>
+            </div>
+
+            <h4>2. Reusability</h4>
+            <p>Create the structure once, use it forever. No need to rebuild workflows from scratch.</p>
+
+            <h4>3. Flexibility</h4>
+            <p>Different templates for different purposes:</p>
+            <ul style="list-style-type: disc; padding-left: 20px;">
+                <li><strong>Compliance Template:</strong> 3 levels (Controls → Actions → Evidence)</li>
+                <li><strong>Project Template:</strong> 4 levels (Phase → Milestone → Task → Subtask)</li>
+                <li><strong>Checklist Template:</strong> 1 level (Items only)</li>
+                <li><strong>Development Template:</strong> 5 levels (Epic → Feature → Story → Task → Subtask)</li>
+            </ul>
+
+            <h4>4. Easy Updates</h4>
+            <p>Need to change the structure? Edit the template once. All <em>new</em> workflows get the updated design. Existing workflows stay unchanged (protecting your work).</p>
+
+            <h4>5. Customization Per Level</h4>
+            <p>Control which properties appear at each level:</p>
+            <ul style="list-style-type: disc; padding-left: 20px;">
+                <li>Level 1 might have icon, name, description, and progress bar</li>
+                <li>Level 2 might have name, description, tags, and grade</li>
+                <li>Level 3 might have everything including attachments and done checkbox</li>
+            </ul>
+
+            <div class="feature">
+                <strong><i class="fa-solid fa-shield-alt"></i> Protection Built-In:</strong> When you create a workflow from a template, it gets a "snapshot" copy of that template. If you later edit the template, existing workflows are unaffected. This protects your completed work while allowing template improvements.
+            </div>
+
+            <h3>When to Create a New Template</h3>
+            <p>Create a template when you have:</p>
+            <ul>
+                <li>A repeatable process (audits, reviews, projects)</li>
+                <li>A standard structure your team uses often</li>
+                <li>Different types of workflows needing different structures</li>
+                <li>A workflow pattern you want to formalize</li>
+            </ul>
+
+            <h3>When NOT to Create a Template</h3>
+            <p>Don't create a template if:</p>
+            <ul>
+                <li>You only need this workflow structure once</li>
+                <li>The workflow is highly unique and won't be reused</li>
+                <li>You're still experimenting and the structure will change frequently</li>
+            </ul>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-hand-pointer"></i> Pro Tip:</strong> Start with one or two general-purpose templates (like "Classic Compliance" and "Simple Checklist"). As patterns emerge in your work, create specialized templates for specific use cases.
+            </div>
+        </section>
+
+        <section id="getting-started">
+            <h2>3. Getting Started</h2>
+            
+            <h3>Accessing the Template Builder</h3>
+            <ol>
+                <li>From the Workflow Manager, ensure you're in <strong>Creation Mode</strong> (toggle at top-right)</li>
+                <li>Click <strong>"<i class="fa-solid fa-layer-group"></i> Templates"</strong> link in the navigation</li>
+                <li>The Template Builder opens showing all existing templates</li>
+            </ol>
+
+            <h3>Template Builder Interface Overview</h3>
+            <p>The main screen shows:</p>
+            <ul>
+                <li><strong>Header:</strong> "Workflow Templates" title and "Create New Template" button</li>
+                <li><strong>Template List:</strong> All your existing templates (if any)</li>
+                <li><strong>Template Cards:</strong> Each template shows:
+                    <ul style="list-style-type: circle; padding-left: 20px;">
+                        <li>Template name and description</li>
+                        <li>Number of levels (e.g., "3 levels")</li>
+                        <li>"Default" badge if it's the default template</li>
+                        <li>Action buttons (View, Edit, Delete)</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>Your First Template: Quick Start</h3>
+            <p>Let's create a simple 2-level checklist template:</p>
+            
+            <ol>
+                <li>Click <strong>"<i class="fa-solid fa-plus"></i> Create New Template"</strong></li>
+                <li>Enter name: <code>Simple Checklist</code></li>
+                <li>Enter description: <code>Basic 2-level checklist for simple tasks</code></li>
+                <li>Leave "Set as default" unchecked (for now)</li>
+                <li>Scroll to <strong>"Workflow-Level Configuration"</strong>:
+                    <ul style="list-style-type: circle; padding-left: 20px;">
+                        <li>Uncheck "Workflow Icon" (keep it simple)</li>
+                        <li>Uncheck "Workflow Description"</li>
+                        <li>Uncheck "Sequential Order"</li>
+                    </ul>
+                </li>
+                <li>Scroll to <strong>"Workflow Levels"</strong> - you have 1 level by default</li>
+                <li>Click <strong>"<i class="fa-solid fa-plus"></i> Add Level"</strong> to add a second level</li>
+                <li>Configure <strong>Level 1</strong>:
+                    <ul style="list-style-type: circle; padding-left: 20px;">
+                        <li>Name: <code>Category</code></li>
+                        <li>Singular: <code>Category</code></li>
+                        <li>Plural: <code>Categories</code></li>
+                        <li>Description: <code>Main category grouping</code></li>
+                        <li>Unit Properties: Enable <strong>Name</strong> and <strong>Progress Bar</strong> only</li>
+                    </ul>
+                </li>
+                <li>Configure <strong>Level 2</strong>:
+                    <ul style="list-style-type: circle; padding-left: 20px;">
+                        <li>Name: <code>Item</code></li>
+                        <li>Singular: <code>Item</code></li>
+                        <li>Plural: <code>Items</code></li>
+                        <li>Description: <code>Individual checklist item</code></li>
+                        <li>Unit Properties: Enable <strong>Name</strong>, <strong>Description</strong>, <strong>Done</strong>, and <strong>Notes</strong></li>
+                    </ul>
+                </li>
+                <li>Click <strong>"<i class="fa-solid fa-check"></i> Create Template"</strong></li>
+                <li>Success! Your template is created</li>
+            </ol>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-graduation-cap"></i> What You Just Created:</strong> A 2-level checklist where you can have multiple Categories, and each Category contains multiple Items. Categories show progress bars (how many items are done), and Items have a done checkbox. Perfect for simple task tracking!
+            </div>
+
+            <h3>Testing Your Template</h3>
+            <ol>
+                <li>Return to Workflow Manager (click "Compliance Manager" or back button)</li>
+                <li>Click <strong>"<i class="fa-solid fa-plus"></i> New"</strong> button</li>
+                <li>Select <strong>"From Template"</strong></li>
+                <li>Choose your <code>Simple Checklist</code> template</li>
+                <li>Name it: <code>My First Checklist</code></li>
+                <li>Click <strong>"Create Workflow"</strong></li>
+                <li>Start adding Categories and Items!</li>
+            </ol>
+        </section>
+
+        <section id="template-identity">
+            <h2>4. Template Identity (Name & Description)</h2>
+            
+            <h3>Template Name</h3>
+            <p><strong>Required.</strong> This is what users see when selecting a template for a new workflow.</p>
+            
+            <h4>Best Practices for Template Names:</h4>
+            <ul>
+                <li><strong>Descriptive:</strong> "NIST CSF Compliance" not just "Template 1"</li>
+                <li><strong>Specific:</strong> "Quarterly Security Audit" not "Audit"</li>
+                <li><strong>Use Case:</strong> Include what it's for: "Software Development Sprint"</li>
+                <li><strong>Consistent:</strong> If you have multiple, use a naming convention</li>
+            </ul>
+
+            <div class="example-box">
+                <h4>💡 Good Template Names</h4>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li><strong>"Classic Compliance (3-Level)"</strong> - Clear structure indication</li>
+                    <li><strong>"ISO 27001 Controls"</strong> - Standard it's based on</li>
+                    <li><strong>"Agile Sprint Planning"</strong> - Use case clear</li>
+                    <li><strong>"Simple Task Checklist"</strong> - Indicates simplicity</li>
+                    <li><strong>"Complex Project (5-Level)"</strong> - Complexity noted</li>
+                </ul>
+            </div>
+
+            <h3>Template Description</h3>
+            <p><strong>Optional but recommended.</strong> Explain when and how to use this template.</p>
+
+            <h4>What to Include:</h4>
+            <ul>
+                <li><strong>Purpose:</strong> What is this template for?</li>
+                <li><strong>Structure:</strong> Brief overview of levels</li>
+                <li><strong>Use Cases:</strong> When should someone choose this template?</li>
+                <li><strong>Tips:</strong> Any special notes</li>
+            </ul>
+
+            <div class="example-box">
+                <h4>💡 Good Template Description</h4>
+                <p><strong>Template:</strong> "NIST CSF Compliance"</p>
+                <p><strong>Description:</strong></p>
+                <p><code>Three-level template for NIST Cybersecurity Framework compliance workflows. Structure: Controls → Actions → Evidence. Use this for annual NIST audits, continuous monitoring, or compliance assessments. Controls track overall compliance areas, Actions define implementation steps, and Evidence captures proof of compliance.</code></p>
+            </div>
+
+            <h3>Default Template</h3>
+            <p>The <strong>"Set as default template"</strong> checkbox makes this template pre-selected when creating new workflows.</p>
+
+            <h4>When to Mark as Default:</h4>
+            <ul>
+                <li>This is your most commonly used template</li>
+                <li>New users should start with this template</li>
+                <li>You want to streamline workflow creation</li>
+            </ul>
+
+            <div class="important">
+                <strong>⚠️ Only One Default:</strong> Setting a template as default automatically unsets any other default. You can only have one default template at a time.
+            </div>
+        </section>
+
+        <section id="workflow-config">
+            <h2>5. Workflow-Level Configuration</h2>
+            
+            <h3>What is Workflow-Level Configuration?</h3>
+            <p>These are properties that apply to the <em>entire workflow</em>, not individual units. When enabled, users can set these when creating or editing a workflow.</p>
+
+            <div class="property-grid">
+                <div class="property-card">
+                    <div class="property-icon">🎨</div>
+                    <h4>Workflow Icon</h4>
+                    <p>Allow workflows to have a visual icon displayed next to the workflow name.</p>
+                    <p><strong>When to enable:</strong> Visual identification helpful, multiple workflows exist.</p>
+                </div>
+                
+                <div class="property-card">
+                    <div class="property-icon">📝</div>
+                    <h4>Workflow Description</h4>
+                    <p>Allow workflows to have a description field explaining the workflow's purpose.</p>
+                    <p><strong>When to enable:</strong> Need context, documentation, or purpose clarification.</p>
+                </div>
+                
+                <div class="property-card">
+                    <div class="property-icon">⚡</div>
+                    <h4>Sequential Order Option</h4>
+                    <p>Allow enforcing sequential completion (items must be done in order).</p>
+                    <p><strong>When to enable:</strong> Order matters, dependencies exist, compliance requires sequential steps.</p>
+                </div>
+            </div>
+
+            <h3>How These Work in Practice</h3>
+            
+            <h4>If Enabled in Template:</h4>
+            <p>When a user creates a workflow from this template, they'll see:</p>
+            <ul>
+                <li><strong>Workflow Icon</strong> - "Add Icon" button to select from available icons</li>
+                <li><strong>Workflow Description</strong> - Text area to enter description</li>
+                <li><strong>Sequential Order</strong> - Checkbox to enable/disable sequential enforcement</li>
+            </ul>
+
+            <h4>If Disabled in Template:</h4>
+            <p>These options simply don't appear. The workflow is created without them.</p>
+
+            <div class="example-box">
+                <h4>💡 Configuration Example</h4>
+                <p><strong>Template:</strong> "Compliance Audit"</p>
+                <p><strong>Enabled:</strong></p>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>✅ Workflow Icon - Different audits get different icons</li>
+                    <li>✅ Workflow Description - Explain the audit scope</li>
+                    <li>✅ Sequential Order - Evidence must be collected in sequence</li>
+                </ul>
+                <p><strong>Result:</strong> Every audit workflow can have an icon, description, and optional sequential enforcement.</p>
+            </div>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-toggle-on"></i> Default Approach:</strong> When in doubt, enable these features. They're optional for users - if they don't need them, they can leave them blank. It's better to have the option than to realize later you need it and have to recreate the template.
+            </div>
+        </section>
+
+        <section id="levels">
+            <h2>6. Defining Workflow Levels</h2>
+            
+            <h3>What Are Levels?</h3>
+            <p>Levels define the hierarchical structure of your workflow. Each level is a "layer" in the tree structure.</p>
+
+            <div class="structure-diagram">
+<strong>3-Level Example:</strong><br>
+<br>
+Level 1: Control (Root)<br>
+   ↓ contains ↓<br>
+Level 2: Action (Children)<br>
+   ↓ contains ↓<br>
+Level 3: Evidence (Grandchildren)<br>
+            </div>
+
+            <h3>Level Configuration Fields</h3>
+            <p>For each level, you define:</p>
+
+            <h4>1. Level Name (Display Name)</h4>
+            <p><strong>Purpose:</strong> What you see in the template builder (e.g., "Control", "Action", "Evidence")</p>
+            <p><strong>Example:</strong> <code>Control</code>, <code>Phase</code>, <code>Category</code></p>
+
+            <h4>2. Singular Name</h4>
+            <p><strong>Purpose:</strong> Used in UI text when referring to one unit (e.g., "Add New <em>Control</em>")</p>
+            <p><strong>Example:</strong> <code>Control</code>, <code>Task</code>, <code>Item</code></p>
+
+            <h4>3. Plural Name</h4>
+            <p><strong>Purpose:</strong> Used in UI text when referring to multiple units (e.g., "No <em>Controls</em> Yet")</p>
+            <p><strong>Example:</strong> <code>Controls</code>, <code>Tasks</code>, <code>Items</code></p>
+
+            <h4>4. Level Description</h4>
+            <p><strong>Purpose:</strong> Internal documentation - what this level represents</p>
+            <p><strong>Example:</strong> <code>High-level compliance control areas</code></p>
+
+            <div class="example-box">
+                <h4>💡 Complete Level Example</h4>
+                <p><strong>Level 1 Configuration:</strong></p>
+                <table style="font-size: 0.9rem;">
+                    <tr>
+                        <td><strong>Name:</strong></td>
+                        <td><code>Control</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Singular:</strong></td>
+                        <td><code>Control</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Plural:</strong></td>
+                        <td><code>Controls</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Description:</strong></td>
+                        <td><code>High-level compliance requirement or control objective</code></td>
+                    </tr>
+                </table>
+                <p><strong>UI Result:</strong></p>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>Button text: "Add New <strong>Control</strong>"</li>
+                    <li>Empty state: "No <strong>Controls</strong> Yet"</li>
+                    <li>Delete confirmation: "Delete this <strong>control</strong>?"</li>
+                </ul>
+            </div>
+
+            <h3>Adding and Removing Levels</h3>
+            
+            <h4>Adding a Level:</h4>
+            <ol>
+                <li>Click <strong>"<i class="fa-solid fa-plus"></i> Add Level"</strong> button</li>
+                <li>New level appears at the bottom</li>
+                <li>Configure its name and properties</li>
+                <li>Maximum: 10 levels</li>
+            </ol>
+
+            <h4>Removing a Level:</h4>
+            <ol>
+                <li>Click the <strong><i class="fa-solid fa-trash"></i> Delete</strong> button on the level</li>
+                <li>Confirm deletion</li>
+                <li>Minimum: 1 level (can't delete if only one remains)</li>
+            </ol>
+
+            <h4>Reordering Levels:</h4>
+            <ol>
+                <li>Use <strong><i class="fa-solid fa-arrow-up"></i> Move Up</strong> button to move level higher</li>
+                <li>Use <strong><i class="fa-solid fa-arrow-down"></i> Move Down</strong> button to move level lower</li>
+                <li>Top level is Level 1 (root), bottom level is the deepest (leaves)</li>
+            </ol>
+
+            <div class="important">
+                <strong>⚠️ Order Matters:</strong> Level 1 is always the root (top-level items). Level 2 are children of Level 1. Level 3 are children of Level 2, and so on. You can't have Level 3 items without Level 2 parents.
+            </div>
+
+            <h3>How Many Levels Should You Have?</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Levels</th>
+                        <th>Best For</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1 Level</strong></td>
+                        <td>Simple flat lists, basic checklists</td>
+                        <td>Shopping list, task list</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2 Levels</strong></td>
+                        <td>Grouped items, categorized lists</td>
+                        <td>Categories → Items</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3 Levels</strong></td>
+                        <td>Complex workflows, compliance (most common)</td>
+                        <td>Control → Action → Evidence</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4 Levels</strong></td>
+                        <td>Projects with phases and milestones</td>
+                        <td>Phase → Milestone → Task → Subtask</td>
+                    </tr>
+                    <tr>
+                        <td><strong>5+ Levels</strong></td>
+                        <td>Very complex hierarchies, large programs</td>
+                        <td>Program → Project → Epic → Story → Task</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-balance-scale"></i> Keep It Simple:</strong> More levels = more flexibility, but also more complexity. Start with 2-3 levels. Add more only if you genuinely need the hierarchical depth. Most use cases work perfectly with 3 levels.
+            </div>
+        </section>
+
+        <section id="unit-config">
+            <h2>7. Unit Properties Configuration</h2>
+            
+            <h3>What Are Unit Properties?</h3>
+            <p>Unit properties are the <strong>features and fields</strong> that appear on individual units (items) in a workflow. For each level, you decide which properties are available.</p>
+
+            <div class="feature">
+                <strong><i class="fa-solid fa-wrench"></i> Customization Power:</strong> Level 1 might show icons and progress bars but no attachments. Level 3 might show everything including done checkboxes and full attachments. You control it per level.
+            </div>
+
+            <h3>All Available Properties</h3>
+
+            <h4>Identity Properties</h4>
+            <p>These define how users identify and name units:</p>
+
+            <div class="property-grid">
+                <div class="property-card">
+                    <div class="property-icon">🎨</div>
+                    <h4>Display Icon</h4>
+                    <p>Shows an icon next to the unit name. Users can select from available icons.</p>
+                    <p><strong>Best for:</strong> Visual identification, categorization</p>
+                </div>
+                
+                <div class="property-card">
+                    <div class="property-icon">🔢</div>
+                    <h4>Display ID</h4>
+                    <p>Short identifier or code (e.g., "AC-01", "TASK-123").</p>
+                    <p><strong>Best for:</strong> Standards compliance, reference numbering</p>
+                </div>
+                
+                <div class="property-card">
+                    <div class="property-icon">✏️</div>
+                    <h4>Name</h4>
+                    <p>The unit's title or name. <strong>Always enabled by default</strong> (can't disable).</p>
+                    <p><strong>Required:</strong> Every unit must have a name</p>
+                </div>
+                
+                <div class="property-card">
+                    <div class="property-icon">📄</div>
+                    <h4>Description</h4>
+                    <p>Longer text field for detailed explanation or instructions.</p>
+                    <p><strong>Best for:</strong> Context, requirements, detailed info</p>
+                </div>
+            </div>
+
+            <h4>Workflow Properties</h4>
+            <p>These help with workflow management:</p>
+
+            <div class="property-grid">
+                <div class="property-card">
+                    <div class="property-icon">🏷️</div>
+                    <h4>Tags</h4>
+                    <p>Add keywords/labels to units for filtering and categorization.</p>
+                    <p><strong>Best for:</strong> Filtering, searching, grouping</p>
+                </div>
+                
+                <div class="property-card">
+                    <div class="property-icon">✅</div>
+                    <h4>Done Checkbox</h4>
+                    <p>Checkbox to mark unit as complete (execution mode only).</p>
+                    <p><strong>Best for:</strong> Leaf nodes (bottom level), tracking completion</p>
+                </div>
+                
+                <div class="property-card">
+                    <div class="property-icon">💯</div>
+                    <h4>Grade</h4>
+                    <p>Numeric score/grade for the unit. Can be cumulative (sum of children).</p>
+                    <p><strong>Best for:</strong> Scoring, weighted assessments</p>
+                </div>
+                
+                <div class="property-card">
+                    <div class="property-icon">📊</div>
+                    <h4>Progress Bar</h4>
+                    <p>Visual bar showing completion % based on children's done status.</p>
+                    <p><strong>Best for:</strong> Parent levels, visual progress tracking</p>
+                </div>
+            </div>
+
+            <h4>Attachment Properties</h4>
+            <p>These allow users to attach supporting materials:</p>
+
+            <div class="property-grid">
+                <div class="property-card">
+                    <div class="property-icon">🔗</div>
+                    <h4>Links</h4>
+                    <p>Attach URLs to external documents, websites, or resources.</p>
+                    <p><strong>Best for:</strong> References, policy docs, external systems</p>
+                </div>
+                
+                <div class="property-card">
+                    <div class="property-icon">🖼️</div>
+                    <h4>Images</h4>
+                    <p>Attach image URLs for screenshots, diagrams, photos.</p>
+                    <p><strong>Best for:</strong> Visual evidence, diagrams, screenshots</p>
+                </div>
+                
+                <div class="property-card">
+                    <div class="property-icon">📝</div>
+                    <h4>Notes</h4>
+                    <p>Rich text notes with formatting (headers, lists, bold, etc.).</p>
+                    <p><strong>Best for:</strong> Detailed instructions, procedures, guides</p>
+                </div>
+                
+                <div class="property-card">
+                    <div class="property-icon">💬</div>
+                    <h4>Comments</h4>
+                    <p>Simple text comments for quick notes or reminders.</p>
+                    <p><strong>Best for:</strong> Quick notes, clarifications, reminders</p>
+                </div>
+            </div>
+
+            <h3>Cumulative Grade Feature</h3>
+            <p>When you enable <strong>Grade</strong> for a level, you see an additional option:</p>
+            
+            <div class="checkbox-demo">
+                <strong>☑ Cumulative Grade</strong> (enabled by default when Grade is enabled)
+            </div>
+
+            <h4>How Cumulative Grade Works:</h4>
+            <ul>
+                <li><strong>If Cumulative is ON:</strong> Unit's grade = sum of all children's grades (read-only, auto-calculated)</li>
+                <li><strong>If Cumulative is OFF:</strong> Unit's grade is independent (user enters manually)</li>
+            </ul>
+
+            <div class="example-box">
+                <h4>💡 Cumulative Grade Example</h4>
+                <p><strong>Structure:</strong></p>
+                <ul style="list-style-type: none; padding-left: 20px;">
+                    <li>Control A (Cumulative Grade: ON)</li>
+                    <li>&nbsp;&nbsp;├─ Action 1: Grade = 25</li>
+                    <li>&nbsp;&nbsp;├─ Action 2: Grade = 30</li>
+                    <li>&nbsp;&nbsp;└─ Action 3: Grade = 45</li>
+                </ul>
+                <p><strong>Result:</strong> Control A's grade automatically = 100 (25 + 30 + 45)</p>
+                <p><strong>Benefit:</strong> Parent scores reflect child completion automatically. Perfect for weighted compliance scoring!</p>
+            </div>
+
+            <div class="important">
+                <strong>⚠️ Validation Rule:</strong> Progress Bar requires child level to have Done Checkbox enabled. If Level 2 has a progress bar, Level 3 must have the done checkbox. The system will warn you if this rule is violated.
+            </div>
+
+            <h3>Typical Property Combinations</h3>
+
+            <h4>For Top/Parent Levels (Level 1, 2):</h4>
+            <p>Enable:</p>
+            <ul style="list-style-type: disc; padding-left: 20px;">
+                <li>Icon (visual grouping)</li>
+                <li>Display ID (reference numbers)</li>
+                <li>Name (always)</li>
+                <li>Description (explain purpose)</li>
+                <li>Tags (categorization)</li>
+                <li>Grade with Cumulative (roll-up scoring)</li>
+                <li>Progress Bar (track child completion)</li>
+            </ul>
+            <p>Don't Enable:</p>
+            <ul style="list-style-type: disc; padding-left: 20px;">
+                <li>Done Checkbox (parents don't have done state)</li>
+                <li>Attachments (keep at leaf level for clarity)</li>
+            </ul>
+
+            <h4>For Bottom/Leaf Levels (Last level):</h4>
+            <p>Enable:</p>
+            <ul style="list-style-type: disc; padding-left: 20px;">
+                <li>Name (always)</li>
+                <li>Description (detailed instructions)</li>
+                <li>Tags (filtering)</li>
+                <li>Done Checkbox (mark complete)</li>
+                <li>Grade without Cumulative (individual scoring)</li>
+                <li>All Attachments (links, images, notes, comments)</li>
+            </ul>
+            <p>Don't Enable:</p>
+            <ul style="list-style-type: disc; padding-left: 20px;">
+                <li>Progress Bar (no children to track)</li>
+            </ul>
+        </section>
+
+        <section id="validation">
+            <h2>8. Template Validation & Rules</h2>
+            
+            <h3>What is Template Validation?</h3>
+            <p>When you click "Create Template" or "Update Template", the system checks for errors. If any validation rules fail, you'll see a red error banner listing all issues.</p>
+
+            <div class="important">
+                <strong><i class="fa-solid fa-exclamation-triangle"></i> Can't Save Until Valid:</strong> You must fix all validation errors before the template can be saved. This protects against creating broken templates.
+            </div>
+
+            <h3>Validation Rules</h3>
+
+            <h4>Template-Level Rules:</h4>
+            <ul>
+                <li><strong>Template name is required</strong> - Must enter a name</li>
+                <li><strong>Template must have at least 1 level</strong> - Can't be empty</li>
+                <li><strong>Template can't exceed 10 levels</strong> - Maximum limit</li>
+            </ul>
+
+            <h4>Level-Level Rules (For Each Level):</h4>
+            <ul>
+                <li><strong>Level name is required</strong> - Must enter display name</li>
+                <li><strong>Singular name is required</strong> - Must enter singular form</li>
+                <li><strong>Plural name is required</strong> - Must enter plural form</li>
+            </ul>
+
+            <h4>Property Dependency Rules:</h4>
+            <ul>
+                <li><strong>Progress Bar requires child level to have Done Checkbox</strong>
+                    <ul style="list-style-type: circle; padding-left: 20px;">
+                        <li>If Level 2 has progress bar enabled, Level 3 must exist AND have done checkbox enabled</li>
+                        <li>Last level can't have progress bar (no children to calculate from)</li>
+                    </ul>
+                </li>
+                <li><strong>Cumulative Grade requires child level to have Grade</strong>
+                    <ul style="list-style-type: circle; padding-left: 20px;">
+                        <li>If Level 1 has cumulative grade, Level 2 must have grade enabled</li>
+                        <li>Last level can't have cumulative grade (no children to sum from)</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div class="example-box">
+                <h4>💡 Validation Error Example</h4>
+                <p><strong>Error Message:</strong></p>
+                <div style="background: #f8d7da; padding: 10px; border-left: 4px solid #dc3545; border-radius: 4px; font-family: monospace; font-size: 0.9rem; margin: 10px 0;">
+                    Please fix the following errors:<br>
+                    • Level 1 name is required<br>
+                    • Level 2 singular name is required<br>
+                    • Level 1 has Progress Bar enabled but Level 2 doesn't have Done Checkbox
+                </div>
+                <p><strong>What to fix:</strong></p>
+                <ul style="list-style-type: decimal; padding-left: 20px;">
+                    <li>Fill in Level 1's name field</li>
+                    <li>Fill in Level 2's singular name field</li>
+                    <li>Enable "Done" checkbox on Level 2, OR disable "Progress Bar" on Level 1</li>
+                </ul>
+            </div>
+
+            <h3>Common Validation Issues and Fixes</h3>
+
+            <h4>Issue: "Level X has Progress Bar but child level doesn't have Done"</h4>
+            <p><strong>Cause:</strong> Progress bar calculates completion based on children's done status. If children can't be marked done, can't calculate progress.</p>
+            <p><strong>Fix:</strong> Enable "Done Checkbox" on the child level, OR disable "Progress Bar" on the parent level.</p>
+
+            <h4>Issue: "All names cleared when I toggle checkbox"</h4>
+            <p><strong>Cause:</strong> This was a bug in earlier versions (now fixed). Toggling a checkbox triggered re-render without saving form state.</p>
+            <p><strong>Fix:</strong> Update to latest version. Now form values are preserved automatically.</p>
+
+            <h4>Issue: "Can't delete last level"</h4>
+            <p><strong>Cause:</strong> Template must have at least 1 level.</p>
+            <p><strong>Fix:</strong> This is intentional. If you want a 1-level template, configure the one level you have instead of trying to delete it.</p>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-shield-alt"></i> Why Validation Exists:</strong> These rules prevent creating templates that would result in broken workflows. For example, a progress bar without a way to mark children done would show "0%" forever, confusing users. Validation protects data integrity.
+            </div>
+        </section>
+
+        <section id="creating-workflow">
+            <h2>9. Creating Workflows from Templates</h2>
+            
+            <h3>The Creation Process</h3>
+            <ol>
+                <li>From Workflow Manager, click <strong>"<i class="fa-solid fa-plus"></i> New"</strong></li>
+                <li>In the modal, select <strong>"From Template"</strong> tab (default)</li>
+                <li>Choose a template from the dropdown (default template is pre-selected)</li>
+                <li>Enter workflow name (required)</li>
+                <li>Click <strong>"Create Workflow"</strong></li>
+                <li>Workflow is created and opened in <strong>Creation Mode</strong></li>
+            </ol>
+
+            <h3>What Happens Behind the Scenes</h3>
+            <p>When you create a workflow from a template:</p>
+            
+            <ol>
+                <li><strong>Template Snapshot Created:</strong> Workflow gets a complete copy of the template (frozen in time)</li>
+                <li><strong>Empty Data Array:</strong> Workflow starts with zero units (empty <code>data: []</code> array)</li>
+                <li><strong>Properties Configured:</strong> Workflow knows which properties are available per level</li>
+                <li><strong>UI Adapts:</strong> Interface shows/hides features based on template config</li>
+            </ol>
+
+            <div class="feature">
+                <strong><i class="fa-solid fa-camera"></i> Template Snapshot:</strong> The workflow stores its own copy of the template. If you later edit the template, existing workflows are unaffected. Only new workflows get the updated template. This protects your work!
+            </div>
+
+            <h3>Workflow-Level Configuration (If Template Enabled)</h3>
+            <p>If the template has workflow-level features enabled, you'll see them at the top of the workflow:</p>
+
+            <h4>Workflow Icon (if enabled in template):</h4>
+            <ul>
+                <li>Button: <strong>"Add Icon"</strong> or <strong>"Change Icon"</strong></li>
+                <li>Click to open icon picker modal</li>
+                <li>Select from 70+ available icons</li>
+                <li>Icon appears next to workflow name</li>
+            </ul>
+
+            <h4>Workflow Description (if enabled):</h4>
+            <ul>
+                <li>Text area below workflow name</li>
+                <li>Enter description (visible in both creation and execution modes)</li>
+                <li>Good for documenting workflow purpose or scope</li>
+            </ul>
+
+            <h4>Sequential Order (if enabled):</h4>
+            <ul>
+                <li>Checkbox: <strong>"Enforce Sequential Order"</strong></li>
+                <li>If checked, units must be completed in order</li>
+                <li>Useful for compliance or process workflows</li>
+            </ul>
+
+            <h3>Adding Units to Your Workflow</h3>
+            <p>After creating the workflow, you'll see:</p>
+            <ul>
+                <li><strong>Empty State Message:</strong> "No [Level 1 Plural] Yet"</li>
+                <li><strong>Add Button:</strong> "Add New [Level 1 Singular]" at the bottom</li>
+            </ul>
+
+            <h4>Adding Root-Level Units (Level 1):</h4>
+            <ol>
+                <li>Click <strong>"Add New [Level 1 Singular]"</strong> button at bottom</li>
+                <li>New unit appears with fields based on template config</li>
+                <li>Fill in name (required), and any other enabled fields</li>
+            </ol>
+
+            <h4>Adding Child Units (Level 2, 3, etc.):</h4>
+            <ol>
+                <li>Within a parent unit, look for <strong>"Add [Child Level Singular]"</strong> button</li>
+                <li>Click to add child unit</li>
+                <li>Child appears nested under parent</li>
+                <li>Fill in child's properties</li>
+            </ol>
+
+            <div class="example-box">
+                <h4>💡 Workflow Creation Example</h4>
+                <p><strong>Template:</strong> "Classic Compliance (3-Level)"</p>
+                <p><strong>Workflow Creation Steps:</strong></p>
+                <ol style="list-style-type: decimal; padding-left: 20px;">
+                    <li>Click "New" → Select "Classic Compliance"</li>
+                    <li>Name: "Q1 2025 Security Audit"</li>
+                    <li>Click "Create Workflow"</li>
+                    <li>Workflow opens (empty, creation mode)</li>
+                    <li>Click "Add New Control" at bottom</li>
+                    <li>Fill in control name: "Access Control"</li>
+                    <li>Within control, click "Add Action"</li>
+                    <li>Fill in action name: "Review User Permissions"</li>
+                    <li>Within action, click "Add Evidence"</li>
+                    <li>Fill in evidence name: "Permission Audit Report"</li>
+                    <li>Add attachments to evidence (links, notes, etc.)</li>
+                    <li>Continue building out workflow...</li>
+                </ol>
+            </div>
+
+            <h3>Switching Between Creation and Execution Modes</h3>
+            <p>The mode toggle at top-right switches between:</p>
+
+            <h4>Creation Mode:</h4>
+            <ul>
+                <li>Build and edit workflow structure</li>
+                <li>Add/delete units</li>
+                <li>Configure names, descriptions, properties</li>
+                <li>Set up tags, grades, attachments</li>
+            </ul>
+
+            <h4>Execution Mode:</h4>
+            <ul>
+                <li>Execute the workflow (check off done items)</li>
+                <li>View progress bars</li>
+                <li>Filter by tags</li>
+                <li>Track completion</li>
+                <li>Can't modify structure</li>
+            </ul>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-toggle-on"></i> Mode Best Practice:</strong> Build your workflow completely in Creation Mode first. Once structure is ready, switch to Execution Mode to actually perform the work. Don't mix building and executing - it gets confusing!
+            </div>
+        </section>
+
+        <section id="examples">
+            <h2>10. Template Examples & Use Cases</h2>
+            
+            <h3>Example 1: Classic Compliance (3-Level)</h3>
+            <div class="level-example">
+                <p><strong>Use Case:</strong> NIST CSF, ISO 27001, SOC 2, general compliance workflows</p>
+                <p><strong>Structure:</strong></p>
+                <ul style="list-style-type: none; padding-left: 20px; font-family: monospace; font-size: 0.95rem;">
+                    <li><strong>Level 1: Control</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Icon, Display ID, Name, Description, Tags, Cumulative Grade, Progress Bar</li>
+                    <li><strong>Level 2: Action</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Name, Description, Tags, Grade, Progress Bar</li>
+                    <li><strong>Level 3: Evidence</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Name, Description, Tags, Done, Grade, All Attachments</li>
+                </ul>
+                <p><strong>Why This Works:</strong> Controls group related actions. Actions define implementation steps. Evidence provides proof. Progress rolls up from evidence → action → control. Perfect for audits!</p>
+            </div>
+
+            <h3>Example 2: Agile Sprint (4-Level)</h3>
+            <div class="level-example">
+                <p><strong>Use Case:</strong> Software development sprints, agile project management</p>
+                <p><strong>Structure:</strong></p>
+                <ul style="list-style-type: none; padding-left: 20px; font-family: monospace; font-size: 0.95rem;">
+                    <li><strong>Level 1: Epic</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Icon, Name, Description, Tags, Progress Bar</li>
+                    <li><strong>Level 2: Story</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Display ID, Name, Description, Tags, Grade (Story Points), Progress Bar</li>
+                    <li><strong>Level 3: Task</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Name, Description, Tags, Done, Grade (Hours)</li>
+                    <li><strong>Level 4: Subtask</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Name, Done, Comments</li>
+                </ul>
+                <p><strong>Why This Works:</strong> Epics are big features. Stories are user stories with points. Tasks are work items. Subtasks are granular steps. Grades track points and hours.</p>
+            </div>
+
+            <h3>Example 3: Simple Checklist (1-Level)</h3>
+            <div class="level-example">
+                <p><strong>Use Case:</strong> To-do lists, simple task tracking, daily checklists</p>
+                <p><strong>Structure:</strong></p>
+                <ul style="list-style-type: none; padding-left: 20px; font-family: monospace; font-size: 0.95rem;">
+                    <li><strong>Level 1: Item</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Name, Description, Tags, Done, Links, Notes</li>
+                </ul>
+                <p><strong>Why This Works:</strong> Flat list, no hierarchy. Perfect for simple task tracking. Each item has done checkbox. Can attach notes and links for reference.</p>
+            </div>
+
+            <h3>Example 4: Project Phases (3-Level)</h3>
+            <div class="level-example">
+                <p><strong>Use Case:</strong> Traditional project management, waterfall projects</p>
+                <p><strong>Structure:</strong></p>
+                <ul style="list-style-type: none; padding-left: 20px; font-family: monospace; font-size: 0.95rem;">
+                    <li><strong>Level 1: Phase</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Icon, Name, Description, Progress Bar</li>
+                    <li><strong>Level 2: Milestone</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Name, Description, Tags, Progress Bar</li>
+                    <li><strong>Level 3: Deliverable</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Name, Description, Tags, Done, All Attachments</li>
+                </ul>
+                <p><strong>Why This Works:</strong> Phases group milestones. Milestones group deliverables. Progress shows how close to completing each phase/milestone. Attachments on deliverables.</p>
+            </div>
+
+            <h3>Example 5: Risk Assessment (4-Level)</h3>
+            <div class="level-example">
+                <p><strong>Use Case:</strong> Risk management, threat assessments, security reviews</p>
+                <p><strong>Structure:</strong></p>
+                <ul style="list-style-type: none; padding-left: 20px; font-family: monospace; font-size: 0.95rem;">
+                    <li><strong>Level 1: Category</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Icon, Name, Description, Cumulative Grade</li>
+                    <li><strong>Level 2: Risk</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Display ID, Name, Description, Tags, Cumulative Grade</li>
+                    <li><strong>Level 3: Mitigation</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Name, Description, Tags, Done, Grade (Effectiveness Score)</li>
+                    <li><strong>Level 4: Task</strong></li>
+                    <li>&nbsp;&nbsp;Properties: Name, Description, Done, All Attachments</li>
+                </ul>
+                <p><strong>Why This Works:</strong> Categories group risk types. Risks have IDs for tracking. Mitigations are actions with effectiveness grades. Tasks are implementation steps. Grades roll up to show overall risk coverage.</p>
+            </div>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-lightbulb"></i> Inspiration:</strong> These examples cover most use cases. Start with one similar to your needs, then customize. Don't reinvent the wheel - adapt what works!
+            </div>
+        </section>
+
+        <section id="best-practices">
+            <h2>11. Best Practices</h2>
+            
+            <h3>Template Design Best Practices</h3>
+            
+            <h4>1. Start Simple, Add Complexity Later</h4>
+            <ul>
+                <li>Begin with 2-3 levels</li>
+                <li>Enable only essential properties</li>
+                <li>Test with real workflow</li>
+                <li>Add features as needed</li>
+            </ul>
+
+            <h4>2. Use Clear, Consistent Naming</h4>
+            <ul>
+                <li>Level names should be intuitive (Control, Action, Evidence - not Level1, Level2, Level3)</li>
+                <li>Singular/plural forms should match grammatically</li>
+                <li>Descriptions should explain purpose clearly</li>
+            </ul>
+
+            <h4>3. Think About Your Users</h4>
+            <ul>
+                <li>Will they understand these level names?</li>
+                <li>Do they need icons for visual identification?</li>
+                <li>Are attachments needed at this level?</li>
+                <li>Does sequential order make sense for this workflow type?</li>
+            </ul>
+
+            <h4>4. Follow Property Patterns</h4>
+            <ul>
+                <li><strong>Top Levels:</strong> Progress bars, cumulative grades, no done checkbox</li>
+                <li><strong>Middle Levels:</strong> Mix of tracking and data</li>
+                <li><strong>Bottom Level:</strong> Done checkbox, attachments, individual grades</li>
+            </ul>
+
+            <h4>5. Validate Before Publishing</h4>
+            <ul>
+                <li>Create a test workflow from the template</li>
+                <li>Add units at all levels</li>
+                <li>Try all features (grade, done, tags, attachments)</li>
+                <li>Switch to execution mode - does it work as expected?</li>
+                <li>Fix template if issues found</li>
+            </ul>
+
+            <h3>Template Management Best Practices</h3>
+
+            <h4>1. Use Descriptive Template Names</h4>
+            <ul>
+                <li>Include structure info: "Classic Compliance (3-Level)"</li>
+                <li>Include use case: "Agile Sprint Planning"</li>
+                <li>Be specific: "ISO 27001 Controls" not just "Controls"</li>
+            </ul>
+
+            <h4>2. Document Your Templates</h4>
+            <ul>
+                <li>Write clear descriptions explaining when to use each template</li>
+                <li>Include examples in description: "Use for quarterly audits"</li>
+                <li>Note any special configurations: "Includes cumulative grading for scoring"</li>
+            </ul>
+
+            <h4>3. Set a Sensible Default</h4>
+            <ul>
+                <li>Mark your most common template as default</li>
+                <li>This saves users time when creating workflows</li>
+                <li>Change default as your needs evolve</li>
+            </ul>
+
+            <h4>4. Don't Delete Templates With Active Workflows</h4>
+            <ul>
+                <li>Templates can be deleted even if workflows use them</li>
+                <li>Existing workflows keep working (they have snapshots)</li>
+                <li>But you lose the template for creating NEW workflows</li>
+                <li>Consider: Archive or rename instead of delete</li>
+            </ul>
+
+            <h3>Workflow Creation Best Practices</h3>
+
+            <h4>1. Choose the Right Template</h4>
+            <ul>
+                <li>Read template descriptions before selecting</li>
+                <li>Match template structure to your use case</li>
+                <li>Don't force-fit a workflow into wrong template</li>
+            </ul>
+
+            <h4>2. Configure Workflow Properties</h4>
+            <ul>
+                <li>If template enables workflow icon, use it (helps identification)</li>
+                <li>Add workflow description (documents purpose)</li>
+                <li>Set sequential order if needed (compliance, procedures)</li>
+            </ul>
+
+            <h4>3. Build Structure Before Content</h4>
+            <ul>
+                <li>Add all units first (controls, actions, evidence)</li>
+                <li>Name them appropriately</li>
+                <li>Then go back and fill in descriptions, tags, attachments</li>
+                <li>Faster than doing everything at once</li>
+            </ul>
+
+            <h4>4. Use Tags Consistently</h4>
+            <ul>
+                <li>Establish tag conventions: #high-priority, #q1-2025, #firewall</li>
+                <li>Use same tags across workflows for filtering</li>
+                <li>Don't over-tag (5-10 tags is usually enough)</li>
+            </ul>
+
+            <h4>5. Test Before Executing</h4>
+            <ul>
+                <li>Build complete workflow in creation mode</li>
+                <li>Switch to execution mode to preview</li>
+                <li>Verify progress bars calculate correctly</li>
+                <li>Check that done checkboxes appear where expected</li>
+                <li>Return to creation mode if fixes needed</li>
+            </ul>
+
+            <div class="highlight">
+                <strong><i class="fa-solid fa-star"></i> Golden Rule:</strong> Templates are blueprints, not prisons. If a template doesn't quite fit your needs, create a new one! Better to have 5 well-designed templates than force everything into 1 mediocre template.
+            </div>
+        </section>
+
+        <section id="tips">
+            <h2>12. Tips & Tricks</h2>
+            
+            <h3>Template Builder Tips</h3>
+            
+            <h4>Tip 1: Keep Template Name Short</h4>
+            <p>Template names appear in dropdowns. Long names get truncated. Aim for 30 characters or less.</p>
+            <p><strong>Good:</strong> "Classic Compliance (3L)"<br>
+            <strong>Bad:</strong> "Three-Level Compliance Template For NIST CSF And ISO 27001"</p>
+
+            <h4>Tip 2: Toggle Form Auto-Saves</h4>
+            <p>When you toggle checkboxes in the template builder, the form values are now automatically preserved. You can safely check/uncheck properties while filling out level names - your work won't be lost!</p>
+
+            <h4>Tip 3: Use Level Descriptions for Documentation</h4>
+            <p>Level descriptions are internal (users don't see them in workflows). Use them to document design decisions:</p>
+            <p><code>"Control - High-level requirement areas. Should have 5-10 controls per workflow. Each control groups 3-5 actions."</code></p>
+
+            <h4>Tip 4: Copy from Existing Template</h4>
+            <p>No "duplicate template" feature yet, but you can:</p>
+            <ol>
+                <li>Open existing template in Edit mode</li>
+                <li>Copy all settings mentally or take notes</li>
+                <li>Click Cancel</li>
+                <li>Create new template</li>
+                <li>Enter similar configuration</li>
+            </ol>
+
+            <h4>Tip 5: Enable More Than You Think You Need</h4>
+            <p>It's easier to ignore a field than wish you had it. When in doubt, enable the property. Users can leave it blank if not needed.</p>
+
+            <h3>Workflow Creation Tips</h3>
+
+            <h4>Tip 1: Icons Make Navigation Easier</h4>
+            <p>If your template enables icons, use them! Visual icons help users quickly scan and find units, especially with many items.</p>
+
+            <h4>Tip 2: Use Display IDs for Standards</h4>
+            <p>If working with standards (NIST, ISO, PCI-DSS), enable Display ID and use control identifiers:</p>
+            <p><code>AC-01</code>, <code>AU-02</code>, <code>SC-07</code></p>
+            <p>Users familiar with the standard can reference controls by ID.</p>
+
+            <h4>Tip 3: Tags Are Powerful Filters</h4>
+            <p>Add tags during creation, use them for filtering in execution:</p>
+            <ul style="list-style-type: disc; padding-left: 20px;">
+                <li>#phase-1 - See only first phase items</li>
+                <li>#high-priority - Focus on critical work</li>
+                <li>#firewall - All firewall-related tasks</li>
+            </ul>
+
+            <h4>Tip 4: Grade Weights Should Add Up</h4>
+            <p>If using cumulative grades, plan your weights:</p>
+            <ul style="list-style-type: disc; padding-left: 20px;">
+                <li>Control A: Action 1 (40 points) + Action 2 (60 points) = 100 points</li>
+                <li>Makes math easy, percentages clear</li>
+            </ul>
+
+            <h4>Tip 5: Attachments at Leaf Level</h4>
+            <p>Put links, images, notes, comments at the bottom level (evidence/tasks/items). Keeps information close to where work happens.</p>
+
+            <h3>Debugging Tips</h3>
+
+            <h4>Tip 1: Browser Console is Your Friend</h4>
+            <p>Press F12 to open browser console. You'll see helpful logs:</p>
+            <ul style="list-style-type: none; padding-left: 20px; font-family: monospace; font-size: 0.9rem;">
+                <li>🔹 addChildUnit called: {parentPath: "data.0", childDepth: 1}</li>
+                <li>✅ Created new unit: unit-123-abc for level: Actions</li>
+                <li>📝 updateUnitProperty: {path: "data.0.subcategories.0", property: "name", value: "Action 1"}</li>
+            </ul>
+            <p>These logs show what's happening behind the scenes. Useful if something seems wrong!</p>
+
+            <h4>Tip 2: Validation Errors Are Helpful</h4>
+            <p>Don't ignore validation errors. They prevent broken templates. Read the error carefully - it tells you exactly what's wrong and where.</p>
+
+            <h4>Tip 3: Refresh if UI Seems Stuck</h4>
+            <p>If buttons don't respond or UI looks wrong:</p>
+            <ol>
+                <li>Press Ctrl+Shift+R (hard refresh)</li>
+                <li>Clears browser cache</li>
+                <li>Reloads latest code</li>
+            </ol>
+
+            <h4>Tip 4: Create Test Workflows</h4>
+            <p>Before committing to a template design:</p>
+            <ol>
+                <li>Create template</li>
+                <li>Create test workflow from it</li>
+                <li>Add units at all levels</li>
+                <li>Try all features</li>
+                <li>Delete test workflow if happy</li>
+                <li>Edit template if not</li>
+            </ol>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-rocket"></i> Performance Tip:</strong> Templates with 100+ units work fine. If you have 1000+ units, performance may degrade. Consider splitting into multiple workflows or using tag filtering to focus on subsets.
+            </div>
+        </section>
+
+        <section id="faq">
+            <h2>13. Frequently Asked Questions</h2>
+            
+            <h4>Q: Can I edit a template after creating workflows from it?</h4>
+            <p><strong>A:</strong> Yes! Edit the template anytime. Existing workflows are unaffected (they have snapshots). Only NEW workflows created after your edit will use the updated template.</p>
+
+            <h4>Q: What happens to my workflows if I delete a template?</h4>
+            <p><strong>A:</strong> Nothing. Workflows keep working normally because they have their own snapshot copy of the template. You just can't create NEW workflows from that deleted template.</p>
+
+            <h4>Q: Can I change a workflow's template after creation?</h4>
+            <p><strong>A:</strong> No. Once a workflow is created from a template, it's locked to that template's snapshot. To use a different structure, create a new workflow from a different template.</p>
+
+            <h4>Q: Why does progress bar require child level to have done checkbox?</h4>
+            <p><strong>A:</strong> Progress bar calculates completion % by checking how many children are marked done. If children don't have done checkboxes, there's nothing to calculate from. It would always show 0%.</p>
+
+            <h4>Q: Can I have different properties for different units at the same level?</h4>
+            <p><strong>A:</strong> No. All units at the same level have the same properties. If Level 2 enables "tags", ALL Level 2 units have tags. This ensures consistency.</p>
+
+            <h4>Q: What's the difference between Name and Display ID?</h4>
+            <p><strong>A:</strong> <strong>Name</strong> is the full title ("Access Control Management"). <strong>Display ID</strong> is a short code/reference ("AC-01"). Display ID is optional and typically used for standards or tracking numbers.</p>
+
+            <h4>Q: Can I have a 10-level template?</h4>
+            <p><strong>A:</strong> Yes! Maximum is 10 levels. But consider if you really need that many. Most use cases work fine with 2-4 levels. Deep hierarchies can be confusing.</p>
+
+            <h4>Q: Why can't I enable done checkbox on Level 1?</h4>
+            <p><strong>A:</strong> You can! The system doesn't prevent it. But it's usually not useful - Level 1 items are parents, and their "done" state is typically indicated by progress bars showing children completion, not a checkbox.</p>
+
+            <h4>Q: Can I export/import templates?</h4>
+            <p><strong>A:</strong> Not currently. Templates are stored in <code>data/templates.json</code>. Advanced users can manually edit this file, but it's risky. Future versions may support export/import.</p>
+
+            <h4>Q: How do I create a template with no hierarchy (flat list)?</h4>
+            <p><strong>A:</strong> Create a 1-level template. Just configure Level 1 properties. Don't add additional levels. Your workflow will be a flat list of items.</p>
+
+            <h4>Q: What happens if two templates have the same name?</h4>
+            <p><strong>A:</strong> It's allowed (they have unique internal IDs). But it's confusing for users. Avoid duplicate names. If you have similar templates, use names like "Compliance v1" and "Compliance v2".</p>
+
+            <h4>Q: Can I reorder levels after template is created?</h4>
+            <p><strong>A:</strong> Yes, while editing the template. Use the up/down arrows to reorder levels. Save to apply changes. New workflows will have the new order.</p>
+
+            <h4>Q: Why does cumulative grade show as read-only?</h4>
+            <p><strong>A:</strong> When cumulative grade is enabled, the unit's grade is auto-calculated (sum of children). You can't manually edit it - that would defeat the purpose of cumulative calculation. Edit children's grades instead.</p>
+
+            <h4>Q: Can I mix cumulative and non-cumulative grades in same template?</h4>
+            <p><strong>A:</strong> Yes! Level 1 can have cumulative grade (sums Level 2), Level 2 can have non-cumulative grade (manual entry), Level 3 has no grade. Each level is configured independently.</p>
+
+            <h4>Q: How do I make a template similar to the old fixed 3-level workflow?</h4>
+            <p><strong>A:</strong> Use the provided "Classic Compliance (3-Level)" template. It replicates the old Control → Action → Evidence structure. Or create new template with 3 levels named as you prefer.</p>
+
+            <h4>Q: Can I see which workflows use a template?</h4>
+            <p><strong>A:</strong> Not directly in the UI currently. You'd need to check each workflow (workflows show their template name in metadata). Future versions may add this.</p>
+
+            <h4>Q: What's the difference between Notes and Comments?</h4>
+            <p><strong>A:</strong> <strong>Notes</strong> support rich text (bold, lists, headers, formatting). <strong>Comments</strong> are simple plain text. Use notes for detailed instructions, comments for quick remarks.</p>
+
+            <h4>Q: Can I set default values for properties?</h4>
+            <p><strong>A:</strong> No. Templates define which properties exist, not their default values. Users enter values when creating workflow units.</p>
+
+            <h4>Q: Why is my progress bar showing 0% when some children are done?</h4>
+            <p><strong>A:</strong> Check that:</p>
+            <ol>
+                <li>Parent has progress bar enabled</li>
+                <li>Children have done checkbox enabled</li>
+                <li>You've actually checked the done checkboxes (in execution mode)</li>
+                <li>You're in execution mode (progress bars don't show in creation mode)</li>
+            </ol>
+        </section>
+
+        <div class="highlight">
+            <h3>🎉 You're Now a Template Builder Expert!</h3>
+            <p>You now know how to:</p>
+            <ul>
+                <li>Create reusable workflow templates</li>
+                <li>Configure levels and properties</li>
+                <li>Use cumulative grading and progress bars</li>
+                <li>Build workflows from templates</li>
+                <li>Apply best practices and avoid common issues</li>
+            </ul>
+            <p style="text-align: center; margin-top: 20px;">
+                <a href="template-builder.html" class="app-button"><i class="fa-solid fa-rocket"></i> Start Building Templates</a>
+                <a href="index.html" class="app-button"><i class="fa-solid fa-sitemap"></i> Create Workflows</a>
+            </p>
+        </div>
+
+        <footer style="text-align: center; margin-top: 50px; padding-top: 20px; border-top: 2px solid #e9ecef; color: #6c757d;">
+            <p>Workflow Template Builder Manual - Version 7.0</p>
+            <p>Part of the Dynamic Workflows System</p>
+            <p><small>Need help? Review the FAQ or contact your system administrator.</small></p>
+        </footer>
+    </main>
+</body>
+</html>
