@@ -1,0 +1,114 @@
+{
+  "users": [
+    {
+      "id": "user-default-001",
+      "name": "Default User",
+      "email": "user@company.com",
+      "avatar": "",
+      "role": "admin",
+      "department": "Management",
+      "position": "Administrator",
+      "notifications": {
+        "email": true,
+        "browser": true,
+        "assignments": true,
+        "mentions": true,
+        "reminders": true
+      },
+      "preferences": {
+        "theme": "light",
+        "boardView": "kanban",
+        "timezone": "Europe/Brussels"
+      },
+      "createdAt": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "user-002",
+      "name": "John Smith",
+      "email": "john.smith@company.com",
+      "avatar": "",
+      "role": "member",
+      "department": "IT",
+      "position": "System Administrator",
+      "notifications": {
+        "email": true,
+        "browser": true,
+        "assignments": true,
+        "mentions": true,
+        "reminders": true
+      },
+      "preferences": {
+        "theme": "light",
+        "boardView": "kanban",
+        "timezone": "Europe/Brussels"
+      },
+      "createdAt": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "user-003",
+      "name": "Sarah Johnson",
+      "email": "sarah.johnson@company.com",
+      "avatar": "",
+      "role": "member",
+      "department": "Compliance",
+      "position": "Compliance Officer",
+      "notifications": {
+        "email": true,
+        "browser": true,
+        "assignments": true,
+        "mentions": true,
+        "reminders": true
+      },
+      "preferences": {
+        "theme": "light",
+        "boardView": "kanban",
+        "timezone": "Europe/Brussels"
+      },
+      "createdAt": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "user-004",
+      "name": "Michael Brown",
+      "email": "michael.brown@company.com",
+      "avatar": "",
+      "role": "member",
+      "department": "Security",
+      "position": "Security Analyst",
+      "notifications": {
+        "email": true,
+        "browser": true,
+        "assignments": true,
+        "mentions": true,
+        "reminders": true
+      },
+      "preferences": {
+        "theme": "light",
+        "boardView": "kanban",
+        "timezone": "Europe/Brussels"
+      },
+      "createdAt": "2025-01-01T00:00:00Z"
+    },
+    {
+      "id": "user-005",
+      "name": "Emily Davis",
+      "email": "emily.davis@company.com",
+      "avatar": "",
+      "role": "member",
+      "department": "Operations",
+      "position": "Operations Manager",
+      "notifications": {
+        "email": true,
+        "browser": true,
+        "assignments": true,
+        "mentions": true,
+        "reminders": true
+      },
+      "preferences": {
+        "theme": "light",
+        "boardView": "kanban",
+        "timezone": "Europe/Brussels"
+      },
+      "createdAt": "2025-01-01T00:00:00Z"
+    }
+  ]
+}

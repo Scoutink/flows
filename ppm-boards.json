@@ -1,0 +1,1382 @@
+{
+    "boards": [
+        {
+            "id": "board-1761812047784-aboeu",
+            "name": "ID.AM - Asset Management",
+            "description": "",
+            "sourceControlId": "cat-1761691229395-98uze",
+            "sourceFlowId": "flow-1761566127638-rb786",
+            "createdAt": "2025-10-30T08:14:07.784Z",
+            "createdBy": "user-default-001",
+            "archived": false,
+            "members": [
+                {
+                    "userId": "user-default-001",
+                    "name": "Default User",
+                    "email": "user@company.com",
+                    "role": "admin",
+                    "avatar": "",
+                    "joinedAt": "2025-10-30T08:14:07.785Z"
+                }
+            ],
+            "columns": [
+                {
+                    "id": "col-1761812047785-novrm",
+                    "name": "Backlog",
+                    "order": 0,
+                    "limit": null,
+                    "color": "#6c757d"
+                },
+                {
+                    "id": "col-1761812047785-615kk",
+                    "name": "To Do",
+                    "order": 1,
+                    "limit": null,
+                    "color": "#0d6efd"
+                },
+                {
+                    "id": "col-1761812047785-lpw6c",
+                    "name": "In Progress",
+                    "order": 2,
+                    "limit": 5,
+                    "color": "#0dcaf0"
+                },
+                {
+                    "id": "col-1761812047785-mpcgc",
+                    "name": "Review",
+                    "order": 3,
+                    "limit": null,
+                    "color": "#ffc107"
+                },
+                {
+                    "id": "col-1761812047785-3sjlt",
+                    "name": "Done",
+                    "order": 4,
+                    "limit": null,
+                    "color": "#198754"
+                }
+            ],
+            "cards": [
+                {
+                    "id": "card-1761812047785-eoshp",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 0,
+                    "title": "ID.AM-1.1",
+                    "description": "Een inventaris van activa in verband met informatie en informatieverwerkingsfaciliteiten binnen de organisatie moet worden gedocumenteerd, geëvalueerd en bijgewerkt wanneer zich wijzigingen voordoen.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-z6krz",
+                    "sourceGrade": 1.25,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [
+                        "incident reporting and handling",
+                        "Firewall guidance"
+                    ],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-cnr67",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>• Deze inventaris omvat vaste en draagbare computers, tablets, mobiele telefoons, programmeerbare logische Controllers (PLC's), sensoren, actuatoren, robots, machinegereedschappen, firmware, netwerk switches, routers, voedingen en andere netwerkcomponenten of -apparaten.<\/p><p>• Er wordt aanbevolen dat deze inventaris moet alle activa omvatten, ongeacht of zij al dan niet op het netwerk van de organisatie zijn aangesloten.<\/p><p>• Het gebruik van een hulpmiddel voor ICT-activabeheer kan worden overwogen<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-ghe81",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereist Documentatie: Inventaris activa - informatie en informatieverwerkingsfaciliteiten [SSOT] → Een overzicht (bij voorkeur in tabelvorm) van alle fysieke en virtuele IT-activa die informatie verwerken of opslaan. Inclusief hardwaretypes (pc’s, laptops, tablets, servers, netwerkapparatuur, enz.), unieke identifiers, locatie, status, eigenaar\/verantwoordelijke, en eventueel gekoppelde informatiesoorten. Dit kan een export zijn uit een CMDB of IT-beheerplatform.",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-f8o59",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereiste Implementatie: Procedure of logging voor updates van de activalijst → Bewijs dat de inventaris actueel wordt gehouden, bijvoorbeeld via: - changelog of wijzigingsgeschiedenis in het beheersysteem, - een procedure of SOP voor update-registratie bij wijziging, - bewijs van periodieke controles (bv. jaarlijkse review), - screenshot of logboek van recente wijzigingen.",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-lcic9",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 1,
+                    "title": "ID.AM-1.2",
+                    "description": "De inventaris van activa die verband houden met informatie en informatieverwerkingsfaciliteiten moet veranderingen in de context van de organisatie weerspiegelen en alle informatie bevatten die nodig is voor een effectieve verantwoording.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-1l14m",
+                    "sourceGrade": 1.25,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [
+                        "Firewall guidance"
+                    ],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-e8pkr",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>• De inventarisatie kan bijvoorbeeld het volgende omvatten: fabrikant, apparaat type, model, serienummer, machinenamen en netwerkadressen, fysieke locatie...<\/p><p>• Verantwoordingsplicht is de verplichting om iemands daden uit te leggen, te rechtvaardigen en er verantwoordelijkheid voor te nemen; het impliceert verantwoording voor het resultaat van de taak of het proces.<\/p><p>• De veranderingen omvatten de ontmanteling van materiaal<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-mzdh9",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereist Documentatie: Beheersproces activa (levenscyclus) [SSOT] → Een gedocumenteerd proces of procedure voor het beheer van activa van aankoop tot afstoting. Inclusief registratie, toewijzing aan gebruikers, periodieke review, en veilige verwijdering of buitengebruikstelling (bv. wiping, vernietiging, donatieproces). Dit kan een apart levenscyclusbeleid of onderdeel van ITAM (IT Access Management)zijn.",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-w5tw2",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereiste Implementatie: Logboek of workflow-acties van levenscyclusbeheer → Praktisch bewijs van uitvoering, zoals: - registratie van activagebruikers (e.g. in CMDB, tickets), - logboek van updates, overdrachten, of buitengebruikstellingen, - audit trail van verwijderingsacties (met dataverwijdering), - recente voorbeelden van activa die zijn uitgefaseerd volgens procedure.",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-rxdnh",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 2,
+                    "title": "ID.AM-1.3",
+                    "description": "Wanneer niet-toegestane hardware wordt ontdekt, moet deze in quarantaine worden geplaatst voor eventuele uitzonderingsbehandeling, verwijderd of vervangen, en wordt de inventaris dienovereenkomstig bijgewerkt.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-mfjh3",
+                    "sourceGrade": 1.25,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-5a0mk",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>• Alle niet-ondersteunde hardware zonder uitzonderingsdocumentatie wordt aangemerkt als niet_geautoriseerd.<\/p><p>• Niet-toegestane hardware kan worden opgespoord tijdens inventarisaties, verzoeken om ondersteuning door de gebruiker of op andere manieren.<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-f0i1r",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereist Documentatie: 1. Uitzonderingsdocumentatie voor niet-ondersteunde hardware [SSOT] → Een sjabloon of dossier waarin gemotiveerd wordt waarom bepaalde hardware wordt toegestaan ondanks afwijking van standaarden (bv. wegens legacy software, tijdelijke noodzaak, externe partners). Inclusief goedkeuring en einddatum. 2. Procedure 'niet-geautoriseerde hardware' [SSOT] → Een duidelijke beschrijving van het proces bij detectie van ongeautoriseerde hardware: detectie, evaluatie, quarantainemaatregel, eventuele goedkeuring of verwijdering, en update van inventaris.",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-p61cs",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereiste Implementatie: 1. Snapshot aanmerking ‘niet geautoriseerde hardware’ → Voorbeeld van geregistreerde ongeautoriseerde hardware (bv. uit CMDB, scanningtool of SOC-rapport), met aanduiding van status: in quarantaine, verwijderd, of in aanvraag voor uitzondering. 2. Logboek of registraties van afgehandelde incidenten → Bewijs dat het proces daadwerkelijk wordt gevolgd: logging van incidenten, beslissingen over toestaan of verwijderen, en updates aan activaregister.",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-5jbc5",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 3,
+                    "title": "ID.AM-1.4",
+                    "description": "De mechanismen voor het detecteren van de aanwezigheid van niet-geautoriseerde hardware en firmwarecomponenten in het netwerk van de organisatie moeten worden geïdentificeerd.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-0b7cp",
+                    "sourceGrade": 1.25,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-um1qy",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>• Waar dat veilig en haalbaar is, kunnen deze mechanismen worden geautomatiseerd.<\/p><p>• Er zou een proces moeten zijn om niet-geautoriseerde bedrijfsmiddelen (assets) regelmatig aan te pakken; de organisatie kan ervoor kiezen het bedrijfsmiddel (asset) van het netwerk te verwijderen, het bedrijfsmiddel (asset) te verbieden op afstand verbinding te maken met het netwerk, of het bedrijfsmiddel (asset) in quarantaine te plaatsen.<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-5nxr9",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereist Documentatie: 1. Document ‘Detectiemechanismen ongeautoriseerde hardware’ [SSOT] → Beschrijving van gebruikte tools, processen en\/of systemen om niet-geautoriseerde hardware of firmware op het netwerk op te sporen. Inclusief: - gebruikte monitoringtools of netwerkdetectie-oplossingen (bv. NAC, asset discovery), - hoe vaak detectie gebeurt (real-time, periodiek), - wie verantwoordelijk is, - hoe updates en uitzonderingen beheerd worden. 2. Procedure quarantaine- of verwijderactie → Procesbeschrijving wat er gebeurt bij detectie: blokkeren, verwijderen, isoleren of manueel opvolgen.",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-nxty8",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 4,
+                    "title": "ID.AM-2.1",
+                    "description": "Een inventaris die aangeeft welke softwareplatforms en -toepassingen in de organisatie worden gebruikt, moet worden gedocumenteerd, geëvalueerd en bijgewerkt wanneer zich wijzigingen voordoen.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-jz8lj",
+                    "sourceGrade": 1,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-5bxth",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>• Deze inventaris omvat softwareprogramma's, softwareplatforms en databases, zelfs indien deze zijn uitbesteed (SaaS).<\/p><p>• Er wordt aanbevolen dat de modaliteiten van het uitbesteden deel uitmaken van de contractuele overeenkomsten met de dienstverlener.<\/p><p>• De informatie in de inventaris zou bijvoorbeeld het volgende kunnen omvatten: naam, beschrijving, versie, aantal gebruikers, verwerkte gegevens, enz.<\/p><p>• Er zou een onderscheid moeten worden gemaakt tussen niet-ondersteunde software en niet_geautoriseerde software.<\/p><p>• Het gebruik van een hulpmiddel voor IT-activabeheer kan worden overwogen<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-hguw0",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereist Documentatie: Inventaris softwareplatforms en - toepassingen",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-pbcw5",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 5,
+                    "title": "ID.AM-2.2",
+                    "description": "De inventaris van softwareplatforms en -toepassingen die verband houden met informatie en informatieverwerking, moet veranderingen in de context van de organisatie weerspiegelen en alle informatie bevatten die nodig is voor een doeltreffende verantwoording.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-ckp9l",
+                    "sourceGrade": 1,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [
+                        "incident reporting and handling",
+                        "Firewall guidance"
+                    ],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-fy363",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>De inventaris van softwareplatforms en toepassingen zou voor elk item het volgende kunnen omvatten: de titel, de uitgever, de datum van eerste installatie\/gebruik en het bedrijfsdoel; indien van toepassing, de Uniform Resource Locator (URL), de app store(s), de versie(s), het implementatiemechanisme en de datum van buitengebruikstelling.<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-y8q5y",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereist Documentatie: Inventaris softwareplatforms en - toepassingen",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-or5hg",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 6,
+                    "title": "ID.AM-2.3",
+                    "description": "De personen die binnen de organisatie verantwoordelijk en aansprakelijk zijn voor het beheer van softwareplatforms en -toepassingen moeten worden geïdentificeerd.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-lwba5",
+                    "sourceGrade": 1,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-5j94b",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereist Documentatie: Inventaris softwareplatforms en - toepassingen",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-rp76p",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 7,
+                    "title": "ID.AM-2.4",
+                    "description": "Wanneer niet-geautoriseerde software wordt ontdekt, wordt deze in quarantaine geplaatst voor eventuele uitzonderingsbehandeling, verwijderd of vervangen, en wordt de inventaris dienovereenkomstig bijgewerkt.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-9ot8k",
+                    "sourceGrade": 1,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-5qgex",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>• Alle niet-ondersteunde software zonder uitzonderingsdocumentatie wordt als niet-geautoriseerd aangemerkt.<\/p><p>• Niet-geautoriseerde software kan worden opgespoord tijdens inventarisatie, verzoeken om ondersteuning door de gebruiker of andere middelen.<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-a6aex",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereist Documentatie: Proces niet-geautorseerde bedrijfsmiddelen",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-1eb40",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 8,
+                    "title": "ID.AM-2.5",
+                    "description": "De mechanismen voor het opsporen van de aanwezigheid van niet-geautoriseerde software in de ICT\/OT-omgeving van de organisatie moeten worden geïdentificeerd.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-mg4wx",
+                    "sourceGrade": 1,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-czi0k",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>• Waar dat veilig en haalbaar is, kunnen deze mechanismen worden geautomatiseerd.<\/p><p>• Er zou een proces moeten zijn om niet-geautoriseerde bedrijfsmiddelen (activa) regelmatig aan te pakken; de organisatie kan ervoor kiezen het bedrijfsmiddel (activa) van het netwerk te verwijderen, het bedrijfsmiddel (activa) te verbieden op afstand verbinding te maken met het netwerk, of het bedrijfsmiddel (activa) in quarantaine te plaatsen.<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-vfro8",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereist Documentatie: Uitzonderingsdocumentatie voor niet ondersteunde software Snapshot aanmerking 'niet geautoriseerde software'",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-3hitl",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 9,
+                    "title": "ID.AM.3-1",
+                    "description": "Informatie die de organisatie opslaat en gebruikt, moet worden geïdentificeerd.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-uu4sm",
+                    "sourceGrade": 1.67,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-diin3",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>• Begin met een lijst van alle soorten informatie die uw bedrijf opslaat of gebruikt. Definieer  \"informatietype\" op een voor uw bedrijf zinvolle manier. U kunt uw werknemers een lijst laten maken van alle informatie die zij bij hun gewone activiteiten gebruiken. Maak een lijst van alles wat u kunt bedenken, maar u hoeft niet te specifiek te zijn. U kunt bijvoorbeeld klantnamen en e-mailadressen bewaren, ontvangstbewijzen voor grondstoffen, uw bankgegevens of andere vertrouwelijke informatie.<\/p><p>• Overweeg deze informatie in kaart te brengen met de bijbehorende activa die zijn geïdentificeerd in  de inventarissen van fysieke apparaten, systemen, softwareplatforms en toepassingen die binnen de organisatie worden gebruikt (zie ID.AM-1 & ID.AM-2).<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-19lmq",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 10,
+                    "title": "ID.AM.3-2",
+                    "description": "Alle verbindingen binnen de ICT\/OT-omgeving van de organisatie en met andere interne platforms van de organisatie moeten in kaart worden gebracht, gedocumenteerd, goedgekeurd en zo nodig bijgewerkt.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-feyav",
+                    "sourceGrade": 1.67,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [
+                        "Firewall guidance"
+                    ],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-p5alv",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>• Verbindingsinformatie omvat bijvoorbeeld de interfacekenmerken, gegevenskenmerken, poorten, protocollen, adressen, beschrijving van de gegevens, beveiligingsvereisten en de aard van de verbinding.<\/p><p>• Configuratiebeheer kan worden gebruikt als ondersteunende troef.<\/p><p>• Deze documentatie zou niet alleen mogen worden opgeslagen op het netwerk dat zij vertegenwoordigt.<\/p><p>• Overweeg een kopie van deze documentatie te bewaren in een veilige offline omgeving (bv. offline harde schijf, papieren hardcopy...)<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-fv9r0",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 11,
+                    "title": "ID.A.3-3",
+                    "description": "De informatiestromen\/gegevensstromen binnen de ICT\/OT-omgeving van de organisatie en naar andere interne systemen van de organisatie moeten in kaart worden gebracht, gedocumenteerd, geautoriseerd en bijgewerkt wanneer zich wijzigingen voordoen.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-qv2ml",
+                    "sourceGrade": 1.66,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-1so6h",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>• Met kennis van de informatie-\/gegevensstromen binnen een systeem en tussen systemen is het mogelijk te bepalen waar informatie wel en niet naartoe kan gaan.<\/p><p>• Overweeg:<\/p><ul><li>Het afdwingen van controles die verbindingen beperken tot alleen geautoriseerde interfaces.<\/li><li>De systeembewaking opvoeren wanneer er een indicatie is van een verhoogd risico voor de kritische operaties en activa van de organisatie.<\/li><li>Bescherming van het systeem tegen informatielekken als gevolg van elektromagnetische signalen.<\/li><\/ul>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-cgif8",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 12,
+                    "title": "ID.AM-4.1",
+                    "description": "De organisatie moet alle externe diensten en de daarmee gemaakte verbindingen in kaart brengen, documenteren, autoriseren en bij wijzigingen bijwerken.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-ewpmo",
+                    "sourceGrade": 2.5,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-nhh81",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>• De uitbesteding van binnen de organisatie gebruikte systemen, softwareplatforms en toepassingen wordt behandeld in ID.AM-1 & ID.AM-2.<\/p><p>• Externe informatiesystemen zijn systemen of onderdelen van systemen waar organisaties doorgaans geen rechtstreeks toezicht en gezag hebben over de toepassing van beveiligingseisen en -controles, of de bepaling van de doeltreffendheid van de op die systemen toegepaste controles. Dit zijn bv. diensten die worden uitgevoerd in de cloud, SaaS, hosting of andere externe omgevingen, API (Application Programming Interface) ...<\/p><p>• Door externe diensten en de verbindingen daarmee in kaart te brengen en vooraf te autoriseren, wordt voorkomen dat onnodig middelen worden verspild aan het onderzoeken van een zogenaamd niet_geauthentiseerde verbinding met externe systemen.<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-jftkn",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 13,
+                    "title": "ID.AM-4.2",
+                    "description": "De informatiestroom van en naar externe systemen moet in kaart worden gebracht, gedocumenteerd en geautoriseerd, en worden bijgewerkt wanneer zich wijzigingen voordoen.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-fd1g9",
+                    "sourceGrade": 2.5,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [
+                        "incident reporting and handling"
+                    ],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-nsqce",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>Overweeg van externe dienstverleners te verlangen dat zij de functies, poorten, protocollen en diensten die nodig zijn voor de het verlenen van diensten om te connecteren identificeren en documenteren.<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-94rku",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 14,
+                    "title": "ID.AM-5.1",
+                    "description": "De middelen van de organisatie (hardware, apparaten, gegevens, tijd, personeel, informatie en software) moeten worden geprioriteerd op basis van hun classificatie, kriticiteit en bedrijfswaarde.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-gbof1",
+                    "sourceGrade": 5,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [
+                        "Firewall guidance"
+                    ],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-402ll",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>• Bepaal de middelen van de organisatie (bijv. hardware, apparaten, gegevens, tijd, personeel, informatie en software) op basis van volgende vragen:<\/p><ul><li>Wat zou er met mijn bedrijf gebeuren als deze middelen openbaar worden gemaakt, beschadigd worden, verloren gaan...?<\/li><li>Wat gebeurt er met mijn bedrijf als de integriteit van de middelen niet langer gegarandeerd is?<\/li><li>Wat zou er met mijn bedrijf gebeuren als ik\/mijn klanten geen toegang zouden hebben tot deze middelen? En rangschik deze middelen op basis van hun classificatie, kriticiteit en bedrijfswaarde.<\/li><\/ul><p>• De middelen moeten bedrijfsactiva omvatten.<\/p><p>• Er zou een classificatie voor gevoelige informatie moeten worden gemaakt door eerst categorieën te bepalen, bijv. Openbaar, Intern, Vertrouwelijk.<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-6dr6x",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereist Documentatie: Data classificatiesysteem",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-quznd",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 15,
+                    "title": "ID.AM-6.1",
+                    "description": "De rollen, verantwoordelijkheden en bevoegdheden op het gebied van informatie- en cyberbeveiliging binnen de organisatie moeten worden gedocumenteerd, geëvalueerd, geautoriseerd en bijgewerkt en afgestemd op de andere interne rollen van de organisatie en die van externe partners.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-3g1t8",
+                    "sourceGrade": 2.5,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [
+                        "Firewall guidance"
+                    ],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-u1z30",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>Het moet worden overwogen om:<\/p><ul><li>Beveiligingsrollen, -verantwoordelijkheden en -autoriteiten te beschrijven: wie in de organisatie moet worden geraadpleegd, geïnformeerd en verantwoordelijk worden gehouden voor alle of een deel van de bedrijfsmiddelen.<\/li><li>Te voorzien in beveiligingsrollen, verantwoordelijkheden en bevoegdheden voor alle belangrijke functies op het gebied van informatie-\/cyberbeveiliging (juridisch, opsporingsactiviteiten...).<\/li><li>Informatie-\/cyberbeveiligingsrollen en verantwoordelijkheden op te nemen voor derden (bijv. leveranciers, klanten, partners) met fysieke of logische toegang tot de ICT\/OT-omgeving van de organisatie.<\/li><\/ul>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-wlrn1",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereist Documentatie: RASCI",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812047785-iwcq8",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-novrm",
+                    "order": 16,
+                    "title": "ID.AM-6.2",
+                    "description": "De organisatie zal een informatiebeveiligingsfunctionaris (Information Security Officer) aanstellen.",
+                    "sourceType": "evidence",
+                    "sourceId": "evi-1761691229395-53l5b",
+                    "sourceGrade": 2.5,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [],
+                    "attachments": [
+                        {
+                            "id": "att-1761812047785-ho9s2",
+                            "type": "note",
+                            "title": "Richtlijnen",
+                            "url": null,
+                            "content": "<p>De informatiebeveiligingsfunctionaris zou verantwoordelijk moeten zijn voor het toezicht op de uitvoering van de informatie-\/cyberbeveiligingsstrategie en -waarborgen van de organisatie.<\/p>",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        },
+                        {
+                            "id": "att-1761812047785-jsckj",
+                            "type": "comment",
+                            "title": "Comment",
+                            "url": null,
+                            "content": "Vereist Documentatie: Target Operating Model (TOM) Security RASCI",
+                            "uploadedBy": "user-default-001",
+                            "uploadedAt": "2025-10-30T08:14:07.785Z"
+                        }
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:07.785Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:07.785Z",
+                    "updatedBy": "user-default-001"
+                },
+                {
+                    "id": "card-1761812098112-02tc7",
+                    "boardId": "board-1761812047784-aboeu",
+                    "columnId": "col-1761812047785-615kk",
+                    "order": 0,
+                    "title": "Inventory IT\/OT",
+                    "description": "",
+                    "sourceType": null,
+                    "sourceId": null,
+                    "sourceGrade": null,
+                    "assignments": [],
+                    "schedule": {
+                        "startDate": null,
+                        "startMode": "date",
+                        "startDays": null,
+                        "startDependency": null,
+                        "dueDate": null,
+                        "dueMode": "date",
+                        "dueDays": null,
+                        "recurrence": {
+                            "enabled": false,
+                            "pattern": "monthly",
+                            "interval": 1,
+                            "startOf": "month",
+                            "endOf": null,
+                            "customDays": [],
+                            "endMode": "never",
+                            "endOccurrences": null,
+                            "endDate": null
+                        },
+                        "reminders": []
+                    },
+                    "checklist": [],
+                    "labels": [],
+                    "attachments": [],
+                    "linkedBacklogItems": [
+                        "card-1761812047785-eoshp"
+                    ],
+                    "status": {
+                        "current": "pending",
+                        "blocked": false,
+                        "blockedReason": null,
+                        "approvalStatus": null,
+                        "approvedBy": null,
+                        "approvedAt": null
+                    },
+                    "effort": {
+                        "estimated": null,
+                        "actual": null,
+                        "unit": "hours"
+                    },
+                    "activity": [],
+                    "createdAt": "2025-10-30T08:14:58.112Z",
+                    "createdBy": "user-default-001",
+                    "updatedAt": "2025-10-30T08:14:58.112Z",
+                    "updatedBy": "user-default-001"
+                }
+            ],
+            "labels": [],
+            "settings": {
+                "notificationsEnabled": true,
+                "allowGuestView": false,
+                "enforceWIPLimit": false
+            },
+            "activity": [
+                {
+                    "id": "act-1761812098112-nf4dc",
+                    "boardId": "board-1761812047784-aboeu",
+                    "cardId": "card-1761812098112-02tc7",
+                    "userId": "user-default-001",
+                    "type": "card.created",
+                    "timestamp": "2025-10-30T08:14:58.112Z",
+                    "data": {
+                        "cardTitle": "Inventory IT\/OT"
+                    },
+                    "description": "Default User created card \"Inventory IT\/OT\""
+                },
+                {
+                    "id": "act-1761812047785-jrah7",
+                    "boardId": "board-1761812047784-aboeu",
+                    "cardId": null,
+                    "userId": "user-default-001",
+                    "type": "board.created",
+                    "timestamp": "2025-10-30T08:14:07.785Z",
+                    "data": {
+                        "boardName": "ID.AM - Asset Management"
+                    },
+                    "description": "Board \"ID.AM - Asset Management\" created from workflow control"
+                }
+            ]
+        }
+    ]
+}
