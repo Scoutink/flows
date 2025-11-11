@@ -635,29 +635,66 @@ const validateTemplate = (template) => {
 window.saveTemplate = async () => {
     // Collect form data
     const template = state.currentTemplate;
-    template.name = document.getElementById('template-name').value.trim();
-    template.description = document.getElementById('template-description').value.trim();
-    template.isDefault = document.getElementById('template-default').checked;
+    
+    console.log('Saving template, collecting form data...');
+    
+    // Template identity
+    const nameInput = document.getElementById('template-name');
+    const descInput = document.getElementById('template-description');
+    const defaultCheckbox = document.getElementById('template-default');
+    
+    if (!nameInput || !descInput || !defaultCheckbox) {
+        alert('Form elements not found. Please refresh the page.');
+        console.error('Missing form elements');
+        return;
+    }
+    
+    template.name = nameInput.value.trim();
+    template.description = descInput.value.trim();
+    template.isDefault = defaultCheckbox.checked;
+    
+    console.log('Template name:', template.name);
     
     // Workflow config
-    template.workflowConfig.enableIcon = document.getElementById('workflow-icon').checked;
-    template.workflowConfig.enableDescription = document.getElementById('workflow-description').checked;
-    template.workflowConfig.enableSequentialOrder = document.getElementById('workflow-sequential').checked;
+    const iconCheck = document.getElementById('workflow-icon');
+    const descCheck = document.getElementById('workflow-description');
+    const seqCheck = document.getElementById('workflow-sequential');
+    
+    if (iconCheck && descCheck && seqCheck) {
+        template.workflowConfig.enableIcon = iconCheck.checked;
+        template.workflowConfig.enableDescription = descCheck.checked;
+        template.workflowConfig.enableSequentialOrder = seqCheck.checked;
+    }
     
     // Collect level data
+    console.log('Collecting data for', template.levels.length, 'levels');
     template.levels.forEach((level, idx) => {
         const levelEl = document.querySelector(`[data-level-index="${idx}"]`);
+        console.log(`Level ${idx}:`, levelEl ? 'found' : 'NOT FOUND');
+        
         if (levelEl) {
-            level.name = levelEl.querySelector('.level-name').value.trim();
-            level.singularName = levelEl.querySelector('.level-singular').value.trim();
-            level.pluralName = levelEl.querySelector('.level-plural').value.trim();
-            level.description = levelEl.querySelector('.level-description').value.trim();
+            const nameInput = levelEl.querySelector('.level-name');
+            const singularInput = levelEl.querySelector('.level-singular');
+            const pluralInput = levelEl.querySelector('.level-plural');
+            const descInput = levelEl.querySelector('.level-description');
+            
+            console.log(`  - name input:`, nameInput ? nameInput.value : 'NOT FOUND');
+            console.log(`  - singular input:`, singularInput ? singularInput.value : 'NOT FOUND');
+            console.log(`  - plural input:`, pluralInput ? pluralInput.value : 'NOT FOUND');
+            
+            if (nameInput) level.name = nameInput.value.trim();
+            if (singularInput) level.singularName = singularInput.value.trim();
+            if (pluralInput) level.pluralName = pluralInput.value.trim();
+            if (descInput) level.description = descInput.value.trim();
         }
     });
+    
+    console.log('Final template before validation:', template);
     
     // Validate
     const errors = validateTemplate(template);
     if (errors.length > 0) {
+        console.error('Validation errors:', errors);
         showValidationErrors(errors);
         return;
     }

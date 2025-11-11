@@ -795,11 +795,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const template = getTemplate(flow);
         const level = template.levels[childDepth];
         
-        const parent = getObjectByPath(parentPath, flow);
-        if (!parent) return;
-
-        if (!parent.subcategories) {
-            parent.subcategories = [];
+        if (!level) {
+            console.error('Invalid level depth:', childDepth);
+            return;
         }
 
         const newUnit = {
@@ -827,7 +825,23 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
 
-        parent.subcategories.push(newUnit);
+        // Special handling for root level (depth 0)
+        if (childDepth === 0) {
+            flow.data.push(newUnit);
+        } else {
+            // For non-root levels, add to parent's subcategories
+            const parent = getObjectByPath(parentPath, flow);
+            if (!parent) {
+                console.error('Parent not found at path:', parentPath);
+                return;
+            }
+            
+            if (!parent.subcategories) {
+                parent.subcategories = [];
+            }
+            parent.subcategories.push(newUnit);
+        }
+        
         render();
     };
 
@@ -1273,8 +1287,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (addCategoryBtn) {
             addCategoryBtn.addEventListener('click', () => {
                 const flow = getCurrentFlow();
-                if (!flow) return;
-                addChildUnit('data', 0);
+                if (!flow) {
+                    alert('No workflow selected. Please create a workflow first.');
+                    return;
+                }
+                // For root level (depth 0), parentPath is not used
+                addChildUnit(null, 0);
             });
         }
         
