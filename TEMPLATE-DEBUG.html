@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Template Builder DEBUG</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="template-builder.css">
+    <style>
+        #debug-output {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            border-top: 2px solid #0f0;
+            z-index: 10000;
+        }
+        .debug-line { margin: 2px 0; }
+        .debug-error { color: #f00; }
+        .debug-success { color: #0f0; }
+        .debug-warn { color: #ff0; }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <div class="top-bar">
+            <div class="header-controls">
+                <div class="header-title">
+                    <h1><i class="fa-solid fa-layer-group"></i> Template Builder DEBUG</h1>
+                </div>
+            </div>
+        </div>
+
+        <div id="template-content">
+            <div class="loading-state">Loading...</div>
+        </div>
+    </div>
+
+    <div id="debug-output">
+        <div class="debug-line debug-success">Debug Console Ready</div>
+    </div>
+
+    <script>
+        // Debug logger
+        const debugLog = (message, type = 'info') => {
+            const output = document.getElementById('debug-output');
+            const line = document.createElement('div');
+            line.className = `debug-line debug-${type}`;
+            line.textContent = new Date().toLocaleTimeString() + ' | ' + message;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+            console.log(message);
+        };
+
+        // Override console methods
+        const originalLog = console.log;
+        const originalError = console.error;
+        console.log = (...args) => {
+            debugLog(args.join(' '), 'success');
+            originalLog.apply(console, args);
+        };
+        console.error = (...args) => {
+            debugLog(args.join(' '), 'error');
+            originalError.apply(console, args);
+        };
+
+        debugLog('Starting template builder...', 'success');
+    </script>
+    
+    <script src="template-builder.js"></script>
+    
+    <script>
+        // After template builder loads, add click interceptor
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('button')) {
+                const btn = e.target.closest('button');
+                debugLog(`Button clicked: ${btn.textContent.trim()}`, 'warn');
+                
+                // If it's the save button, log form state before save
+                if (btn.textContent.includes('Create Template') || btn.textContent.includes('Update Template')) {
+                    setTimeout(() => {
+                        debugLog('=== PRE-SAVE DEBUG ===', 'warn');
+                        debugLog(`Template name input exists: ${!!document.getElementById('template-name')}`, 'info');
+                        debugLog(`Template name value: "${document.getElementById('template-name')?.value}"`, 'info');
+                        debugLog(`Levels with data-level-index: ${document.querySelectorAll('[data-level-index]').length}`, 'info');
+                        
+                        document.querySelectorAll('[data-level-index]').forEach((el, idx) => {
+                            const nameInput = el.querySelector('.level-name');
+                            debugLog(`  Level ${idx} name: "${nameInput?.value}"`, 'info');
+                        });
+                    }, 10);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

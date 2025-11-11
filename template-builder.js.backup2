@@ -631,151 +631,91 @@ const validateTemplate = (template) => {
     return errors;
 };
 
-
+// ===== SAVE TEMPLATE =====
 window.saveTemplate = async () => {
-    console.log('==================== SAVE TEMPLATE START ====================');
-    
-    // Step 1: Get the template object from state
+    // Collect form data
     const template = state.currentTemplate;
-    if (!template) {
-        alert('Error: No template in state!');
-        console.error('state.currentTemplate is null');
-        return;
-    }
-    console.log('✓ Template object exists in state');
     
-    // Step 2: Read template-level fields from DOM
-    console.log('Reading template-level fields from DOM...');
-    const templateNameEl = document.getElementById('template-name');
-    const templateDescEl = document.getElementById('template-description');
-    const templateDefaultEl = document.getElementById('template-default');
+    console.log('Saving template, collecting form data...');
     
-    console.log('  template-name element:', templateNameEl ? 'FOUND' : 'NOT FOUND');
-    console.log('  template-description element:', templateDescEl ? 'FOUND' : 'NOT FOUND');
-    console.log('  template-default element:', templateDefaultEl ? 'FOUND' : 'NOT FOUND');
+    // Template identity
+    const nameInput = document.getElementById('template-name');
+    const descInput = document.getElementById('template-description');
+    const defaultCheckbox = document.getElementById('template-default');
     
-    if (!templateNameEl || !templateDescEl || !templateDefaultEl) {
-        alert('ERROR: Template form elements not found in DOM!\nPlease refresh the page and try again.');
-        console.error('Missing template form elements');
+    if (!nameInput || !descInput || !defaultCheckbox) {
+        alert('Form elements not found. Please refresh the page.');
+        console.error('Missing form elements');
         return;
     }
     
-    // Read values
-    const templateName = templateNameEl.value.trim();
-    const templateDesc = templateDescEl.value.trim();
-    const templateDefault = templateDefaultEl.checked;
+    template.name = nameInput.value.trim();
+    template.description = descInput.value.trim();
+    template.isDefault = defaultCheckbox.checked;
     
-    console.log('  template name VALUE:', `"${templateName}"`);
-    console.log('  template desc VALUE:', `"${templateDesc}"`);
-    console.log('  template default VALUE:', templateDefault);
+    console.log('Template name:', template.name);
     
-    // Update template object
-    template.name = templateName;
-    template.description = templateDesc;
-    template.isDefault = templateDefault;
-    console.log('✓ Template-level fields updated in object');
+    // Workflow config
+    const iconCheck = document.getElementById('workflow-icon');
+    const descCheck = document.getElementById('workflow-description');
+    const seqCheck = document.getElementById('workflow-sequential');
     
-    // Step 3: Read workflow-level config from DOM
-    console.log('Reading workflow config from DOM...');
-    const workflowIconEl = document.getElementById('workflow-icon');
-    const workflowDescEl = document.getElementById('workflow-description');
-    const workflowSeqEl = document.getElementById('workflow-sequential');
-    
-    if (workflowIconEl && workflowDescEl && workflowSeqEl) {
-        template.workflowConfig.enableIcon = workflowIconEl.checked;
-        template.workflowConfig.enableDescription = workflowDescEl.checked;
-        template.workflowConfig.enableSequentialOrder = workflowSeqEl.checked;
-        console.log('✓ Workflow config updated');
-    } else {
-        console.warn('⚠ Some workflow config elements not found (may be OK)');
+    if (iconCheck && descCheck && seqCheck) {
+        template.workflowConfig.enableIcon = iconCheck.checked;
+        template.workflowConfig.enableDescription = descCheck.checked;
+        template.workflowConfig.enableSequentialOrder = seqCheck.checked;
     }
     
-    // Step 4: Read level data from DOM
-    console.log(`Reading level data for ${template.levels.length} levels...`);
-    
-    for (let idx = 0; idx < template.levels.length; idx++) {
-        const level = template.levels[idx];
-        console.log(`\nProcessing Level ${idx}:`);
-        
-        // Find the level container in DOM
+    // Collect level data
+    console.log('Collecting data for', template.levels.length, 'levels');
+    template.levels.forEach((level, idx) => {
         const levelEl = document.querySelector(`[data-level-index="${idx}"]`);
-        console.log(`  Level container [data-level-index="${idx}"]:`, levelEl ? 'FOUND' : 'NOT FOUND');
+        console.log(`Level ${idx}:`, levelEl ? 'found' : 'NOT FOUND');
         
-        if (!levelEl) {
-            console.error(`  ✗ Level ${idx} container not found in DOM!`);
-            alert(`ERROR: Level ${idx + 1} form not found in DOM!\nThis should not happen. Please refresh and try again.`);
-            return;
+        if (levelEl) {
+            const nameInput = levelEl.querySelector('.level-name');
+            const singularInput = levelEl.querySelector('.level-singular');
+            const pluralInput = levelEl.querySelector('.level-plural');
+            const descInput = levelEl.querySelector('.level-description');
+            
+            console.log(`  - name input:`, nameInput ? nameInput.value : 'NOT FOUND');
+            console.log(`  - singular input:`, singularInput ? singularInput.value : 'NOT FOUND');
+            console.log(`  - plural input:`, pluralInput ? pluralInput.value : 'NOT FOUND');
+            
+            if (nameInput) level.name = nameInput.value.trim();
+            if (singularInput) level.singularName = singularInput.value.trim();
+            if (pluralInput) level.pluralName = pluralInput.value.trim();
+            if (descInput) level.description = descInput.value.trim();
         }
-        
-        // Find input fields within level container
-        const levelNameEl = levelEl.querySelector('.level-name');
-        const levelSingularEl = levelEl.querySelector('.level-singular');
-        const levelPluralEl = levelEl.querySelector('.level-plural');
-        const levelDescEl = levelEl.querySelector('.level-description');
-        
-        console.log(`  .level-name input:`, levelNameEl ? 'FOUND' : 'NOT FOUND');
-        console.log(`  .level-singular input:`, levelSingularEl ? 'FOUND' : 'NOT FOUND');
-        console.log(`  .level-plural input:`, levelPluralEl ? 'FOUND' : 'NOT FOUND');
-        console.log(`  .level-description input:`, levelDescEl ? 'FOUND' : 'NOT FOUND');
-        
-        if (!levelNameEl || !levelSingularEl || !levelPluralEl) {
-            console.error(`  ✗ Level ${idx} inputs not found in DOM!`);
-            alert(`ERROR: Level ${idx + 1} input fields not found!\nThis should not happen. Please refresh and try again.`);
-            return;
-        }
-        
-        // Read values
-        const levelName = levelNameEl.value.trim();
-        const levelSingular = levelSingularEl.value.trim();
-        const levelPlural = levelPluralEl.value.trim();
-        const levelDesc = levelDescEl ? levelDescEl.value.trim() : '';
-        
-        console.log(`  level name VALUE: "${levelName}"`);
-        console.log(`  singular VALUE: "${levelSingular}"`);
-        console.log(`  plural VALUE: "${levelPlural}"`);
-        console.log(`  description VALUE: "${levelDesc}"`);
-        
-        // Update level object
-        level.name = levelName;
-        level.singularName = levelSingular;
-        level.pluralName = levelPlural;
-        level.description = levelDesc;
-        
-        console.log(`✓ Level ${idx} data updated in object`);
-    }
+    });
     
-    // Step 5: Validate the complete template object
-    console.log('\n==================== VALIDATION ====================');
-    console.log('Template object to validate:', JSON.stringify(template, null, 2));
+    console.log('Final template before validation:', template);
     
+    // Validate
     const errors = validateTemplate(template);
-    
     if (errors.length > 0) {
-        console.error('✗ VALIDATION FAILED with errors:', errors);
+        console.error('Validation errors:', errors);
         showValidationErrors(errors);
         return;
     }
     
-    console.log('✓ VALIDATION PASSED');
-    
-    // Step 6: Update timestamp
+    // Update timestamp
     template.updatedAt = new Date().toISOString();
     
-    // Step 7: Add or update in templates array
+    // Save
     if (state.editMode === 'create') {
-        console.log('Adding new template to array...');
+        // New template
         state.templates.push(template);
     } else {
-        console.log('Updating existing template in array...');
+        // Update existing
         const index = state.templates.findIndex(t => t.id === template.id);
         if (index !== -1) {
             state.templates[index] = template;
         }
     }
     
-    // Step 8: Handle default flag
+    // If set as default, unset others
     if (template.isDefault) {
-        console.log('Unsetting default flag on other templates...');
         state.templates.forEach(t => {
             if (t.id !== template.id) {
                 t.isDefault = false;
@@ -783,20 +723,12 @@ window.saveTemplate = async () => {
         });
     }
     
-    // Step 9: Save to backend
-    console.log('Saving to backend...');
-    const saved = await saveTemplates(state.templates);
-    
-    if (saved) {
-        console.log('✓ SAVE SUCCESSFUL');
-        console.log('==================== SAVE TEMPLATE END ====================\n');
+    // Save to backend
+    if (await saveTemplates(state.templates)) {
         alert('Template saved successfully!');
         state.editMode = null;
         state.currentTemplate = null;
         renderTemplateList();
-    } else {
-        console.error('✗ SAVE FAILED');
-        console.log('==================== SAVE TEMPLATE END (FAILED) ====================\n');
     }
 };
 
