@@ -458,17 +458,80 @@
             <h3>Template Builder Interface Overview</h3>
             <p>The main screen shows:</p>
             <ul>
-                <li><strong>Header:</strong> "Workflow Templates" title and "Create New Template" button</li>
-                <li><strong>Template List:</strong> All your existing templates (if any)</li>
-                <li><strong>Template Cards:</strong> Each template shows:
+                <li><strong>Header Bar:</strong>
                     <ul style="list-style-type: circle; padding-left: 20px;">
-                        <li>Template name and description</li>
-                        <li>Number of levels (e.g., "3 levels")</li>
-                        <li>"Default" badge if it's the default template</li>
-                        <li>Action buttons (View, Edit, Delete)</li>
+                        <li>"Template Builder" title with layer icon</li>
+                        <li>"Back to Workflows" button (returns to workflow manager)</li>
+                        <li>Theme toggle button <i class="fa-solid fa-circle-half-stroke"></i> (light/dark mode)</li>
                     </ul>
                 </li>
+                <li><strong>Main Content Area:</strong>
+                    <ul style="list-style-type: circle; padding-left: 20px;">
+                        <li>"Workflow Templates" heading</li>
+                        <li>"Create New Template" button (top-right)</li>
+                    </ul>
+                </li>
+                <li><strong>Template Grid:</strong> Responsive grid showing all templates (or empty state)</li>
+                <li><strong>Template Cards:</strong> Each template displays:
+                    <ul style="list-style-type: circle; padding-left: 20px;">
+                        <li>Template name (large, bold heading)</li>
+                        <li>"Default" badge (blue, if marked as default)</li>
+                        <li>Description text (or "No description provided")</li>
+                        <li>Stats row: <i class="fa-solid fa-layer-group"></i> Level count + <i class="fa-solid fa-calendar"></i> Created date</li>
+                        <li>Action buttons: <i class="fa-solid fa-eye"></i> View, <i class="fa-solid fa-pen"></i> Edit, <i class="fa-solid fa-trash"></i> Delete</li>
+                    </ul>
+                </li>
+                <li><strong>Empty State:</strong> If no templates exist, shows welcome message with "Create Template" button</li>
             </ul>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-moon"></i> Dark Mode:</strong> The template builder supports both light and dark themes. Click the theme toggle button in the top-right to switch. Your preference is saved and syncs across the entire application.
+            </div>
+
+            <h3>Template Management Actions</h3>
+            
+            <h4>Viewing a Template (Read-Only)</h4>
+            <p>To see template details without editing:</p>
+            <ol>
+                <li>Find the template card in the grid</li>
+                <li>Click the <strong>"<i class="fa-solid fa-eye"></i> View"</strong> button</li>
+                <li>A modal opens showing:
+                    <ul style="list-style-type: circle; padding-left: 20px;">
+                        <li><strong>Template Information:</strong> Name, description, version, created date</li>
+                        <li><strong>All Levels:</strong> Names (with singular/plural forms) and descriptions</li>
+                        <li><strong>Enabled Properties:</strong> List of features available at each level</li>
+                    </ul>
+                </li>
+                <li>Click <strong>"Close"</strong> to exit view mode</li>
+            </ol>
+
+            <div class="tip">
+                <strong><i class="fa-solid fa-eye"></i> When to Use View:</strong> Use View mode to quickly reference a template's structure without risk of accidentally changing it. Perfect for checking template details, comparing templates, or sharing information with team members.
+            </div>
+
+            <h4>Editing a Template</h4>
+            <ol>
+                <li>Click the <strong>"<i class="fa-solid fa-pen"></i> Edit"</strong> button on any template card</li>
+                <li>Template opens in edit mode (same form as create)</li>
+                <li>Make your changes to any field</li>
+                <li>Click <strong>"<i class="fa-solid fa-check"></i> Update Template"</strong> to save</li>
+                <li>Or click <strong>"<i class="fa-solid fa-xmark"></i> Cancel"</strong> to discard all changes and return to list</li>
+            </ol>
+
+            <div class="important">
+                <strong>⚠️ Template Edits Don't Affect Existing Workflows:</strong> When you edit a template, only NEW workflows created after the edit will use the updated structure. Existing workflows preserve their original snapshot and continue working unchanged. This protects your completed work from breaking changes!
+            </div>
+
+            <h4>Deleting a Template</h4>
+            <ol>
+                <li>Click the red <strong>"<i class="fa-solid fa-trash"></i> Delete"</strong> button on a template card</li>
+                <li>Confirm the deletion in the dialog box</li>
+                <li>Template is permanently removed from the system</li>
+            </ol>
+
+            <div class="important">
+                <strong>📌 Can't Delete Default Templates:</strong> If a template is marked as default, the delete button is hidden. You must first remove the default status (edit the template and uncheck "Set as default") before deletion is allowed. This prevents accidentally removing your primary template.
+            </div>
 
             <h3>Your First Template: Quick Start</h3>
             <p>Let's create a simple 2-level checklist template:</p>
@@ -724,14 +787,39 @@ Level 3: Evidence (Grandchildren)<br>
             </ol>
 
             <h4>Reordering Levels:</h4>
+            <p>Each level has reordering buttons in its header (next to the level name):</p>
+            <ul>
+                <li><strong><i class="fa-solid fa-arrow-up"></i> Up Arrow:</strong> Moves level one position higher (only shown if not already first)</li>
+                <li><strong><i class="fa-solid fa-arrow-down"></i> Down Arrow:</strong> Moves level one position lower (only shown if not already last)</li>
+            </ul>
+            
+            <p><strong>How it works:</strong></p>
             <ol>
-                <li>Use <strong><i class="fa-solid fa-arrow-up"></i> Move Up</strong> button to move level higher</li>
-                <li>Use <strong><i class="fa-solid fa-arrow-down"></i> Move Down</strong> button to move level lower</li>
-                <li>Top level is Level 1 (root), bottom level is the deepest (leaves)</li>
+                <li>Click the up/down arrow next to the level you want to move</li>
+                <li>Level instantly swaps position with the one above/below it</li>
+                <li>Level numbers automatically update (1, 2, 3...)</li>
+                <li>All form data is preserved during the move (names, properties, etc.)</li>
             </ol>
 
+            <div class="example-box">
+                <h4>💡 Reordering Example</h4>
+                <p><strong>Before:</strong></p>
+                <ul style="list-style-type: none; padding-left: 20px;">
+                    <li>1. Control</li>
+                    <li>2. Action</li>
+                    <li>3. Evidence</li>
+                </ul>
+                <p><strong>After clicking "Up" <i class="fa-solid fa-arrow-up"></i> on Level 3 (Evidence):</strong></p>
+                <ul style="list-style-type: none; padding-left: 20px;">
+                    <li>1. Control</li>
+                    <li>2. Evidence</li>
+                    <li>3. Action</li>
+                </ul>
+                <p><strong>Effect:</strong> In workflows, Evidence would now be children of Controls, and Actions would be grandchildren of Controls (children of Evidence). The hierarchy changed!</p>
+            </div>
+
             <div class="important">
-                <strong>⚠️ Order Matters:</strong> Level 1 is always the root (top-level items). Level 2 are children of Level 1. Level 3 are children of Level 2, and so on. You can't have Level 3 items without Level 2 parents.
+                <strong>⚠️ Order Matters:</strong> Level 1 is always the root (top-level items). Level 2 are children of Level 1. Level 3 are children of Level 2, and so on. You can't have Level 3 items without Level 2 parents. Reordering changes the parent-child relationships!
             </div>
 
             <h3>How Many Levels Should You Have?</h3>
@@ -789,6 +877,15 @@ Level 3: Evidence (Grandchildren)<br>
             </div>
 
             <h3>All Available Properties</h3>
+            
+            <div class="highlight">
+                <strong><i class="fa-solid fa-info-circle"></i> Default Property Values:</strong> When you add a new level, it comes with sensible defaults:
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>✅ <strong>Enabled by default:</strong> Icon, Name (always required, can't disable), Description, Tags, Done Checkbox</li>
+                    <li>❌ <strong>Disabled by default:</strong> Display ID, Grade, Cumulative Grade, Progress Bar, All Attachments (Links, Images, Notes, Comments)</li>
+                </ul>
+                <p>You can toggle any checkbox to customize for your needs. These defaults work well for most use cases, providing basic identification and tracking without overwhelming users.</p>
+            </div>
 
             <h4>Identity Properties</h4>
             <p>These define how users identify and name units:</p>
@@ -1461,6 +1558,15 @@ Level 3: Evidence (Grandchildren)<br>
 
             <h4>Q: Can I change a workflow's template after creation?</h4>
             <p><strong>A:</strong> No. Once a workflow is created from a template, it's locked to that template's snapshot. To use a different structure, create a new workflow from a different template.</p>
+
+            <h4>Q: What's the difference between View and Edit modes for templates?</h4>
+            <p><strong>A:</strong> <strong>View</strong> is read-only - you can see all template details but can't change anything. <strong>Edit</strong> opens the full form where you can modify the template. Use View for quick reference, Edit when you need to make changes.</p>
+
+            <h4>Q: Why can't I delete a template marked as default?</h4>
+            <p><strong>A:</strong> This is a safety feature. Default templates are your primary workflow structure. To delete it, first edit the template and uncheck "Set as default", or mark a different template as default.</p>
+
+            <h4>Q: Does the dark theme setting affect my workflow data?</h4>
+            <p><strong>A:</strong> No. The theme is purely visual (stored in your browser). Your templates and workflows are unchanged. Theme preference syncs across Template Builder and Workflow Manager.</p>
 
             <h4>Q: Why does progress bar require child level to have done checkbox?</h4>
             <p><strong>A:</strong> Progress bar calculates completion % by checking how many children are marked done. If children don't have done checkboxes, there's nothing to calculate from. It would always show 0%.</p>
