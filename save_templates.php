@@ -9,23 +9,33 @@ $input = file_get_contents('php://input');
 $data = json_decode($input, true);
 
 // Validate input
-if (!$data || !isset($data['links'])) {
+if (!$data || !isset($data['templates'])) {
     http_response_code(400);
     echo json_encode([
         'status' => 'error',
-        'message' => 'Invalid data: links array required'
+        'message' => 'Invalid data: templates array required'
+    ]);
+    exit;
+}
+
+// Validate templates array
+if (!is_array($data['templates'])) {
+    http_response_code(400);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Templates must be an array'
     ]);
     exit;
 }
 
 // Prepare output
 $output = [
-    'links' => $data['links']
+    'templates' => $data['templates']
 ];
 
 // Save to file
 $result = file_put_contents(
-    'data/workflow-links.json',
+    'data/templates.json',
     json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
 );
 
@@ -33,14 +43,14 @@ $result = file_put_contents(
 if ($result !== false) {
     echo json_encode([
         'status' => 'success',
-        'message' => 'Workflow links saved successfully',
-        'linkCount' => count($data['links'])
+        'message' => 'Templates saved successfully',
+        'count' => count($data['templates'])
     ]);
 } else {
     http_response_code(500);
     echo json_encode([
         'status' => 'error',
-        'message' => 'Failed to write workflow links file'
+        'message' => 'Failed to write templates file'
     ]);
 }
 ?>

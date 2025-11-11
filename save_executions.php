@@ -1,42 +1,45 @@
 <?php
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Content-Type');
 
-$filename = 'executions.json';
-$json_data = file_get_contents('php://input');
+// Get JSON input
+$input = file_get_contents('php://input');
+$data = json_decode($input, true);
 
-if (empty($json_data)) {
+// Validate input
+if (!$data || !isset($data['flows'])) {
     http_response_code(400);
-    echo json_encode(['status' => 'error', 'message' => 'No data received.']);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Invalid data: flows object required'
+    ]);
     exit;
 }
 
-$data = json_decode($json_data, true);
-if (json_last_error() !== JSON_ERROR_NONE) {
-    http_response_code(400);
-    echo json_encode(['status' => 'error', 'message' => 'Invalid JSON format.']);
-    exit;
-}
+// Prepare output
+$output = [
+    'flows' => $data['flows']
+];
 
-/*
- Expected schema:
- {
-   "flows": {
-     "flow-id": {
-       "completed": {
-         "evidence-id": true/false,
-         ...
-       }
-     },
-     ...
-   }
- }
-*/
-$pretty_json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+// Save to file
+$result = file_put_contents(
+    'data/executions.json',
+    json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+);
 
-if (file_put_contents($filename, $pretty_json) !== false) {
-    echo json_encode(['status' => 'success', 'message' => 'Execution saved successfully.']);
+// Response
+if ($result !== false) {
+    echo json_encode([
+        'status' => 'success',
+        'message' => 'Executions saved successfully'
+    ]);
 } else {
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => 'Failed to save execution. Check file permissions on the server.']);
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Failed to write executions file'
+    ]);
 }
 ?>
