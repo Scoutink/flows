@@ -301,6 +301,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         appState.workflow.flows.push(flow);
         appState.currentFlowId = flow.id;
+        
+        // CRITICAL FIX: Set mode to creation for new workflows
+        appState.currentMode = 'creation';
+        if (modeSwitch) {
+            modeSwitch.checked = false; // Unchecked = creation mode
+        }
+        
         populateFlowSelect();
         render();
         await saveWorkflow();
@@ -422,6 +429,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         appState.workflow.flows.push(newFlow);
         appState.currentFlowId = newFlow.id;
+        
+        // Set mode to creation for copied workflows
+        appState.currentMode = 'creation';
+        if (modeSwitch) {
+            modeSwitch.checked = false;
+        }
+        
         populateFlowSelect();
         render();
         await saveWorkflow();
