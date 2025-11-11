@@ -458,8 +458,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         workflowRoot.innerHTML = workflowInfoHtml + contentHtml;
 
-        applyModeStyles();
-        updateAddButton();
+        // Use setTimeout to ensure DOM is ready before applying styles
+        setTimeout(() => {
+            applyModeStyles();
+            updateAddButton();
+        }, 0);
     };
 
     const renderWorkflowInfo = (flow, template) => {
@@ -518,7 +521,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     };
 
-    const renderUnits = (units, template, depth) => {
+    const renderUnits = (units, template, depth, parentPath = 'data') => {
         if (!units || units.length === 0) return '';
         if (depth >= template.levels.length) return '';
 
@@ -528,9 +531,13 @@ document.addEventListener('DOMContentLoaded', () => {
             filtered = filterUnitsByTag(units, appState.activeTag, template, depth);
         }
 
-        return filtered.map((unit, index) => 
-            renderUnit(unit, template, depth, `data.${index}`)
-        ).join('');
+        return filtered.map((unit, index) => {
+            // Generate correct path for this depth
+            const path = depth === 0 
+                ? `data.${index}` 
+                : `${parentPath}.subcategories.${index}`;
+            return renderUnit(unit, template, depth, path);
+        }).join('');
     };
 
     const renderUnit = (unit, template, depth, path) => {
@@ -655,7 +662,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!nextLevel) return '';
 
         const isCreation = appState.currentMode === 'creation';
-        const childrenHtml = renderUnits(unit.subcategories || [], template, depth + 1);
+        // CRITICAL FIX: Pass parent path to renderUnits
+        const childrenHtml = renderUnits(unit.subcategories || [], template, depth + 1, path);
 
         return `
             <div class="unit-children">
@@ -860,12 +868,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== UNIT OPERATIONS =====
     window.addChildUnit = (parentPath, childDepth) => {
+        console.log('🔹 addChildUnit called:', { parentPath, childDepth });
         const flow = getCurrentFlow();
         const template = getTemplate(flow);
         const level = template.levels[childDepth];
         
         if (!level) {
-            console.error('Invalid level depth:', childDepth);
+            console.error('❌ Invalid level depth:', childDepth);
             return;
         }
 
@@ -875,6 +884,8 @@ document.addEventListener('DOMContentLoaded', () => {
             name: '',
             subcategories: []
         };
+        
+        console.log('✅ Created new unit:', newUnit.id, 'for level:', level.name);
 
         // Initialize properties based on level config
         if (level.unitConfig.enableIcon) newUnit.icon = null;
@@ -896,46 +907,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Special handling for root level (depth 0)
         if (childDepth === 0) {
+            console.log('📍 Adding to root level (flow.data)');
             flow.data.push(newUnit);
         } else {
             // For non-root levels, add to parent's subcategories
+            console.log('📍 Finding parent at path:', parentPath);
             const parent = getObjectByPath(parentPath, flow);
             if (!parent) {
-                console.error('Parent not found at path:', parentPath);
+                console.error('❌ Parent not found at path:', parentPath);
                 return;
             }
             
+            console.log('✅ Parent found:', parent.id || parent);
             if (!parent.subcategories) {
                 parent.subcategories = [];
             }
             parent.subcategories.push(newUnit);
+            console.log('✅ Added to parent. Parent now has', parent.subcategories.length, 'children');
         }
         
+        console.log('🔄 Triggering re-render...');
         render();
     };
 
     window.deleteUnit = (path) => {
+        console.log('🗑️ deleteUnit called for path:', path);
         const flow = getCurrentFlow();
         const template = getTemplate(flow);
         const { parent, key } = getParentAndKey(path, flow);
         
-        if (!parent || !parent[key]) return;
+        if (!parent || !parent[key]) {
+            console.error('❌ Parent or unit not found at path:', path);
+            return;
+        }
         
         const unit = parent[key];
-        const depth = (path.match(/\./g) || []).length / 2;
+        // CRITICAL FIX: Calculate depth by counting "subcategories" in path
+        const depth = (path.match(/subcategories/g) || []).length;
         const level = template.levels[depth];
         
+        if (!level) {
+            console.error('❌ Invalid depth for path:', path, 'depth:', depth);
+            return;
+        }
+        
+        console.log('✅ Deleting unit:', unit.id, 'from', level.name);
         if (!confirm(`Delete this ${level.singularName.toLowerCase()}?`)) return;
         
         parent.splice(key, 1);
+        console.log('✅ Deleted. Parent now has', parent.length, 'children');
         render();
     };
 
     window.updateUnitProperty = (path, property, value) => {
+        console.log('📝 updateUnitProperty:', { path, property, value });
         const flow = getCurrentFlow();
         const unit = getObjectByPath(path, flow);
-        if (!unit) return;
+        if (!unit) {
+            console.error('❌ Unit not found at path:', path);
+            return;
+        }
         
+        console.log('✅ Unit found:', unit.id, '- updating', property);
         unit[property] = value;
         
         // If grade is updated and not cumulative, recalculate parent if parent is cumulative
