@@ -853,8 +853,10 @@ const PPM = (() => {
             
             return `
                 <div class="milestone-item ${isCompleted ? 'completed' : ''}" 
+                     style="border-color: ${milestone.color}; ${!isCompleted ? `background-color: ${milestone.color}15;` : ''}"
                      onclick="PPM.ui.showMilestoneDetails('${milestone.id}')"
                      title="${milestone.description || milestone.name}">
+                    <div class="milestone-color" style="background-color: ${milestone.color}"></div>
                     <span class="milestone-name">${milestone.name}</span>
                     <span class="milestone-progress">${progress}</span>
                     <div class="milestone-actions" onclick="event.stopPropagation()">
@@ -999,16 +1001,20 @@ const PPM = (() => {
         if (isOverdue) dueDateClass = 'overdue';
         else if (isDueSoon) dueDateClass = 'due-soon';
         
-        // Get the backlog column ID (first column)
-        const backlogColumnId = board.columns[0]?.id;
-        const isBacklogCard = card.columnId === backlogColumnId;
+        // Get the References column ID (first column)
+        const referencesColumnId = board.columns[0]?.id;
+        const isReferenceCard = card.columnId === referencesColumnId;
+        
+        // Check if card is in Done column
+        const doneColumn = board.columns.find(col => col.name === 'Done');
+        const isDone = doneColumn && card.columnId === doneColumn.id;
         
         return `
-            <div class="card ${isBacklogCard ? 'backlog-card' : ''}" 
+            <div class="card ${isReferenceCard ? 'backlog-card' : ''} ${isDone ? 'card-done' : ''}" 
                  draggable="true" 
                  data-card-id="${card.id}"
                  onclick="PPM.ui.openCardDetail('${card.id}')">
-                ${isBacklogCard ? `
+                ${isReferenceCard ? `
                     <div class="backlog-card-actions">
                         <button class="backlog-action-btn" 
                                 onclick="event.stopPropagation(); PPM.ui.filterByBacklog('${card.id}')" 
@@ -1027,10 +1033,13 @@ const PPM = (() => {
                         ${card.labels.slice(0, 3).map(label => `<span class="card-label">${label}</span>`).join('')}
                     </div>
                 ` : ''}
-                <h4 class="card-title">${card.title}</h4>
+                <h4 class="card-title">
+                    ${isDone ? '<i class="fa-solid fa-circle-check done-icon"></i> ' : ''}
+                    ${card.title}
+                </h4>
                 ${card.description ? `<p class="card-description">${card.description.substring(0, 100)}${card.description.length > 100 ? '...' : ''}</p>` : ''}
                 
-                ${isBacklogCard && card.attachments.length > 0 ? `
+                ${isReferenceCard && card.attachments.length > 0 ? `
                     <div class="backlog-attachments">
                         ${card.attachments.slice(0, 5).map((att, idx) => `
                             <button class="attachment-preview-btn" 
@@ -1046,7 +1055,7 @@ const PPM = (() => {
                 <div class="card-meta">
                     ${dueDate ? `<span class="card-due ${dueDateClass}"><i class="fa-solid fa-clock"></i> ${formatDate(dueDate)}</span>` : ''}
                     ${card.checklist.length > 0 ? `<span class="card-checklist"><i class="fa-solid fa-check-square"></i> ${card.checklist.filter(c => c.completed).length}/${card.checklist.length}</span>` : ''}
-                    ${!isBacklogCard && card.attachments.length > 0 ? `<span class="card-attachments"><i class="fa-solid fa-paperclip"></i> ${card.attachments.length}</span>` : ''}
+                    ${!isReferenceCard && card.attachments.length > 0 ? `<span class="card-attachments"><i class="fa-solid fa-paperclip"></i> ${card.attachments.length}</span>` : ''}
                     ${hasApprover ? `<span class="card-approval"><i class="fa-solid fa-user-check"></i></span>` : ''}
                 </div>
                 ${assignees.length > 0 ? `
@@ -1158,6 +1167,7 @@ const PPM = (() => {
     const closeModal = () => {
         const backdrop = document.getElementById('modal-backdrop');
         backdrop.classList.add('hidden');
+        backdrop.classList.remove('secondary-modal'); // Remove secondary class when closing
     };
 
     const openCardModal = (title, bodyHTML, onOpen = () => {}) => {
@@ -1569,13 +1579,28 @@ const PPM = (() => {
             }
         },
         
+        // Carousel navigation
+        scrollCarousel: (type, direction) => {
+            const container = document.getElementById(`${type}-container`);
+            if (!container) return;
+            
+            const scrollAmount = 200; // pixels to scroll
+            const currentScroll = container.scrollLeft;
+            
+            if (direction === 'next') {
+                container.scrollLeft = currentScroll + scrollAmount;
+            } else {
+                container.scrollLeft = currentScroll - scrollAmount;
+            }
+        },
+        
         openAddCardModal: (columnId) => {
             const board = getCurrentBoard();
             const column = getColumnById(board, columnId);
             
-            // Get backlog items for linking (if not adding to backlog)
-            const backlogColumnId = board.columns[0]?.id;
-            const backlogCards = columnId !== backlogColumnId ? getCardsByColumn(board, backlogColumnId) : [];
+            // Get References items for linking (if not adding to References)
+            const referencesColumnId = board.columns[0]?.id;
+            const referenceCards = columnId !== referencesColumnId ? getCardsByColumn(board, referencesColumnId) : [];
             
             openModal(`Add Task to ${column.name}`, `
                 <form id="add-card-form" class="modal-form">
@@ -1585,10 +1610,10 @@ const PPM = (() => {
                     <label for="card-description">Description</label>
                     <textarea id="card-description" rows="3"></textarea>
                     
-                    ${backlogCards.length > 0 ? `
-                        <label>Link to Backlog Items (optional)</label>
+                    ${referenceCards.length > 0 ? `
+                        <label>Link to Reference Items (optional)</label>
                         <div class="backlog-selector">
-                            ${backlogCards.map(bc => `
+                            ${referenceCards.map(bc => `
                                 <label class="checkbox-label">
                                     <input type="checkbox" name="backlog-link" value="${bc.id}">
                                     <span>${bc.title}</span>
@@ -1840,7 +1865,46 @@ const PPM = (() => {
                 <div class="card-detail-main">
                     <div class="detail-section">
                         <label>Description</label>
-                        <textarea id="card-desc-edit" rows="4">${card.description || ''}</textarea>
+                        <textarea id="card-desc-edit" rows="4" onchange="PPM.ui.updateDescription('${card.id}', this.value)">${card.description || ''}</textarea>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <label>Milestone</label>
+                        <select id="card-milestone" onchange="PPM.ui.updateMilestone('${card.id}', this.value)">
+                            <option value="">No Milestone</option>
+                            ${board.milestones.map(m => `
+                                <option value="${m.id}" ${card.milestoneId === m.id ? 'selected' : ''}>
+                                    ${m.name}
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <label>Category</label>
+                        <select id="card-category" onchange="PPM.ui.updateCategory('${card.id}', this.value)">
+                            <option value="">No Category</option>
+                            ${board.categories.map(c => `
+                                <option value="${c.id}" ${card.categoryId === c.id ? 'selected' : ''}>
+                                    ${c.name}
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <label>Groups</label>
+                        <div class="groups-selector">
+                            ${board.groups.length > 0 ? board.groups.map(g => `
+                                <label class="checkbox-label">
+                                    <input type="checkbox" 
+                                           value="${g.id}" 
+                                           ${card.groupIds && card.groupIds.includes(g.id) ? 'checked' : ''}
+                                           onchange="PPM.ui.toggleGroup('${card.id}', '${g.id}', this.checked)">
+                                    <span>${g.name}</span>
+                                </label>
+                            `).join('') : '<p class="empty-message">No groups available</p>'}
+                        </div>
                     </div>
                     
                     ${card.checklist.length > 0 ? `
