@@ -71,7 +71,7 @@ const PPM = (() => {
     // ===== DATA LAYER =====
     const loadBoards = async () => {
         try {
-            const res = await fetch(`data/ppm-boards.json?t=${Date.now()}`);
+            const res = await fetch(`ppm-boards.json?t=${Date.now()}`);
             if (!res.ok) throw new Error('Failed to load boards');
             const data = await res.json();
             state.boards = data.boards || [];
@@ -84,7 +84,7 @@ const PPM = (() => {
 
     const loadUsers = async () => {
         try {
-            const res = await fetch(`data/ppm-users.json?t=${Date.now()}`);
+            const res = await fetch(`ppm-users.json?t=${Date.now()}`);
             if (!res.ok) throw new Error('Failed to load users');
             const data = await res.json();
             state.users = data.users || [];
