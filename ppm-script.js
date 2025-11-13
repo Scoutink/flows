@@ -2372,24 +2372,62 @@ const PPM = (() => {
         const card = getCardById(board, cardId);
         if (!card) return;
         
-        const title = prompt('Note title:');
-        if (!title || !title.trim()) return;
+        const html = `
+            <form id="add-note-form" class="modal-form">
+                <label for="note-title">Note Title</label>
+                <input type="text" id="note-title" required autofocus placeholder="e.g., Implementation Guidelines">
+                
+                <label for="note-content">Content (Rich Text)</label>
+                <div id="note-editor-container" style="height: 200px; background: white;"></div>
+                
+                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+                    <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Add Note</button>
+                </div>
+            </form>
+        `;
         
-        const content = prompt('Note content:');
-        if (!content || !content.trim()) return;
-        
-        const attachment = {
-            type: 'note',
-            title: title.trim(),
-            content: content.trim(),
-            author: state.currentUser?.name || 'Anonymous',
-            timestamp: new Date().toISOString()
-        };
-        
-        card.attachments.push(attachment);
-        await saveBoards();
-        closeCardModal();
-        ui.openCardDetail(cardId);
+        openModal('Add Note', html, () => {
+            // Initialize Quill editor
+            const quill = new Quill('#note-editor-container', {
+                theme: 'snow',
+                placeholder: 'Write your note content...',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link'],
+                        ['clean']
+                    ]
+                }
+            });
+            
+            const form = document.getElementById('add-note-form');
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const title = document.getElementById('note-title').value.trim();
+                const content = quill.root.innerHTML;
+                
+                if (!title) {
+                    alert('Please enter a note title');
+                    return;
+                }
+                
+                const attachment = {
+                    type: 'note',
+                    title: title,
+                    content: content,
+                    author: state.currentUser?.name || 'Anonymous',
+                    timestamp: new Date().toISOString()
+                };
+                
+                card.attachments.push(attachment);
+                await saveBoards();
+                closeModal();
+                closeCardModal();
+                ui.openCardDetail(cardId);
+            });
+        });
     };
     
     ui.showAddLinkDialog = async (cardId) => {
@@ -2655,7 +2693,7 @@ const PPM = (() => {
             return `
                 <div class="thread-note">
                     <strong class="thread-note-title">${escapeHtml(attachment.title)}</strong>
-                    <p class="thread-note-content">${escapeHtml(attachment.content)}</p>
+                    <div class="thread-note-content">${attachment.content}</div>
                 </div>
             `;
         } else if (attachment.type === 'link') {
@@ -3329,31 +3367,69 @@ PPM.dynamicList = {
     
     showAddNoteDialog: async function(nodeId) {
         try {
-            const title = prompt('Note title:');
-            if (!title || !title.trim()) return;
-            
-            const content = prompt('Note content:');
-            if (!content || !content.trim()) return;
-            
             const board = PPM.getCurrentBoard();
             const node = board.dynamicList.nodes.find(n => n.id === nodeId);
             if (!node) return;
             
-            if (!node.taskData) node.taskData = {};
-            if (!node.taskData.attachments) node.taskData.attachments = [];
+            const html = `
+                <form id="add-note-form" class="modal-form">
+                    <label for="note-title">Note Title</label>
+                    <input type="text" id="note-title" required autofocus placeholder="e.g., Implementation Guidelines">
+                    
+                    <label for="note-content">Content (Rich Text)</label>
+                    <div id="note-editor-container" style="height: 200px; background: white;"></div>
+                    
+                    <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+                        <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Add Note</button>
+                    </div>
+                </form>
+            `;
             
-            const attachment = {
-                type: 'note',
-                title: title.trim(),
-                content: content.trim(),
-                author: PPM.state.currentUser?.name || 'Anonymous',
-                timestamp: new Date().toISOString()
-            };
-            
-            node.taskData.attachments.push(attachment);
-            await PPM.saveBoards();
-            
-            setTimeout(() => { this.openTaskModal(nodeId); }, 100);
+            PPM.openModal('Add Note', html, () => {
+                // Initialize Quill editor
+                const quill = new Quill('#note-editor-container', {
+                    theme: 'snow',
+                    placeholder: 'Write your note content...',
+                    modules: {
+                        toolbar: [
+                            ['bold', 'italic', 'underline'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            ['link'],
+                            ['clean']
+                        ]
+                    }
+                });
+                
+                const form = document.getElementById('add-note-form');
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const title = document.getElementById('note-title').value.trim();
+                    const content = quill.root.innerHTML;
+                    
+                    if (!title) {
+                        alert('Please enter a note title');
+                        return;
+                    }
+                    
+                    if (!node.taskData) node.taskData = {};
+                    if (!node.taskData.attachments) node.taskData.attachments = [];
+                    
+                    const attachment = {
+                        type: 'note',
+                        title: title,
+                        content: content,
+                        author: PPM.state.currentUser?.name || 'Anonymous',
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    node.taskData.attachments.push(attachment);
+                    await PPM.saveBoards();
+                    
+                    PPM.closeModal();
+                    setTimeout(() => { PPM.dynamicList.openTaskModal(nodeId); }, 100);
+                });
+            });
         } catch (err) {
             console.error('showAddNoteDialog error:', err);
             alert('Failed to add note: ' + err.message);
@@ -3497,7 +3573,7 @@ PPM.dynamicList = {
             return `
                 <div class="thread-note">
                     <strong class="thread-note-title">${escapeHtml(attachment.title)}</strong>
-                    <p class="thread-note-content">${escapeHtml(attachment.content)}</p>
+                    <div class="thread-note-content">${attachment.content}</div>
                 </div>
             `;
         } else if (attachment.type === 'link') {

@@ -2527,12 +2527,14 @@ textarea.form-input {
 /* Comment */
 .thread-comment {
     margin: 0;
-    padding: 8px 12px;
+    padding: 6px 10px;
     background: var(--bg-secondary);
     border-radius: 6px;
     border-left: 3px solid #1976d2;
     white-space: pre-wrap;
     word-wrap: break-word;
+    line-height: 1.4;
+    font-size: 0.95em;
 }
 
 /* Note */
@@ -2545,16 +2547,57 @@ textarea.form-input {
 
 .thread-note-title {
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     color: var(--text-color);
     font-size: 1em;
+    font-weight: 600;
 }
 
 .thread-note-content {
     margin: 0;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* Quill editor content styling in notes */
+.thread-note-content p {
+    margin: 0.5em 0;
+}
+
+.thread-note-content p:first-child {
+    margin-top: 0;
+}
+
+.thread-note-content p:last-child {
+    margin-bottom: 0;
+}
+
+.thread-note-content ul,
+.thread-note-content ol {
+    margin: 0.5em 0;
+    padding-left: 1.5em;
+}
+
+.thread-note-content strong {
+    font-weight: 600;
+}
+
+.thread-note-content em {
+    font-style: italic;
+}
+
+.thread-note-content h1,
+.thread-note-content h2,
+.thread-note-content h3 {
+    margin: 0.75em 0 0.5em 0;
+    font-weight: 600;
+}
+
+.thread-note-content blockquote {
+    border-left: 3px solid var(--border-color);
+    padding-left: 1em;
+    margin: 0.5em 0;
     color: var(--text-muted);
-    white-space: pre-wrap;
-    word-wrap: break-word;
 }
 
 /* Link */
