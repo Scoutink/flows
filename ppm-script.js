@@ -1963,7 +1963,7 @@ const PPM = (() => {
                             <button class="btn-attachment" onclick="PPM.ui.showAddCommentDialog('${card.id}')">
                                 <i class="fa-solid fa-comment"></i> Comment
                             </button>
-                            <button class="btn-attachment" onclick="PPM.ui.showAddNoteDialog('${card.id}')">
+                            <button class="btn-attachment" onclick="PPM.ui.toggleNoteEditor('${card.id}')">
                                 <i class="fa-solid fa-book-open"></i> Note
                             </button>
                             <button class="btn-attachment" onclick="PPM.ui.showAddLinkDialog('${card.id}')">
@@ -1972,6 +1972,20 @@ const PPM = (() => {
                             <button class="btn-attachment" onclick="PPM.ui.showAddImageDialog('${card.id}')">
                                 <i class="fa-solid fa-image"></i> Image
                             </button>
+                        </div>
+                        
+                        <!-- Inline Note Editor -->
+                        <div id="inline-note-editor-${card.id}" class="inline-note-editor" style="display: none;">
+                            <label for="inline-note-title-${card.id}">Note Title</label>
+                            <input type="text" id="inline-note-title-${card.id}" placeholder="e.g., Implementation Guidelines">
+                            
+                            <label for="inline-note-content-${card.id}">Content (Rich Text)</label>
+                            <div id="inline-note-content-${card.id}" class="note-editor-container"></div>
+                            
+                            <div class="editor-actions">
+                                <button class="btn-secondary" onclick="PPM.ui.cancelNoteEditor('${card.id}')">Cancel</button>
+                                <button class="btn-primary" onclick="PPM.ui.saveInlineNote('${card.id}')">Add Note</button>
+                            </div>
                         </div>
                         
                         <div class="activity-thread">
@@ -2367,67 +2381,86 @@ const PPM = (() => {
         ui.openCardDetail(cardId);
     };
     
-    ui.showAddNoteDialog = async (cardId) => {
+    ui.toggleNoteEditor = (cardId) => {
+        const editor = document.getElementById(`inline-note-editor-${cardId}`);
+        const container = document.getElementById(`inline-note-content-${cardId}`);
+        
+        if (editor.style.display === 'none') {
+            editor.style.display = 'block';
+            
+            // Initialize Quill if not already initialized
+            if (!editor.quillInstance) {
+                editor.quillInstance = new Quill(`#inline-note-content-${cardId}`, {
+                    theme: 'snow',
+                    placeholder: 'Write your note content...',
+                    modules: {
+                        toolbar: [
+                            ['bold', 'italic', 'underline'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            ['link'],
+                            ['clean']
+                        ]
+                    }
+                });
+            }
+            
+            // Clear previous content
+            document.getElementById(`inline-note-title-${cardId}`).value = '';
+            editor.quillInstance.setText('');
+            
+            // Scroll to editor
+            setTimeout(() => {
+                editor.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        } else {
+            editor.style.display = 'none';
+        }
+    };
+    
+    ui.cancelNoteEditor = (cardId) => {
+        const editor = document.getElementById(`inline-note-editor-${cardId}`);
+        editor.style.display = 'none';
+        document.getElementById(`inline-note-title-${cardId}`).value = '';
+        if (editor.quillInstance) {
+            editor.quillInstance.setText('');
+        }
+    };
+    
+    ui.saveInlineNote = async (cardId) => {
         const board = getCurrentBoard();
         const card = getCardById(board, cardId);
         if (!card) return;
         
-        const html = `
-            <form id="add-note-form" class="modal-form">
-                <label for="note-title">Note Title</label>
-                <input type="text" id="note-title" required autofocus placeholder="e.g., Implementation Guidelines">
-                
-                <label for="note-content">Content (Rich Text)</label>
-                <div id="note-editor-container" style="height: 200px; background: white;"></div>
-                
-                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
-                    <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Add Note</button>
-                </div>
-            </form>
-        `;
+        const editor = document.getElementById(`inline-note-editor-${cardId}`);
+        const title = document.getElementById(`inline-note-title-${cardId}`).value.trim();
         
-        openModal('Add Note', html, () => {
-            // Initialize Quill editor
-            const quill = new Quill('#note-editor-container', {
-                theme: 'snow',
-                placeholder: 'Write your note content...',
-                modules: {
-                    toolbar: [
-                        ['bold', 'italic', 'underline'],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        ['link'],
-                        ['clean']
-                    ]
-                }
-            });
-            
-            const form = document.getElementById('add-note-form');
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const title = document.getElementById('note-title').value.trim();
-                const content = quill.root.innerHTML;
-                
-                if (!title) {
-                    alert('Please enter a note title');
-                    return;
-                }
-                
-                const attachment = {
-                    type: 'note',
-                    title: title,
-                    content: content,
-                    author: state.currentUser?.name || 'Anonymous',
-                    timestamp: new Date().toISOString()
-                };
-                
-                card.attachments.push(attachment);
-                await saveBoards();
-                closeModal();
-                closeCardModal();
-                ui.openCardDetail(cardId);
-            });
-        });
+        if (!title) {
+            alert('Please enter a note title');
+            return;
+        }
+        
+        if (!editor.quillInstance) {
+            alert('Editor not initialized');
+            return;
+        }
+        
+        const content = editor.quillInstance.root.innerHTML;
+        
+        const attachment = {
+            type: 'note',
+            title: title,
+            content: content,
+            author: state.currentUser?.name || 'Anonymous',
+            timestamp: new Date().toISOString()
+        };
+        
+        card.attachments.push(attachment);
+        await saveBoards();
+        
+        // Hide editor and refresh
+        editor.style.display = 'none';
+        closeCardModal();
+        ui.openCardDetail(cardId);
     };
     
     ui.showAddLinkDialog = async (cardId) => {
@@ -3153,7 +3186,7 @@ PPM.dynamicList = {
                             <button class="btn-attachment" onclick="PPM.dynamicList.showAddCommentDialog('${node.id}')">
                                 <i class="fa-solid fa-comment"></i> Comment
                             </button>
-                            <button class="btn-attachment" onclick="PPM.dynamicList.showAddNoteDialog('${node.id}')">
+                            <button class="btn-attachment" onclick="PPM.dynamicList.toggleNoteEditor('${node.id}')">
                                 <i class="fa-solid fa-book-open"></i> Note
                             </button>
                             <button class="btn-attachment" onclick="PPM.dynamicList.showAddLinkDialog('${node.id}')">
@@ -3162,6 +3195,20 @@ PPM.dynamicList = {
                             <button class="btn-attachment" onclick="PPM.dynamicList.showAddImageDialog('${node.id}')">
                                 <i class="fa-solid fa-image"></i> Image
                             </button>
+                        </div>
+                        
+                        <!-- Inline Note Editor -->
+                        <div id="inline-note-editor-node-${node.id}" class="inline-note-editor" style="display: none;">
+                            <label for="inline-note-title-node-${node.id}">Note Title</label>
+                            <input type="text" id="inline-note-title-node-${node.id}" placeholder="e.g., Implementation Guidelines">
+                            
+                            <label for="inline-note-content-node-${node.id}">Content (Rich Text)</label>
+                            <div id="inline-note-content-node-${node.id}" class="note-editor-container"></div>
+                            
+                            <div class="editor-actions">
+                                <button class="btn-secondary" onclick="PPM.dynamicList.cancelNoteEditor('${node.id}')">Cancel</button>
+                                <button class="btn-primary" onclick="PPM.dynamicList.saveInlineNote('${node.id}')">Add Note</button>
+                            </div>
                         </div>
                         
                         <div class="activity-thread">
@@ -3365,74 +3412,104 @@ PPM.dynamicList = {
         }
     },
     
-    showAddNoteDialog: async function(nodeId) {
+    toggleNoteEditor: function(nodeId) {
+        try {
+            const editor = document.getElementById(`inline-note-editor-node-${nodeId}`);
+            const container = document.getElementById(`inline-note-content-node-${nodeId}`);
+            
+            if (!editor) return;
+            
+            if (editor.style.display === 'none') {
+                editor.style.display = 'block';
+                
+                // Initialize Quill if not already initialized
+                if (!editor.quillInstance) {
+                    editor.quillInstance = new Quill(`#inline-note-content-node-${nodeId}`, {
+                        theme: 'snow',
+                        placeholder: 'Write your note content...',
+                        modules: {
+                            toolbar: [
+                                ['bold', 'italic', 'underline'],
+                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                ['link'],
+                                ['clean']
+                            ]
+                        }
+                    });
+                }
+                
+                // Clear previous content
+                document.getElementById(`inline-note-title-node-${nodeId}`).value = '';
+                editor.quillInstance.setText('');
+                
+                // Scroll to editor
+                setTimeout(() => {
+                    editor.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            } else {
+                editor.style.display = 'none';
+            }
+        } catch (err) {
+            console.error('toggleNoteEditor error:', err);
+        }
+    },
+    
+    cancelNoteEditor: function(nodeId) {
+        try {
+            const editor = document.getElementById(`inline-note-editor-node-${nodeId}`);
+            if (editor) {
+                editor.style.display = 'none';
+                document.getElementById(`inline-note-title-node-${nodeId}`).value = '';
+                if (editor.quillInstance) {
+                    editor.quillInstance.setText('');
+                }
+            }
+        } catch (err) {
+            console.error('cancelNoteEditor error:', err);
+        }
+    },
+    
+    saveInlineNote: async function(nodeId) {
         try {
             const board = PPM.getCurrentBoard();
             const node = board.dynamicList.nodes.find(n => n.id === nodeId);
             if (!node) return;
             
-            const html = `
-                <form id="add-note-form" class="modal-form">
-                    <label for="note-title">Note Title</label>
-                    <input type="text" id="note-title" required autofocus placeholder="e.g., Implementation Guidelines">
-                    
-                    <label for="note-content">Content (Rich Text)</label>
-                    <div id="note-editor-container" style="height: 200px; background: white;"></div>
-                    
-                    <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
-                        <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Cancel</button>
-                        <button type="submit" class="btn-primary">Add Note</button>
-                    </div>
-                </form>
-            `;
+            const editor = document.getElementById(`inline-note-editor-node-${nodeId}`);
+            const title = document.getElementById(`inline-note-title-node-${nodeId}`).value.trim();
             
-            PPM.openModal('Add Note', html, () => {
-                // Initialize Quill editor
-                const quill = new Quill('#note-editor-container', {
-                    theme: 'snow',
-                    placeholder: 'Write your note content...',
-                    modules: {
-                        toolbar: [
-                            ['bold', 'italic', 'underline'],
-                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                            ['link'],
-                            ['clean']
-                        ]
-                    }
-                });
-                
-                const form = document.getElementById('add-note-form');
-                form.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const title = document.getElementById('note-title').value.trim();
-                    const content = quill.root.innerHTML;
-                    
-                    if (!title) {
-                        alert('Please enter a note title');
-                        return;
-                    }
-                    
-                    if (!node.taskData) node.taskData = {};
-                    if (!node.taskData.attachments) node.taskData.attachments = [];
-                    
-                    const attachment = {
-                        type: 'note',
-                        title: title,
-                        content: content,
-                        author: PPM.state.currentUser?.name || 'Anonymous',
-                        timestamp: new Date().toISOString()
-                    };
-                    
-                    node.taskData.attachments.push(attachment);
-                    await PPM.saveBoards();
-                    
-                    PPM.closeModal();
-                    setTimeout(() => { PPM.dynamicList.openTaskModal(nodeId); }, 100);
-                });
-            });
+            if (!title) {
+                alert('Please enter a note title');
+                return;
+            }
+            
+            if (!editor.quillInstance) {
+                alert('Editor not initialized');
+                return;
+            }
+            
+            const content = editor.quillInstance.root.innerHTML;
+            
+            if (!node.taskData) node.taskData = {};
+            if (!node.taskData.attachments) node.taskData.attachments = [];
+            
+            const attachment = {
+                type: 'note',
+                title: title,
+                content: content,
+                author: PPM.state.currentUser?.name || 'Anonymous',
+                timestamp: new Date().toISOString()
+            };
+            
+            node.taskData.attachments.push(attachment);
+            await PPM.saveBoards();
+            
+            // Hide editor and refresh
+            editor.style.display = 'none';
+            setTimeout(() => { this.openTaskModal(nodeId); }, 100);
         } catch (err) {
-            console.error('showAddNoteDialog error:', err);
-            alert('Failed to add note: ' + err.message);
+            console.error('saveInlineNote error:', err);
+            alert('Failed to save note: ' + err.message);
         }
     },
     
