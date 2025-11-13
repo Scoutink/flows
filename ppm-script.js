@@ -2100,6 +2100,76 @@ const PPM = (() => {
         ui.openCardDetail(cardId);
     };
 
+    ui.updateDescription = (cardId, description) => {
+        const board = getCurrentBoard();
+        updateCard(board, cardId, { description });
+        saveBoards();
+    };
+    
+    ui.updateMilestone = async (cardId, milestoneId) => {
+        const board = getCurrentBoard();
+        const card = getCardById(board, cardId);
+        
+        // Remove from old milestone
+        if (card.milestoneId) {
+            const oldMilestone = getMilestoneById(board, card.milestoneId);
+            if (oldMilestone) {
+                oldMilestone.linkedCards = oldMilestone.linkedCards.filter(id => id !== cardId);
+                updateMilestoneStatus(board, card.milestoneId);
+            }
+        }
+        
+        // Add to new milestone
+        if (milestoneId) {
+            const newMilestone = getMilestoneById(board, milestoneId);
+            if (newMilestone && !newMilestone.linkedCards.includes(cardId)) {
+                newMilestone.linkedCards.push(cardId);
+            }
+            updateCard(board, cardId, { milestoneId });
+            updateMilestoneStatus(board, milestoneId);
+        } else {
+            updateCard(board, cardId, { milestoneId: null });
+        }
+        
+        await saveBoards();
+        renderMilestones(board);
+    };
+    
+    ui.updateCategory = async (cardId, categoryId) => {
+        const board = getCurrentBoard();
+        updateCard(board, cardId, { categoryId: categoryId || null });
+        await saveBoards();
+        renderCategories(board);
+    };
+    
+    ui.toggleGroup = async (cardId, groupId, checked) => {
+        const board = getCurrentBoard();
+        const card = getCardById(board, cardId);
+        const group = getGroupById(board, groupId);
+        
+        if (!card || !group) return;
+        
+        // Ensure groupIds array exists
+        if (!card.groupIds) card.groupIds = [];
+        
+        if (checked) {
+            // Add to group
+            if (!card.groupIds.includes(groupId)) {
+                card.groupIds.push(groupId);
+            }
+            if (!group.linkedCards.includes(cardId)) {
+                group.linkedCards.push(cardId);
+            }
+        } else {
+            // Remove from group
+            card.groupIds = card.groupIds.filter(id => id !== groupId);
+            group.linkedCards = group.linkedCards.filter(id => id !== cardId);
+        }
+        
+        await saveBoards();
+        renderGroups(board);
+    };
+    
     ui.updateDueDate = (cardId, dateValue) => {
         const board = getCurrentBoard();
         const card = getCardById(board, cardId);
