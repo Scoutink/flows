@@ -426,14 +426,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const showCreateFlowDialog = async () => {
-        console.log('=== SHOW CREATE FLOW DIALOG ===');
-        console.log('Templates available:', appState.templates.length);
-        console.log('Existing workflows:', appState.workflow.flows.length);
-        
-        // Allow empty workflow creation even if no templates
         if (appState.templates.length === 0) {
-            console.warn('⚠️ No templates available');
-            // Don't block - empty workflow can create its own template
+            alert('No templates available. Please create a template first in Template Builder.');
+            return;
         }
 
         const existingFlows = appState.workflow.flows.map(f => 
@@ -455,12 +450,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="text" id="flow-name" required autofocus placeholder="e.g., NIST CSF Compliance 2025">
                     
                     <label for="flow-template">Based on Template <span style="color: #ef4444;">*</span></label>
-                    <select id="flow-template" ${appState.templates.length > 0 ? 'required' : 'disabled'}>
-                        ${appState.templates.length > 0 ? appState.templates.map(t => `
+                    <select id="flow-template" required>
+                        ${appState.templates.map(t => `
                             <option value="${t.id}" ${t.isDefault ? 'selected' : ''}>
                                 ${t.name} (${t.levels.length} level${t.levels.length !== 1 ? 's' : ''})
                             </option>
-                        `).join('') : '<option value="">No templates available - use Empty or Copy</option>'}
+                        `).join('')}
                     </select>
                     <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
                         <i class="fa-solid fa-info-circle"></i> The template defines the structure and available properties for your workflow
@@ -530,84 +525,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 const mode = document.getElementById('creation-mode').value;
                 
-                try {
-                    let name = '';
-                    
-                    if (mode === 'template') {
-                        name = document.getElementById('flow-name').value.trim();
-                        if (!name) {
-                            alert('Please enter a workflow name');
-                            return;
-                        }
-                        const templateId = document.getElementById('flow-template').value;
-                        if (!templateId) {
-                            alert('Please select a template');
-                            return;
-                        }
-                        await createFlowFromTemplate(name, templateId);
-                        
-                    } else if (mode === 'empty') {
-                        name = document.getElementById('empty-name').value.trim();
-                        if (!name) {
-                            alert('Please enter a workflow name');
-                            return;
-                        }
-                        await createEmptyWorkflow(name);
-                        
-                    } else if (mode === 'copy') {
-                        name = document.getElementById('copy-name').value.trim();
-                        if (!name) {
-                            alert('Please enter a workflow name');
-                            return;
-                        }
-                        const sourceId = document.getElementById('copy-source').value;
-                        if (!sourceId || !appState.workflow.flows.find(f => f.id === sourceId)) {
-                            alert('Please select a valid source workflow');
-                            return;
-                        }
-                        await copyWorkflow(name, sourceId);
-                        
-                    } else if (mode === 'linked') {
-                        name = document.getElementById('linked-name').value.trim();
-                        if (!name) {
-                            alert('Please enter a workflow name');
-                            return;
-                        }
-                        const sourceId = document.getElementById('linked-source').value;
-                        const sourceFlow = appState.workflow.flows.find(f => f.id === sourceId);
-                        if (!sourceFlow) {
-                            alert('Please select a valid source workflow');
-                            return;
-                        }
-                        await createLinkedWorkflow(name, sourceId);
-                    }
-                    
-                    closeModal();
-                    
-                } catch (error) {
-                    console.error('Workflow creation error:', error);
-                    alert('Failed to create workflow: ' + error.message);
+                if (mode === 'template') {
+                    const name = document.getElementById('flow-name').value.trim();
+                    const templateId = document.getElementById('flow-template').value;
+                    await createFlowFromTemplate(name, templateId);
+                } else if (mode === 'empty') {
+                    const name = document.getElementById('empty-name').value.trim();
+                    await createEmptyWorkflow(name);
+                } else if (mode === 'copy') {
+                    const name = document.getElementById('copy-name').value.trim();
+                    const sourceId = document.getElementById('copy-source').value;
+                    await copyWorkflow(name, sourceId);
+                } else if (mode === 'linked') {
+                    const name = document.getElementById('linked-name').value.trim();
+                    const sourceId = document.getElementById('linked-source').value;
+                    await createLinkedWorkflow(name, sourceId);
                 }
+                closeModal();
             });
         });
     };
 
     const copyWorkflow = async (newName, sourceFlowId) => {
-        if (!newName || newName.trim() === '') {
-            throw new Error('Workflow name is required');
+        const sourceFlow = appState.workflow.flows.find(f => f.id === sourceFlowId);
+        if (!sourceFlow) {
+            alert('Source workflow not found!');
+            return;
         }
-        
-        try {
-            console.log('Copying workflow:', newName, 'from', sourceFlowId);
-            
-            const sourceFlow = appState.workflow.flows.find(f => f.id === sourceFlowId);
-            if (!sourceFlow) {
-                throw new Error('Source workflow not found!');
-            }
-            
-            console.log('Source workflow:', sourceFlow.name);
 
-            // Deep clone the source flow
+        // Deep clone the source flow
         const newFlow = deepCopy(sourceFlow);
         newFlow.id = generateId('flow');
         newFlow.name = newName;
@@ -648,77 +594,57 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const createEmptyWorkflow = async (name) => {
-        if (!name || name.trim() === '') {
-            throw new Error('Workflow name is required');
+        // Find or create "Empty" template (simple 1-level with all properties)
+        let emptyTemplate = appState.templates.find(t => t.name === 'Empty' || t.name === 'Simple Workflow');
+        
+        if (!emptyTemplate) {
+            // Create a basic empty template
+            emptyTemplate = {
+                id: 'template-empty-default',
+                name: 'Empty',
+                description: 'Simple 1-level workflow with all properties enabled',
+                isDefault: false,
+                version: '1.0.0',
+                workflowConfig: {
+                    enableIcon: true,
+                    enableDescription: true,
+                    enableSequentialOrder: true
+                },
+                levels: [{
+                    id: 'level-empty-1',
+                    order: 0,
+                    name: 'Item',
+                    singularName: 'Item',
+                    pluralName: 'Items',
+                    description: 'Workflow items',
+                    unitConfig: {
+                        enableIcon: true,
+                        enableUnitId: true,
+                        enableName: true,
+                        enableDescription: true,
+                        enableTags: true,
+                        enableDone: true,
+                        enableGrade: true,
+                        gradeCumulative: false,
+                        enableProgressBar: false,
+                        enableLinks: true,
+                        enableImages: true,
+                        enableNotes: true,
+                        enableComments: true
+                    }
+                }]
+            };
         }
         
-        try {
-            console.log('Creating empty workflow:', name);
-            
-            // Find or create "Empty" template (simple 1-level with all properties)
-            let emptyTemplate = appState.templates.find(t => t.name === 'Empty' || t.name === 'Simple Workflow');
-            
-            if (!emptyTemplate) {
-                console.log('No Empty template found, creating default...');
-                // Create a basic empty template
-                emptyTemplate = {
-                    id: 'template-empty-default',
-                    name: 'Empty',
-                    description: 'Simple 1-level workflow with all properties enabled',
-                    isDefault: false,
-                    version: '1.0.0',
-                    workflowConfig: {
-                        enableIcon: true,
-                        enableDescription: true,
-                        enableSequentialOrder: true
-                    },
-                    levels: [{
-                        id: 'level-empty-1',
-                        order: 0,
-                        name: 'Item',
-                        singularName: 'Item',
-                        pluralName: 'Items',
-                        description: 'Workflow items',
-                        unitConfig: {
-                            enableIcon: true,
-                            enableUnitId: true,
-                            enableName: true,
-                            enableDescription: true,
-                            enableTags: true,
-                            enableDone: true,
-                            enableGrade: true,
-                            gradeCumulative: false,
-                            enableProgressBar: false,
-                            enableLinks: true,
-                            enableImages: true,
-                            enableNotes: true,
-                            enableComments: true
-                        }
-                    }]
-                };
-            }
-            
-            await createFlowFromTemplate(name, emptyTemplate.id, emptyTemplate);
-            console.log('Empty workflow created successfully');
-            
-        } catch (error) {
-            console.error('createEmptyWorkflow error:', error);
-            throw new Error('Failed to create empty workflow: ' + error.message);
-        }
+        await createFlowFromTemplate(name, emptyTemplate.id, emptyTemplate);
     };
 
     const createLinkedWorkflow = async (name, sourceFlowId) => {
-        if (!name || name.trim() === '') {
-            throw new Error('Workflow name is required');
+        const sourceFlow = appState.workflow.flows.find(f => f.id === sourceFlowId);
+        if (!sourceFlow) {
+            alert('Source workflow not found!');
+            return;
         }
-        
-        try {
-            console.log('Creating linked workflow:', name, 'from', sourceFlowId);
-            
-            const sourceFlow = appState.workflow.flows.find(f => f.id === sourceFlowId);
-            if (!sourceFlow) {
-                throw new Error('Source workflow not found!');
-            }
 
         // Deep clone the source flow
         const newFlow = deepCopy(sourceFlow);
@@ -771,19 +697,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== DYNAMIC RENDERING =====
     const render = () => {
-        try {
-            const flow = getCurrentFlow();
-            if (!flow) {
-                workflowRoot.innerHTML = '<div class="loading-state">Select or create a workflow</div>';
-                return;
-            }
+        const flow = getCurrentFlow();
+        if (!flow) {
+            workflowRoot.innerHTML = '<div class="loading-state">Select or create a workflow</div>';
+            return;
+        }
 
-            const template = getTemplate(flow);
-            if (!template) {
-                workflowRoot.innerHTML = '<div class="loading-state">Error: Template not found</div>';
-                console.error('Template not found for flow:', flow.id, flow.name);
-                return;
-            }
+        const template = getTemplate(flow);
+        if (!template) {
+            workflowRoot.innerHTML = '<div class="loading-state">Error: Template not found</div>';
+            return;
+        }
 
         // Update cumulative grades before rendering
         updateAllCumulativeGrades(flow.data, template, 0);
@@ -1211,29 +1135,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== UNIT OPERATIONS =====
     window.addChildUnit = (parentPath, childDepth) => {
-        try {
-            console.log('🔹 addChildUnit called:', { parentPath, childDepth });
-            const flow = getCurrentFlow();
-            if (!flow) {
-                console.error('❌ No current flow');
-                alert('No workflow selected. Please select or create a workflow first.');
-                return;
-            }
-            
-            const template = getTemplate(flow);
-            if (!template) {
-                console.error('❌ No template found for flow');
-                alert('Template not found for this workflow');
-                return;
-            }
-            
-            const level = template.levels[childDepth];
-            
-            if (!level) {
-                console.error('❌ Invalid level depth:', childDepth);
-                alert('Invalid level configuration');
-                return;
-            }
+        console.log('🔹 addChildUnit called:', { parentPath, childDepth });
+        const flow = getCurrentFlow();
+        const template = getTemplate(flow);
+        const level = template.levels[childDepth];
+        
+        if (!level) {
+            console.error('❌ Invalid level depth:', childDepth);
+            return;
+        }
 
         const newUnit = {
             id: generateId('unit'),
@@ -1288,23 +1198,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.deleteUnit = (path) => {
-        try {
-            console.log('🗑️ deleteUnit called for path:', path);
-            const flow = getCurrentFlow();
-            if (!flow) {
-                throw new Error('No current flow');
-            }
-            
-            const template = getTemplate(flow);
-            if (!template) {
-                throw new Error('Template not found');
-            }
-            
-            const { parent, key } = getParentAndKey(path, flow);
-            
-            if (!parent || !parent[key]) {
-                throw new Error('Unit not found at path: ' + path);
-            }
+        console.log('🗑️ deleteUnit called for path:', path);
+        const flow = getCurrentFlow();
+        const template = getTemplate(flow);
+        const { parent, key } = getParentAndKey(path, flow);
+        
+        if (!parent || !parent[key]) {
+            console.error('❌ Parent or unit not found at path:', path);
+            return;
+        }
         
         const unit = parent[key];
         // CRITICAL FIX: Calculate depth by counting "subcategories" in path
@@ -1342,25 +1244,14 @@ document.addEventListener('DOMContentLoaded', () => {
             updateAllCumulativeGrades(flow.data, template, 0);
             render();
         }
-        } catch (error) {
-            console.error('updateUnitProperty error:', error);
-            alert('Failed to update property: ' + error.message);
-        }
     };
 
     window.toggleUnitCompletion = (path, unitId) => {
-        try {
-            const flow = getCurrentFlow();
-            if (!flow) {
-                console.error('No current flow');
-                return;
-            }
-            
-            const unit = getObjectByPath(path, flow);
-            if (!unit) {
-                console.error('Unit not found at path:', path);
-                return;
-            }
+        const flow = getCurrentFlow();
+        if (!flow) return;
+        
+        const unit = getObjectByPath(path, flow);
+        if (!unit) return;
         
         const currentState = isCompleted(flow.id, unitId);
         setCompleted(flow.id, unitId, !currentState);
@@ -1370,23 +1261,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== WORKFLOW PROPERTY UPDATES =====
     window.updateWorkflowProperty = (property, value) => {
-        try {
-            const flow = getCurrentFlow();
-            if (!flow) {
-                console.error('No current flow');
-                return;
-            }
-            
-            flow[property] = value;
-            // Don't re-render for these properties to avoid losing focus
-            if (property === 'description') {
-                return;
-            }
-            render();
-        } catch (error) {
-            console.error('updateWorkflowProperty error:', error);
-            alert('Failed to update workflow property: ' + error.message);
+        const flow = getCurrentFlow();
+        if (!flow) return;
+        
+        flow[property] = value;
+        // Don't re-render for these properties to avoid losing focus
+        if (property === 'description') {
+            return;
         }
+        render();
     };
 
     // ===== ICON PICKER =====
@@ -1441,7 +1324,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.showUnitIconPicker = async (path) => {
-        try {
         const icons = await getAvailableIcons();
         const iconsGrid = icons.map(icon => `
             <div class="icon-picker-item" onclick="selectUnitIcon('${path}', '${icon}')">
@@ -1457,10 +1339,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         openModal('Select Unit Icon', html);
-        } catch (error) {
-            console.error('showUnitIconPicker error:', error);
-            alert('Failed to open dialog: ' + error.message);
-        }
     };
 
     window.selectUnitIcon = (path, iconFilename) => {
@@ -1507,7 +1385,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.showAddTagDialog = (path) => {
-        try {
         const html = `
             <form id="add-tag-form" class="modal-form">
                 <label for="tag-input">Tag Name</label>
@@ -1538,31 +1415,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeModal();
             });
         });
-        } catch (error) {
-            console.error('showAddTagDialog error:', error);
-            alert('Failed to open dialog: ' + error.message);
-        }
     };
 
     window.removeTag = (path, tag) => {
-        try {
-            const flow = getCurrentFlow();
-            if (!flow) return;
-            
-            const unit = getObjectByPath(path, flow);
-            if (unit && unit.tags) {
-                unit.tags = unit.tags.filter(t => t !== tag);
-                render();
-            }
-        } catch (error) {
-            console.error('removeTag error:', error);
-            alert('Failed to remove tag: ' + error.message);
+        const flow = getCurrentFlow();
+        const unit = getObjectByPath(path, flow);
+        if (unit && unit.tags) {
+            unit.tags = unit.tags.filter(t => t !== tag);
+            render();
         }
     };
 
     // ===== ATTACHMENT OPERATIONS =====
     window.showAddLinkDialog = (path) => {
-        try {
         const html = `
             <form id="add-link-form" class="modal-form">
                 <label for="link-text">Link Text</label>
@@ -1596,10 +1461,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeModal();
             });
         });
-        } catch (error) {
-            console.error('showAddLinkDialog error:', error);
-            alert('Failed to open dialog: ' + error.message);
-        }
     };
 
     window.removeLink = (path, index) => {
@@ -1612,7 +1473,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.showAddImageDialog = (path) => {
-        try {
         const html = `
             <form id="add-image-form" class="modal-form">
                 <label for="image-url">Image URL</label>
@@ -1642,10 +1502,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeModal();
             });
         });
-        } catch (error) {
-            console.error('showAddImageDialog error:', error);
-            alert('Failed to open dialog: ' + error.message);
-        }
     };
 
     window.removeImage = (path, index) => {
@@ -1658,7 +1514,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.showAddCommentDialog = (path) => {
-        try {
         const html = `
             <form id="add-comment-form" class="modal-form">
                 <label for="comment-text">Comment</label>
@@ -1688,10 +1543,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeModal();
             });
         });
-        } catch (error) {
-            console.error('showAddCommentDialog error:', error);
-            alert('Failed to open dialog: ' + error.message);
-        }
     };
 
     window.removeComment = (path, index) => {
@@ -1704,7 +1555,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.showAddNoteDialog = (path) => {
-        try {
         const html = `
             <form id="add-note-form" class="modal-form">
                 <label for="note-title">Note Title</label>
@@ -1745,10 +1595,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeModal();
             });
         });
-        } catch (error) {
-            console.error('showAddNoteDialog error:', error);
-            alert('Failed to open dialog: ' + error.message);
-        }
     };
 
     window.removeNote = (path, index) => {
@@ -1761,12 +1607,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.openImageModal = (imgUrl) => {
-        try {
         openModal('Image', `<img src="${imgUrl}" style="max-width: 100%; max-height: 70vh;">`);
-        } catch (error) {
-            console.error('openImageModal error:', error);
-            alert('Failed to open dialog: ' + error.message);
-        }
     };
 
     // ===== MODAL SYSTEM =====
@@ -1959,17 +1800,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== PPM INTEGRATION - EXPORT TO BOARD =====
     window.exportUnitToBoard = async (unitPath) => {
-        try {
-            const flow = getCurrentFlow();
-            if (!flow) {
-                throw new Error('No workflow selected');
-            }
-            const unit = getObjectByPath(unitPath, flow);
-            const template = getTemplate(flow);
-            
-            if (!unit || !template) {
-                throw new Error('Unit or template not found');
-            }
+        const flow = getCurrentFlow();
+        const unit = getObjectByPath(unitPath, flow);
+        const template = getTemplate(flow);
+        
+        if (!unit || !template) return;
         
         const depth = (unitPath.match(/\./g) || []).length / 2;
         const level = template.levels[depth];
@@ -2223,17 +2058,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start the app
     init();
-        } catch (error) {
-            console.error('createLinkedWorkflow error:', error);
-            throw new Error('Failed to create linked workflow: ' + error.message);
-        } catch (error) {
-            console.error('addChildUnit error:', error);
-            alert('Failed to add unit: ' + error.message);
-        }
-        }
-            console.log('Workflow copy complete');
-        } catch (error) {
-            console.error('copyWorkflow error:', error);
-            throw new Error('Failed to copy workflow: ' + error.message);
-        }
 });
