@@ -131,7 +131,7 @@ const PPM = (() => {
     };
 
     // ===== BOARD OPERATIONS =====
-    const createBoard = (name, description, sourceData = null, options = {}) => {
+    const createBoard = (name, description, sourceData = null) => {
         const board = {
             id: generateId('board'),
             name: name || 'New Board',
@@ -151,12 +151,9 @@ const PPM = (() => {
                     joinedAt: new Date().toISOString()
                 }
             ],
-            columns: createDefaultColumns(options.includeReferences !== false), // true by default
+            columns: createDefaultColumns(),
             cards: [],
             labels: [],
-            milestones: [], // NEW
-            categories: [], // NEW
-            groups: [],     // NEW
             settings: {
                 notificationsEnabled: true,
                 allowGuestView: false,
@@ -170,31 +167,14 @@ const PPM = (() => {
         return board;
     };
 
-    const createDefaultColumns = (includeReferences = true) => {
-        const columns = [];
-        
-        // References column (locked, optional)
-        if (includeReferences) {
-            columns.push({ 
-                id: generateId('col'), 
-                name: 'References', 
-                order: 0, 
-                limit: null, 
-                color: '#6c757d',
-                locked: true  // Cards in this column cannot be moved
-            });
-        }
-        
-        // Standard workflow columns
-        const startOrder = includeReferences ? 1 : 0;
-        columns.push(
-            { id: generateId('col'), name: 'To Do', order: startOrder, limit: null, color: '#0d6efd' },
-            { id: generateId('col'), name: 'In Progress', order: startOrder + 1, limit: 5, color: '#0dcaf0' },
-            { id: generateId('col'), name: 'Review', order: startOrder + 2, limit: null, color: '#ffc107' },
-            { id: generateId('col'), name: 'Done', order: startOrder + 3, limit: null, color: '#198754' }
-        );
-        
-        return columns;
+    const createDefaultColumns = () => {
+        return [
+            { id: generateId('col'), name: 'Backlog', order: 0, limit: null, color: '#6c757d' },
+            { id: generateId('col'), name: 'To Do', order: 1, limit: null, color: '#0d6efd' },
+            { id: generateId('col'), name: 'In Progress', order: 2, limit: 5, color: '#0dcaf0' },
+            { id: generateId('col'), name: 'Review', order: 3, limit: null, color: '#ffc107' },
+            { id: generateId('col'), name: 'Done', order: 4, limit: null, color: '#198754' }
+        ];
     };
 
     const addColumn = (board, name) => {
@@ -679,13 +659,11 @@ const PPM = (() => {
         const cards = getCardsByColumn(board, column.id);
         const limit = column.limit;
         const isOverLimit = limit && cards.length > limit;
-        const lockedClass = column.locked ? ' board-column-locked' : '';
-        const lockIcon = column.locked ? '<i class="fa-solid fa-lock" title="Locked column"></i> ' : '';
         
         return `
-            <div class="board-column${lockedClass}" data-column-id="${column.id}">
+            <div class="board-column" data-column-id="${column.id}">
                 <div class="column-header">
-                    <h3 class="column-title">${lockIcon}${column.name}</h3>
+                    <h3 class="column-title">${column.name}</h3>
                     <span class="column-count ${isOverLimit ? 'over-limit' : ''}">${cards.length}${limit ? `/${limit}` : ''}</span>
                     <button class="btn-icon" onclick="PPM.ui.openColumnMenu(event, '${column.id}')">
                         <i class="fa-solid fa-ellipsis-h"></i>
@@ -790,21 +768,7 @@ const PPM = (() => {
     };
 
     const handleDragStart = (e) => {
-        const board = getCurrentBoard();
-        const cardId = e.target.dataset.cardId;
-        const card = board.cards.find(c => c.id === cardId);
-        
-        if (!card) return;
-        
-        // Check if card is in a locked column
-        const column = board.columns.find(col => col.id === card.columnId);
-        if (column && column.locked) {
-            e.preventDefault();
-            alert('Cards in the References column are locked and cannot be moved.');
-            return;
-        }
-        
-        state.draggedCard = cardId;
+        state.draggedCard = e.target.dataset.cardId;
         e.target.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
     };
@@ -839,13 +803,6 @@ const PPM = (() => {
         
         const board = getCurrentBoard();
         const toColumnId = e.currentTarget.dataset.columnId;
-        
-        // Check if target column is locked
-        const toColumn = board.columns.find(col => col.id === toColumnId);
-        if (toColumn && toColumn.locked) {
-            alert('Cannot drop cards into the References column (it is locked).');
-            return;
-        }
         
         moveCard(board, state.draggedCard, toColumnId);
         saveBoards();

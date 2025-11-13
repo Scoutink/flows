@@ -9,8 +9,6 @@
     --danger: #dc3545;
     --warning: #ffc107;
     --info: #0dcaf0;
-    --locked-bg: #f8f9fa;
-    --locked-border: #adb5bd;
     
     --bg-primary: #ffffff;
     --bg-secondary: #f8f9fa;
@@ -323,39 +321,6 @@ button {
     flex-direction: column;
     max-height: calc(100vh - 140px);
 }
-
-/* Locked column styling (References column) */
-.board-column-locked {
-    background-color: var(--locked-bg);
-    border: 2px dashed var(--locked-border);
-    opacity: 0.95;
-}
-
-body.dark-theme .board-column-locked {
-    background-color: rgba(173, 181, 189, 0.05);
-    border-color: var(--text-muted);
-}
-
-.board-column-locked .column-header {
-    background-color: rgba(173, 181, 189, 0.1);
-}
-
-.board-column-locked .column-title i.fa-lock {
-    color: var(--secondary);
-    margin-right: 0.25rem;
-    font-size: 0.875rem;
-}
-
-.board-column-locked .card {
-    cursor: not-allowed !important;
-    opacity: 0.9;
-}
-
-.board-column-locked .card:hover {
-    transform: none !important;
-    box-shadow: var(--shadow-sm) !important;
-}
-
 
 .column-header {
     padding: 1rem 1rem 0.75rem;
