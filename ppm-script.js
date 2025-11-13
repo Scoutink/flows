@@ -1907,6 +1907,31 @@ const PPM = (() => {
                         </div>
                     </div>
                     
+                    ${board.dynamicList && board.dynamicList.nodes && board.dynamicList.nodes.filter(n => n.type === 'connection').length > 0 ? `
+                        <div class="detail-section">
+                            <label>
+                                <i class="fa-solid fa-sitemap"></i> Dynamic List Connections
+                            </label>
+                            <small class="form-hint">Link this task to connection nodes for filtering</small>
+                            <div class="dynamic-list-connections">
+                                ${board.dynamicList.nodes.filter(n => n.type === 'connection').map(node => {
+                                    const isLinked = node.linkedTaskIds && node.linkedTaskIds.includes(card.id);
+                                    const level = node.level || 0;
+                                    const indent = level * 15;
+                                    return `
+                                        <label class="checkbox-label" style="padding-left: ${indent}px;">
+                                            <input type="checkbox" 
+                                                   value="${node.id}" 
+                                                   ${isLinked ? 'checked' : ''}
+                                                   onchange="PPM.ui.toggleNodeConnection('${card.id}', '${node.id}', this.checked)">
+                                            <span>${node.title}</span>
+                                        </label>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
                     ${card.checklist.length > 0 ? `
                         <div class="detail-section">
                             <label>Checklist</label>
@@ -2168,6 +2193,49 @@ const PPM = (() => {
         
         await saveBoards();
         renderGroups(board);
+    };
+    
+    ui.toggleNodeConnection = async (cardId, nodeId, checked) => {
+        try {
+            const board = getCurrentBoard();
+            if (!board || !board.dynamicList) {
+                console.error('Board or dynamicList not found');
+                return;
+            }
+            
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            if (!node) {
+                console.error('Node not found:', nodeId);
+                return;
+            }
+            
+            // Ensure linkedTaskIds array exists
+            if (!node.linkedTaskIds) {
+                node.linkedTaskIds = [];
+            }
+            
+            if (checked) {
+                // Add card to node's linked tasks
+                if (!node.linkedTaskIds.includes(cardId)) {
+                    node.linkedTaskIds.push(cardId);
+                }
+            } else {
+                // Remove card from node's linked tasks
+                node.linkedTaskIds = node.linkedTaskIds.filter(id => id !== cardId);
+            }
+            
+            await saveBoards();
+            
+            // Re-render dynamic list to update task counts
+            if (PPM.dynamicList) {
+                PPM.dynamicList.render();
+            }
+            
+            console.log(`${checked ? 'Linked' : 'Unlinked'} card ${cardId} ${checked ? 'to' : 'from'} node ${nodeId}`);
+        } catch (err) {
+            console.error('toggleNodeConnection error:', err);
+            alert('Failed to update node connection: ' + err.message);
+        }
     };
     
     ui.updateDueDate = (cardId, dateValue) => {
@@ -2616,11 +2684,6 @@ PPM.dynamicList = {
                             ${level < 9 ? `
                                 <button class="btn-icon-sm" onclick="PPM.dynamicList.showNodeDialog('${node.id}')" title="Add child">
                                     <i class="fa-solid fa-plus"></i>
-                                </button>
-                            ` : ''}
-                            ${node.type === 'connection' ? `
-                                <button class="btn-icon-sm" onclick="PPM.dynamicList.showTaskLinkDialog('${node.id}')" title="Link tasks">
-                                    <i class="fa-solid fa-link"></i>
                                 </button>
                             ` : ''}
                             <button class="btn-icon-sm" onclick="PPM.dynamicList.editNode('${node.id}')" title="Edit">
@@ -3074,8 +3137,14 @@ Note: Full task editing will be available when the card modal is properly integr
         }
     },
     
-    // Show task link dialog
+    // DEPRECATED: Task linking now done through card modal
     showTaskLinkDialog: function(nodeId) {
+        alert('Task linking has been moved to the card modal.\n\nOpen any task and look for the "Dynamic List Connections" section to link it to connection nodes.');
+    },
+    
+    // OLD VERSION - KEPT FOR REFERENCE
+    _showTaskLinkDialog_old: function(nodeId) {
+        /* OLD IMPLEMENTATION
         const board = PPM.getCurrentBoard();
         const node = board.dynamicList.nodes.find(n => n.id === nodeId);
         if (!node || node.type !== 'connection') return;
@@ -3135,12 +3204,15 @@ Note: Full task editing will be available when the card modal is properly integr
         
         PPM.saveBoards();
         this.render(); // Update task counts
+        */
     },
     
-    // Close task link dialog
+    // DEPRECATED: Task linking now done through card modal
     closeTaskLinkDialog: function() {
         const dialog = document.getElementById('task-link-dialog-backdrop');
-        dialog.classList.add('hidden');
+        if (dialog) {
+            dialog.classList.add('hidden');
+        }
     }
 };
 
