@@ -232,8 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }).filter(group => group.workflows.length > 1);
         saveWorkflowLinks();
-        populateFlowSelect();
-        render();
     };
 
     const propagateToLinkedWorkflows = (sourceFlowId) => {
@@ -527,56 +525,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 const mode = document.getElementById('creation-mode').value;
                 
-                try {
-                    if (mode === 'template') {
-                        const name = document.getElementById('flow-name').value.trim();
-                        const templateId = document.getElementById('flow-template').value;
-                        if (!name) {
-                            alert('Please enter a workflow name');
-                            return;
-                        }
-                        if (!templateId) {
-                            alert('Please select a template');
-                            return;
-                        }
-                        await createFlowFromTemplate(name, templateId);
-                    } else if (mode === 'empty') {
-                        const name = document.getElementById('empty-name').value.trim();
-                        if (!name) {
-                            alert('Please enter a workflow name');
-                            return;
-                        }
-                        await createEmptyWorkflow(name);
-                    } else if (mode === 'copy') {
-                        const name = document.getElementById('copy-name').value.trim();
-                        if (!name) {
-                            alert('Please enter a workflow name');
-                            return;
-                        }
-                        const sourceId = document.getElementById('copy-source').value;
-                        if (!sourceId) {
-                            alert('Please select a source workflow');
-                            return;
-                        }
-                        await copyWorkflow(name, sourceId);
-                    } else if (mode === 'linked') {
-                        const name = document.getElementById('linked-name').value.trim();
-                        if (!name) {
-                            alert('Please enter a workflow name');
-                            return;
-                        }
-                        const sourceId = document.getElementById('linked-source').value;
-                        if (!sourceId) {
-                            alert('Please select a source workflow');
-                            return;
-                        }
-                        await createLinkedWorkflow(name, sourceId);
+                if (mode === 'template') {
+                    const name = document.getElementById('flow-name').value.trim();
+                    const templateId = document.getElementById('flow-template').value;
+                    await createFlowFromTemplate(name, templateId);
+                } else if (mode === 'empty') {
+                    const name = document.getElementById('empty-name').value.trim();
+                    if (!name) {
+                        alert('Please enter a workflow name');
+                        return;
                     }
-                    closeModal();
-                } catch (error) {
-                    console.error('Workflow creation error:', error);
-                    alert('Failed to create workflow: ' + error.message);
+                    await createEmptyWorkflow(name);
+                } else if (mode === 'copy') {
+                    const name = document.getElementById('copy-name').value.trim();
+                    const sourceId = document.getElementById('copy-source').value;
+                    await copyWorkflow(name, sourceId);
+                } else if (mode === 'linked') {
+                    const name = document.getElementById('linked-name').value.trim();
+                    const sourceId = document.getElementById('linked-source').value;
+                    await createLinkedWorkflow(name, sourceId);
                 }
+                closeModal();
             });
         });
     };
