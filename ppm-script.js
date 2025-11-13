@@ -2436,16 +2436,26 @@ PPM.dynamicList = {
     
     // Initialize dynamic list
     init: function() {
-        const board = PPM.getCurrentBoard();
-        if (!board.dynamicList) {
-            board.dynamicList = {
-                isActive: false,
-                nodes: []
-            };
+        try {
+            const board = PPM.getCurrentBoard();
+            if (!board) {
+                console.error('Board not found in dynamicList.init()');
+                return;
+            }
+            
+            if (!board.dynamicList) {
+                board.dynamicList = {
+                    isActive: false,
+                    nodes: []
+                };
+                PPM.saveBoards();
+            }
+            
+            this.render();
+            this.setupEventListeners();
+        } catch (err) {
+            console.error('dynamicList.init error:', err);
         }
-        
-        this.render();
-        this.setupEventListeners();
     },
     
     // Setup event listeners
@@ -2467,28 +2477,53 @@ PPM.dynamicList = {
     
     // Toggle mode (Creation/Active)
     toggleMode: function() {
-        const board = PPM.getCurrentBoard();
-        board.dynamicList.isActive = !board.dynamicList.isActive;
-        PPM.saveBoards();
-        this.render();
-        this.updateModeUI();
+        try {
+            const board = PPM.getCurrentBoard();
+            if (!board || !board.dynamicList) {
+                console.error('Board or dynamicList not found');
+                return;
+            }
+            board.dynamicList.isActive = !board.dynamicList.isActive;
+            PPM.saveBoards();
+            this.render();
+            this.updateModeUI();
+        } catch (err) {
+            console.error('toggleMode error:', err);
+            alert('Failed to toggle mode: ' + err.message);
+        }
     },
     
     // Update mode UI
     updateModeUI: function() {
-        const board = PPM.getCurrentBoard();
-        const modeBtn = document.getElementById('dynamic-list-mode-btn');
-        const modeText = document.getElementById('mode-text');
-        const icon = modeBtn.querySelector('i');
-        
-        if (board.dynamicList.isActive) {
-            modeText.textContent = 'Active';
-            icon.className = 'fa-solid fa-check-circle';
-            modeBtn.classList.add('mode-active');
-        } else {
-            modeText.textContent = 'Creation';
-            icon.className = 'fa-solid fa-edit';
-            modeBtn.classList.remove('mode-active');
+        try {
+            const board = PPM.getCurrentBoard();
+            if (!board || !board.dynamicList) return;
+            
+            const modeBtn = document.getElementById('dynamic-list-mode-btn');
+            const modeText = document.getElementById('mode-text');
+            
+            if (!modeBtn || !modeText) {
+                console.warn('Mode UI elements not found');
+                return;
+            }
+            
+            const icon = modeBtn.querySelector('i');
+            if (!icon) {
+                console.warn('Mode icon not found');
+                return;
+            }
+            
+            if (board.dynamicList.isActive) {
+                modeText.textContent = 'Active';
+                icon.className = 'fa-solid fa-check-circle';
+                modeBtn.classList.add('mode-active');
+            } else {
+                modeText.textContent = 'Creation';
+                icon.className = 'fa-solid fa-edit';
+                modeBtn.classList.remove('mode-active');
+            }
+        } catch (err) {
+            console.error('updateModeUI error:', err);
         }
     },
     
@@ -2821,63 +2856,91 @@ PPM.dynamicList = {
     
     // Save node (create or update)
     saveNode: function() {
-        const board = PPM.getCurrentBoard();
-        const title = document.getElementById('node-title').value.trim();
-        const type = document.getElementById('node-type').value;
-        const parentId = document.getElementById('node-parent').value || null;
-        const editId = document.getElementById('node-edit-id').value;
-        
-        if (!title) {
-            alert('Please enter a title');
-            return;
-        }
-        
-        // Calculate level
-        let level = 0;
-        if (parentId) {
-            const parent = board.dynamicList.nodes.find(n => n.id === parentId);
-            if (parent) {
-                level = (parent.level || 0) + 1;
+        try {
+            const board = PPM.getCurrentBoard();
+            if (!board) {
+                alert('Board not found');
+                return;
             }
-        }
-        
-        if (level > 9) {
-            alert('Maximum level depth (10) reached');
-            return;
-        }
-        
-        if (editId) {
-            // Update existing node
-            const node = board.dynamicList.nodes.find(n => n.id === editId);
-            if (node) {
-                node.title = title;
-                node.type = type;
-                node.parentId = parentId;
-                node.level = level;
-                node.updatedAt = new Date().toISOString();
-            }
-        } else {
-            // Create new node
-            const newNode = {
-                id: `node-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-                title: title,
-                type: type,
-                parentId: parentId,
-                level: level,
-                order: board.dynamicList.nodes.filter(n => n.parentId === parentId).length,
-                collapsed: false,
-                linkedTaskIds: [],
-                taskData: type === 'task' ? {} : null,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
             
-            board.dynamicList.nodes.push(newNode);
+            if (!board.dynamicList) {
+                board.dynamicList = {
+                    isActive: false,
+                    nodes: []
+                };
+            }
+            
+            const titleEl = document.getElementById('node-title');
+            const typeEl = document.getElementById('node-type');
+            const parentEl = document.getElementById('node-parent');
+            const editIdEl = document.getElementById('node-edit-id');
+            
+            if (!titleEl || !typeEl || !parentEl || !editIdEl) {
+                alert('Form elements not found. Please try again.');
+                console.error('Missing form elements:', {titleEl, typeEl, parentEl, editIdEl});
+                return;
+            }
+            
+            const title = titleEl.value.trim();
+            const type = typeEl.value;
+            const parentId = parentEl.value || null;
+            const editId = editIdEl.value;
+            
+            if (!title) {
+                alert('Please enter a title');
+                return;
+            }
+            
+            // Calculate level
+            let level = 0;
+            if (parentId) {
+                const parent = board.dynamicList.nodes.find(n => n.id === parentId);
+                if (parent) {
+                    level = (parent.level || 0) + 1;
+                }
+            }
+            
+            if (level > 9) {
+                alert('Maximum level depth (10) reached');
+                return;
+            }
+            
+            if (editId) {
+                // Update existing node
+                const node = board.dynamicList.nodes.find(n => n.id === editId);
+                if (node) {
+                    node.title = title;
+                    node.type = type;
+                    node.parentId = parentId;
+                    node.level = level;
+                    node.updatedAt = new Date().toISOString();
+                }
+            } else {
+                // Create new node
+                const newNode = {
+                    id: `node-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+                    title: title,
+                    type: type,
+                    parentId: parentId,
+                    level: level,
+                    order: board.dynamicList.nodes.filter(n => n.parentId === parentId).length,
+                    collapsed: false,
+                    linkedTaskIds: [],
+                    taskData: type === 'task' ? {} : null,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                board.dynamicList.nodes.push(newNode);
+            }
+            
+            PPM.saveBoards();
+            this.render();
+            this.closeNodeDialog();
+        } catch (err) {
+            console.error('saveNode error:', err);
+            alert('Failed to save node: ' + err.message);
         }
-        
-        PPM.saveBoards();
-        this.render();
-        this.closeNodeDialog();
     },
     
     // Delete node
