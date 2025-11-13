@@ -1860,6 +1860,13 @@ const PPM = (() => {
         const followers = card.assignments.filter(a => a.role === 'follower');
         const supervisors = card.assignments.filter(a => a.role === 'supervisor');
         
+        // Sort attachments by timestamp (newest first for thread)
+        const sortedAttachments = [...(card.attachments || [])].sort((a, b) => {
+            const timeA = new Date(a.timestamp || 0).getTime();
+            const timeB = new Date(b.timestamp || 0).getTime();
+            return timeB - timeA;
+        });
+        
         return `
             <div class="card-detail">
                 <div class="card-detail-main">
@@ -1947,20 +1954,38 @@ const PPM = (() => {
                         </div>
                     ` : ''}
                     
-                    ${card.attachments.length > 0 ? `
-                        <div class="detail-section">
-                            <label>Attachments</label>
-                            <div class="attachments-list">
-                                ${card.attachments.map((att, idx) => `
-                                    <div class="attachment-item clickable" onclick="PPM.ui.openAttachment('${card.id}', ${idx})">
-                                        <i class="fa-solid fa-${att.type === 'link' ? 'link' : att.type === 'image' ? 'image' : att.type === 'note' ? 'book-open' : 'comment'}"></i>
-                                        <span>${att.title}</span>
-                                        ${att.type === 'link' ? `<i class="fa-solid fa-external-link-alt" style="margin-left: auto; font-size: 0.85em; opacity: 0.6;"></i>` : ''}
-                                    </div>
-                                `).join('')}
-                            </div>
+                    <!-- Activity Thread Section -->
+                    <div class="detail-section">
+                        <label>
+                            <i class="fa-solid fa-comments"></i> Activity & Attachments
+                        </label>
+                        <div class="attachment-actions" style="margin-bottom: 1rem;">
+                            <button class="btn-attachment" onclick="PPM.ui.showAddCommentDialog('${card.id}')">
+                                <i class="fa-solid fa-comment"></i> Comment
+                            </button>
+                            <button class="btn-attachment" onclick="PPM.ui.showAddNoteDialog('${card.id}')">
+                                <i class="fa-solid fa-book-open"></i> Note
+                            </button>
+                            <button class="btn-attachment" onclick="PPM.ui.showAddLinkDialog('${card.id}')">
+                                <i class="fa-solid fa-link"></i> Link
+                            </button>
+                            <button class="btn-attachment" onclick="PPM.ui.showAddImageDialog('${card.id}')">
+                                <i class="fa-solid fa-image"></i> Image
+                            </button>
                         </div>
-                    ` : ''}
+                        
+                        <div class="activity-thread">
+                            ${sortedAttachments.length > 0 ? sortedAttachments.map((att, idx) => {
+                                const actualIndex = card.attachments.indexOf(att);
+                                return PPM.renderThreadItem(card.id, att, actualIndex);
+                            }).join('') : `
+                                <div class="thread-empty">
+                                    <i class="fa-solid fa-inbox"></i>
+                                    <p>No activity yet. Add comments, notes, links, or images to get started.</p>
+                                </div>
+                            `}
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="card-detail-sidebar">
@@ -2320,6 +2345,114 @@ const PPM = (() => {
         }
     };
     
+    // Thread attachment handlers for board cards
+    ui.showAddCommentDialog = async (cardId) => {
+        const board = getCurrentBoard();
+        const card = getCardById(board, cardId);
+        if (!card) return;
+        
+        const comment = prompt('Enter your comment:');
+        if (!comment || !comment.trim()) return;
+        
+        const attachment = {
+            type: 'comment',
+            content: comment.trim(),
+            author: state.currentUser?.name || 'Anonymous',
+            timestamp: new Date().toISOString()
+        };
+        
+        card.attachments.push(attachment);
+        await saveBoards();
+        closeCardModal();
+        ui.openCardDetail(cardId);
+    };
+    
+    ui.showAddNoteDialog = async (cardId) => {
+        const board = getCurrentBoard();
+        const card = getCardById(board, cardId);
+        if (!card) return;
+        
+        const title = prompt('Note title:');
+        if (!title || !title.trim()) return;
+        
+        const content = prompt('Note content:');
+        if (!content || !content.trim()) return;
+        
+        const attachment = {
+            type: 'note',
+            title: title.trim(),
+            content: content.trim(),
+            author: state.currentUser?.name || 'Anonymous',
+            timestamp: new Date().toISOString()
+        };
+        
+        card.attachments.push(attachment);
+        await saveBoards();
+        closeCardModal();
+        ui.openCardDetail(cardId);
+    };
+    
+    ui.showAddLinkDialog = async (cardId) => {
+        const board = getCurrentBoard();
+        const card = getCardById(board, cardId);
+        if (!card) return;
+        
+        const url = prompt('Enter URL:');
+        if (!url || !url.trim()) return;
+        
+        const title = prompt('Link title (optional):') || url.trim();
+        
+        const attachment = {
+            type: 'link',
+            url: url.trim(),
+            title: title.trim(),
+            author: state.currentUser?.name || 'Anonymous',
+            timestamp: new Date().toISOString()
+        };
+        
+        card.attachments.push(attachment);
+        await saveBoards();
+        closeCardModal();
+        ui.openCardDetail(cardId);
+    };
+    
+    ui.showAddImageDialog = async (cardId) => {
+        const board = getCurrentBoard();
+        const card = getCardById(board, cardId);
+        if (!card) return;
+        
+        const url = prompt('Enter image URL:');
+        if (!url || !url.trim()) return;
+        
+        const title = prompt('Image title (optional):') || 'Image';
+        
+        const attachment = {
+            type: 'image',
+            url: url.trim(),
+            title: title.trim(),
+            author: state.currentUser?.name || 'Anonymous',
+            timestamp: new Date().toISOString()
+        };
+        
+        card.attachments.push(attachment);
+        await saveBoards();
+        closeCardModal();
+        ui.openCardDetail(cardId);
+    };
+    
+    ui.removeAttachment = async (cardId, attIndex) => {
+        if (!confirm('Remove this item from the activity thread?')) return;
+        
+        const board = getCurrentBoard();
+        const card = getCardById(board, cardId);
+        if (!card || !card.attachments[attIndex]) return;
+        
+        card.attachments.splice(attIndex, 1);
+        await saveBoards();
+        closeCardModal();
+        ui.openCardDetail(cardId);
+    };
+    
     ui.linkToBacklog = (cardId) => {
         const board = getCurrentBoard();
         const card = getCardById(board, cardId);
@@ -2478,6 +2611,104 @@ const PPM = (() => {
         });
     };
 
+    // ===== THREAD RENDERING =====
+    const renderThreadItem = (cardId, attachment, index) => {
+        const timestamp = attachment.timestamp ? new Date(attachment.timestamp) : null;
+        const timeAgo = timestamp ? formatTimeAgo(timestamp) : '';
+        const author = attachment.author || 'Anonymous';
+        
+        const iconMap = {
+            comment: 'comment',
+            note: 'book-open',
+            link: 'link',
+            image: 'image'
+        };
+        
+        const icon = iconMap[attachment.type] || 'paperclip';
+        
+        return `
+            <div class="thread-item thread-${attachment.type}">
+                <div class="thread-item-icon">
+                    <i class="fa-solid fa-${icon}"></i>
+                </div>
+                <div class="thread-item-content">
+                    <div class="thread-item-header">
+                        <span class="thread-item-author">${author}</span>
+                        ${attachment.type === 'comment' ? 'commented' : attachment.type === 'note' ? 'added a note' : attachment.type === 'link' ? 'added a link' : 'added an image'}
+                        ${timeAgo ? `<span class="thread-item-time">${timeAgo}</span>` : ''}
+                        <button class="thread-item-delete" onclick="PPM.ui.removeAttachment('${cardId}', ${index})" title="Remove">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="thread-item-body">
+                        ${renderThreadItemBody(cardId, attachment, index)}
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    const renderThreadItemBody = (cardId, attachment, index) => {
+        if (attachment.type === 'comment') {
+            return `<p class="thread-comment">${escapeHtml(attachment.content)}</p>`;
+        } else if (attachment.type === 'note') {
+            return `
+                <div class="thread-note">
+                    <strong class="thread-note-title">${escapeHtml(attachment.title)}</strong>
+                    <p class="thread-note-content">${escapeHtml(attachment.content)}</p>
+                </div>
+            `;
+        } else if (attachment.type === 'link') {
+            return `
+                <a href="${escapeHtml(attachment.url)}" target="_blank" rel="noopener noreferrer" class="thread-link">
+                    <i class="fa-solid fa-external-link-alt"></i> ${escapeHtml(attachment.title)}
+                </a>
+            `;
+        } else if (attachment.type === 'image') {
+            return `
+                <div class="thread-image">
+                    <p class="thread-image-title">${escapeHtml(attachment.title)}</p>
+                    <img src="${escapeHtml(attachment.url)}" alt="${escapeHtml(attachment.title)}" 
+                         onclick="PPM.ui.openAttachment('${cardId}', ${index})"
+                         style="cursor: pointer;">
+                </div>
+            `;
+        }
+        return '';
+    };
+    
+    const formatTimeAgo = (date) => {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        
+        const intervals = {
+            year: 31536000,
+            month: 2592000,
+            week: 604800,
+            day: 86400,
+            hour: 3600,
+            minute: 60
+        };
+        
+        for (const [name, secondsInInterval] of Object.entries(intervals)) {
+            const interval = Math.floor(seconds / secondsInInterval);
+            if (interval >= 1) {
+                return interval === 1 ? `${interval} ${name} ago` : `${interval} ${name}s ago`;
+            }
+        }
+        
+        return 'just now';
+    };
+    
+    const escapeHtml = (unsafe) => {
+        if (!unsafe) return '';
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    };
+    
     // ===== PUBLIC API =====
     return {
         init,
@@ -2485,6 +2716,7 @@ const PPM = (() => {
         ui,
         closeModal,
         closeCardModal,
+        renderThreadItem,
         openCardModal,
         convertControlToBoard,
         saveBoards,
@@ -2803,6 +3035,13 @@ PPM.dynamicList = {
     renderNodeTaskModal: function(board, node) {
         const taskData = node.taskData;
         
+        // Sort attachments by timestamp (newest first for thread)
+        const sortedAttachments = [...(taskData.attachments || [])].sort((a, b) => {
+            const timeA = new Date(a.timestamp || 0).getTime();
+            const timeB = new Date(b.timestamp || 0).getTime();
+            return timeB - timeA;
+        });
+        
         return `
             <div class="card-detail">
                 <div class="card-detail-main">
@@ -2867,27 +3106,37 @@ PPM.dynamicList = {
                         </div>
                     </div>
                     
-                    ${taskData.attachments && taskData.attachments.length > 0 ? `
-                        <div class="detail-section">
-                            <label>Attachments</label>
-                            <div class="attachments-list">
-                                ${taskData.attachments.map((att, idx) => `
-                                    <div class="attachment-item">
-                                        <i class="fa-solid fa-${att.type === 'link' ? 'link' : att.type === 'note' ? 'note' : 'file'}"></i>
-                                        <span>${att.title || att.url || att.content}</span>
-                                        <button class="btn-icon-sm" onclick="PPM.dynamicList.removeNodeAttachment('${node.id}', ${idx})">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
-                    
+                    <!-- Activity Thread Section -->
                     <div class="detail-section">
-                        <button class="btn-secondary" onclick="PPM.dynamicList.showAddAttachmentDialog('${node.id}')">
-                            <i class="fa-solid fa-paperclip"></i> Add Attachment
-                        </button>
+                        <label>
+                            <i class="fa-solid fa-comments"></i> Activity & Attachments
+                        </label>
+                        <div class="attachment-actions" style="margin-bottom: 1rem;">
+                            <button class="btn-attachment" onclick="PPM.dynamicList.showAddCommentDialog('${node.id}')">
+                                <i class="fa-solid fa-comment"></i> Comment
+                            </button>
+                            <button class="btn-attachment" onclick="PPM.dynamicList.showAddNoteDialog('${node.id}')">
+                                <i class="fa-solid fa-book-open"></i> Note
+                            </button>
+                            <button class="btn-attachment" onclick="PPM.dynamicList.showAddLinkDialog('${node.id}')">
+                                <i class="fa-solid fa-link"></i> Link
+                            </button>
+                            <button class="btn-attachment" onclick="PPM.dynamicList.showAddImageDialog('${node.id}')">
+                                <i class="fa-solid fa-image"></i> Image
+                            </button>
+                        </div>
+                        
+                        <div class="activity-thread">
+                            ${sortedAttachments.length > 0 ? sortedAttachments.map((att, idx) => {
+                                const actualIndex = taskData.attachments.indexOf(att);
+                                return PPM.dynamicList.renderNodeThreadItem(node.id, att, actualIndex);
+                            }).join('') : `
+                                <div class="thread-empty">
+                                    <i class="fa-solid fa-inbox"></i>
+                                    <p>No activity yet. Add comments, notes, links, or images to get started.</p>
+                                </div>
+                            `}
+                        </div>
                     </div>
                 </div>
                 
@@ -3048,11 +3297,11 @@ PPM.dynamicList = {
     },
     
     // Show add attachment dialog
-    showAddAttachmentDialog: async function(nodeId) {
+    // Thread attachment handlers for dynamic list task nodes
+    showAddCommentDialog: async function(nodeId) {
         try {
-            const type = prompt('Attachment type:\n1. Link\n2. Note\n3. File\n\nEnter 1, 2, or 3:');
-            
-            if (!type || !['1', '2', '3'].includes(type)) return;
+            const comment = prompt('Enter your comment:');
+            if (!comment || !comment.trim()) return;
             
             const board = PPM.getCurrentBoard();
             const node = board.dynamicList.nodes.find(n => n.id === nodeId);
@@ -3061,39 +3310,122 @@ PPM.dynamicList = {
             if (!node.taskData) node.taskData = {};
             if (!node.taskData.attachments) node.taskData.attachments = [];
             
-            let attachment;
-            
-            if (type === '1') {
-                const url = prompt('Enter URL:');
-                if (!url) return;
-                const title = prompt('Link title (optional):') || url;
-                attachment = { type: 'link', url, title };
-            } else if (type === '2') {
-                const content = prompt('Enter note:');
-                if (!content) return;
-                const title = prompt('Note title (optional):') || 'Note';
-                attachment = { type: 'note', content, title };
-            } else {
-                alert('File attachments will be available in future updates');
-                return;
-            }
+            const attachment = {
+                type: 'comment',
+                content: comment.trim(),
+                author: PPM.state.currentUser?.name || 'Anonymous',
+                timestamp: new Date().toISOString()
+            };
             
             node.taskData.attachments.push(attachment);
             await PPM.saveBoards();
             
-            // Re-render modal
-            setTimeout(() => {
-                this.openTaskModal(nodeId);
-            }, 100);
+            setTimeout(() => { this.openTaskModal(nodeId); }, 100);
         } catch (err) {
-            console.error('showAddAttachmentDialog error:', err);
-            alert('Failed to add attachment: ' + err.message);
+            console.error('showAddCommentDialog error:', err);
+            alert('Failed to add comment: ' + err.message);
         }
     },
     
-    // Remove attachment from node task
+    showAddNoteDialog: async function(nodeId) {
+        try {
+            const title = prompt('Note title:');
+            if (!title || !title.trim()) return;
+            
+            const content = prompt('Note content:');
+            if (!content || !content.trim()) return;
+            
+            const board = PPM.getCurrentBoard();
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            if (!node) return;
+            
+            if (!node.taskData) node.taskData = {};
+            if (!node.taskData.attachments) node.taskData.attachments = [];
+            
+            const attachment = {
+                type: 'note',
+                title: title.trim(),
+                content: content.trim(),
+                author: PPM.state.currentUser?.name || 'Anonymous',
+                timestamp: new Date().toISOString()
+            };
+            
+            node.taskData.attachments.push(attachment);
+            await PPM.saveBoards();
+            
+            setTimeout(() => { this.openTaskModal(nodeId); }, 100);
+        } catch (err) {
+            console.error('showAddNoteDialog error:', err);
+            alert('Failed to add note: ' + err.message);
+        }
+    },
+    
+    showAddLinkDialog: async function(nodeId) {
+        try {
+            const url = prompt('Enter URL:');
+            if (!url || !url.trim()) return;
+            
+            const title = prompt('Link title (optional):') || url.trim();
+            
+            const board = PPM.getCurrentBoard();
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            if (!node) return;
+            
+            if (!node.taskData) node.taskData = {};
+            if (!node.taskData.attachments) node.taskData.attachments = [];
+            
+            const attachment = {
+                type: 'link',
+                url: url.trim(),
+                title: title.trim(),
+                author: PPM.state.currentUser?.name || 'Anonymous',
+                timestamp: new Date().toISOString()
+            };
+            
+            node.taskData.attachments.push(attachment);
+            await PPM.saveBoards();
+            
+            setTimeout(() => { this.openTaskModal(nodeId); }, 100);
+        } catch (err) {
+            console.error('showAddLinkDialog error:', err);
+            alert('Failed to add link: ' + err.message);
+        }
+    },
+    
+    showAddImageDialog: async function(nodeId) {
+        try {
+            const url = prompt('Enter image URL:');
+            if (!url || !url.trim()) return;
+            
+            const title = prompt('Image title (optional):') || 'Image';
+            
+            const board = PPM.getCurrentBoard();
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            if (!node) return;
+            
+            if (!node.taskData) node.taskData = {};
+            if (!node.taskData.attachments) node.taskData.attachments = [];
+            
+            const attachment = {
+                type: 'image',
+                url: url.trim(),
+                title: title.trim(),
+                author: PPM.state.currentUser?.name || 'Anonymous',
+                timestamp: new Date().toISOString()
+            };
+            
+            node.taskData.attachments.push(attachment);
+            await PPM.saveBoards();
+            
+            setTimeout(() => { this.openTaskModal(nodeId); }, 100);
+        } catch (err) {
+            console.error('showAddImageDialog error:', err);
+            alert('Failed to add image: ' + err.message);
+        }
+    },
+    
     removeNodeAttachment: async function(nodeId, index) {
-        if (!confirm('Remove this attachment?')) return;
+        if (!confirm('Remove this item from the activity thread?')) return;
         
         try {
             const board = PPM.getCurrentBoard();
@@ -3103,15 +3435,109 @@ PPM.dynamicList = {
                 node.taskData.attachments.splice(index, 1);
                 await PPM.saveBoards();
                 
-                // Re-render modal
-                setTimeout(() => {
-                    this.openTaskModal(nodeId);
-                }, 100);
+                setTimeout(() => { this.openTaskModal(nodeId); }, 100);
             }
         } catch (err) {
             console.error('removeNodeAttachment error:', err);
             alert('Failed to remove attachment: ' + err.message);
         }
+    },
+    
+    // Render thread item for node task
+    renderNodeThreadItem: function(nodeId, attachment, index) {
+        const timestamp = attachment.timestamp ? new Date(attachment.timestamp) : null;
+        const timeAgo = timestamp ? this.formatTimeAgo(timestamp) : '';
+        const author = attachment.author || 'Anonymous';
+        
+        const iconMap = {
+            comment: 'comment',
+            note: 'book-open',
+            link: 'link',
+            image: 'image'
+        };
+        
+        const icon = iconMap[attachment.type] || 'paperclip';
+        
+        return `
+            <div class="thread-item thread-${attachment.type}">
+                <div class="thread-item-icon">
+                    <i class="fa-solid fa-${icon}"></i>
+                </div>
+                <div class="thread-item-content">
+                    <div class="thread-item-header">
+                        <span class="thread-item-author">${author}</span>
+                        ${attachment.type === 'comment' ? 'commented' : attachment.type === 'note' ? 'added a note' : attachment.type === 'link' ? 'added a link' : 'added an image'}
+                        ${timeAgo ? `<span class="thread-item-time">${timeAgo}</span>` : ''}
+                        <button class="thread-item-delete" onclick="PPM.dynamicList.removeNodeAttachment('${nodeId}', ${index})" title="Remove">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="thread-item-body">
+                        ${this.renderNodeThreadItemBody(nodeId, attachment, index)}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    renderNodeThreadItemBody: function(nodeId, attachment, index) {
+        const escapeHtml = (unsafe) => {
+            if (!unsafe) return '';
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        };
+        
+        if (attachment.type === 'comment') {
+            return `<p class="thread-comment">${escapeHtml(attachment.content)}</p>`;
+        } else if (attachment.type === 'note') {
+            return `
+                <div class="thread-note">
+                    <strong class="thread-note-title">${escapeHtml(attachment.title)}</strong>
+                    <p class="thread-note-content">${escapeHtml(attachment.content)}</p>
+                </div>
+            `;
+        } else if (attachment.type === 'link') {
+            return `
+                <a href="${escapeHtml(attachment.url)}" target="_blank" rel="noopener noreferrer" class="thread-link">
+                    <i class="fa-solid fa-external-link-alt"></i> ${escapeHtml(attachment.title)}
+                </a>
+            `;
+        } else if (attachment.type === 'image') {
+            return `
+                <div class="thread-image">
+                    <p class="thread-image-title">${escapeHtml(attachment.title)}</p>
+                    <img src="${escapeHtml(attachment.url)}" alt="${escapeHtml(attachment.title)}" 
+                         style="cursor: pointer; max-width: 100%; border-radius: 4px;">
+                </div>
+            `;
+        }
+        return '';
+    },
+    
+    formatTimeAgo: function(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        
+        const intervals = {
+            year: 31536000,
+            month: 2592000,
+            week: 604800,
+            day: 86400,
+            hour: 3600,
+            minute: 60
+        };
+        
+        for (const [name, secondsInInterval] of Object.entries(intervals)) {
+            const interval = Math.floor(seconds / secondsInInterval);
+            if (interval >= 1) {
+                return interval === 1 ? `${interval} ${name} ago` : `${interval} ${name}s ago`;
+            }
+        }
+        
+        return 'just now';
     },
     
     // Delete node task
