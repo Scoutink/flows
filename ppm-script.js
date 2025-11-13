@@ -2914,142 +2914,203 @@ PPM.dynamicList = {
     },
     
     // Save node task from modal
-    saveNodeTaskFromModal: function(nodeId) {
+    saveNodeTaskFromModal: async function(nodeId) {
         try {
             const board = PPM.getCurrentBoard();
             const node = board.dynamicList.nodes.find(n => n.id === nodeId);
             
-            if (!node) return;
+            if (!node) {
+                alert('Node not found');
+                return;
+            }
             
             // Get values from form
-            const title = document.getElementById('node-task-title')?.value?.trim();
-            const description = document.getElementById('node-task-desc')?.value?.trim();
-            const priority = document.getElementById('node-task-priority')?.value;
-            const tagsStr = document.getElementById('node-task-tags')?.value?.trim();
+            const titleEl = document.getElementById('node-task-title');
+            const descEl = document.getElementById('node-task-desc');
+            const priorityEl = document.getElementById('node-task-priority');
+            const tagsEl = document.getElementById('node-task-tags');
             
-            if (title) {
-                node.title = title;
+            if (!titleEl || !descEl || !priorityEl || !tagsEl) {
+                alert('Form elements not found. Please try closing and reopening the task.');
+                console.error('Missing elements:', {titleEl, descEl, priorityEl, tagsEl});
+                return;
             }
+            
+            const title = titleEl.value.trim();
+            const description = descEl.value.trim();
+            const priority = priorityEl.value;
+            const tagsStr = tagsEl.value.trim();
+            
+            if (!title) {
+                alert('Title is required');
+                return;
+            }
+            
+            node.title = title;
             
             if (!node.taskData) {
                 node.taskData = {};
             }
             
-            node.taskData.title = title || node.title;
+            node.taskData.title = title;
             node.taskData.description = description || '';
             node.taskData.priority = priority || 'medium';
             node.taskData.tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : [];
             node.updatedAt = new Date().toISOString();
             
-            PPM.saveBoards();
+            await PPM.saveBoards();
             this.render();
             
+            alert('Task saved successfully!');
             console.log('Node task saved:', nodeId);
         } catch (err) {
             console.error('saveNodeTaskFromModal error:', err);
+            alert('Failed to save task: ' + err.message);
         }
     },
     
     // Toggle checklist item in node task
-    toggleNodeChecklistItem: function(nodeId, index) {
-        const board = PPM.getCurrentBoard();
-        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
-        
-        if (node && node.taskData && node.taskData.checklist && node.taskData.checklist[index]) {
-            node.taskData.checklist[index].completed = !node.taskData.checklist[index].completed;
-            PPM.saveBoards();
+    toggleNodeChecklistItem: async function(nodeId, index) {
+        try {
+            const board = PPM.getCurrentBoard();
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            
+            if (node && node.taskData && node.taskData.checklist && node.taskData.checklist[index]) {
+                node.taskData.checklist[index].completed = !node.taskData.checklist[index].completed;
+                await PPM.saveBoards();
+                console.log(`Toggled checklist item ${index} for node ${nodeId}`);
+            }
+        } catch (err) {
+            console.error('toggleNodeChecklistItem error:', err);
         }
     },
     
     // Add checklist item to node task
-    addNodeChecklistItem: function(nodeId) {
-        const board = PPM.getCurrentBoard();
-        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
-        const input = document.getElementById('node-task-new-checklist');
-        
-        if (!input) return;
-        
-        const text = input.value.trim();
-        if (!text) {
-            alert('Please enter checklist item text');
-            return;
+    addNodeChecklistItem: async function(nodeId) {
+        try {
+            const board = PPM.getCurrentBoard();
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            const input = document.getElementById('node-task-new-checklist');
+            
+            if (!input) {
+                console.error('Checklist input not found');
+                return;
+            }
+            
+            const text = input.value.trim();
+            if (!text) {
+                alert('Please enter checklist item text');
+                return;
+            }
+            
+            if (!node.taskData) node.taskData = {};
+            if (!node.taskData.checklist) node.taskData.checklist = [];
+            
+            node.taskData.checklist.push({
+                text: text,
+                completed: false
+            });
+            
+            await PPM.saveBoards();
+            input.value = '';
+            
+            // Re-render modal to show new item
+            setTimeout(() => {
+                this.openTaskModal(nodeId);
+            }, 100);
+        } catch (err) {
+            console.error('addNodeChecklistItem error:', err);
+            alert('Failed to add checklist item: ' + err.message);
         }
-        
-        if (!node.taskData) node.taskData = {};
-        if (!node.taskData.checklist) node.taskData.checklist = [];
-        
-        node.taskData.checklist.push({
-            text: text,
-            completed: false
-        });
-        
-        PPM.saveBoards();
-        input.value = '';
-        
-        // Re-render modal
-        this.openTaskModal(nodeId);
     },
     
     // Remove checklist item from node task
-    removeNodeChecklistItem: function(nodeId, index) {
+    removeNodeChecklistItem: async function(nodeId, index) {
         if (!confirm('Remove this checklist item?')) return;
         
-        const board = PPM.getCurrentBoard();
-        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
-        
-        if (node && node.taskData && node.taskData.checklist) {
-            node.taskData.checklist.splice(index, 1);
-            PPM.saveBoards();
-            this.openTaskModal(nodeId);
+        try {
+            const board = PPM.getCurrentBoard();
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            
+            if (node && node.taskData && node.taskData.checklist) {
+                node.taskData.checklist.splice(index, 1);
+                await PPM.saveBoards();
+                
+                // Re-render modal
+                setTimeout(() => {
+                    this.openTaskModal(nodeId);
+                }, 100);
+            }
+        } catch (err) {
+            console.error('removeNodeChecklistItem error:', err);
+            alert('Failed to remove checklist item: ' + err.message);
         }
     },
     
     // Show add attachment dialog
-    showAddAttachmentDialog: function(nodeId) {
-        const type = prompt('Attachment type:\n1. Link\n2. Note\n3. File\n\nEnter 1, 2, or 3:');
-        
-        if (!type || !['1', '2', '3'].includes(type)) return;
-        
-        const board = PPM.getCurrentBoard();
-        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
-        if (!node) return;
-        
-        if (!node.taskData) node.taskData = {};
-        if (!node.taskData.attachments) node.taskData.attachments = [];
-        
-        let attachment;
-        
-        if (type === '1') {
-            const url = prompt('Enter URL:');
-            if (!url) return;
-            const title = prompt('Link title (optional):') || url;
-            attachment = { type: 'link', url, title };
-        } else if (type === '2') {
-            const content = prompt('Enter note:');
-            if (!content) return;
-            const title = prompt('Note title (optional):') || 'Note';
-            attachment = { type: 'note', content, title };
-        } else {
-            alert('File attachments will be available in future updates');
-            return;
+    showAddAttachmentDialog: async function(nodeId) {
+        try {
+            const type = prompt('Attachment type:\n1. Link\n2. Note\n3. File\n\nEnter 1, 2, or 3:');
+            
+            if (!type || !['1', '2', '3'].includes(type)) return;
+            
+            const board = PPM.getCurrentBoard();
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            if (!node) return;
+            
+            if (!node.taskData) node.taskData = {};
+            if (!node.taskData.attachments) node.taskData.attachments = [];
+            
+            let attachment;
+            
+            if (type === '1') {
+                const url = prompt('Enter URL:');
+                if (!url) return;
+                const title = prompt('Link title (optional):') || url;
+                attachment = { type: 'link', url, title };
+            } else if (type === '2') {
+                const content = prompt('Enter note:');
+                if (!content) return;
+                const title = prompt('Note title (optional):') || 'Note';
+                attachment = { type: 'note', content, title };
+            } else {
+                alert('File attachments will be available in future updates');
+                return;
+            }
+            
+            node.taskData.attachments.push(attachment);
+            await PPM.saveBoards();
+            
+            // Re-render modal
+            setTimeout(() => {
+                this.openTaskModal(nodeId);
+            }, 100);
+        } catch (err) {
+            console.error('showAddAttachmentDialog error:', err);
+            alert('Failed to add attachment: ' + err.message);
         }
-        
-        node.taskData.attachments.push(attachment);
-        PPM.saveBoards();
-        this.openTaskModal(nodeId);
     },
     
     // Remove attachment from node task
-    removeNodeAttachment: function(nodeId, index) {
+    removeNodeAttachment: async function(nodeId, index) {
         if (!confirm('Remove this attachment?')) return;
         
-        const board = PPM.getCurrentBoard();
-        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
-        
-        if (node && node.taskData && node.taskData.attachments) {
-            node.taskData.attachments.splice(index, 1);
-            PPM.saveBoards();
-            this.openTaskModal(nodeId);
+        try {
+            const board = PPM.getCurrentBoard();
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            
+            if (node && node.taskData && node.taskData.attachments) {
+                node.taskData.attachments.splice(index, 1);
+                await PPM.saveBoards();
+                
+                // Re-render modal
+                setTimeout(() => {
+                    this.openTaskModal(nodeId);
+                }, 100);
+            }
+        } catch (err) {
+            console.error('removeNodeAttachment error:', err);
+            alert('Failed to remove attachment: ' + err.message);
         }
     },
     
