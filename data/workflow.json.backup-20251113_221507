@@ -4,12 +4,12 @@
   },
   "flows": [
     {
-      "id": "flow-compliance-2025",
-      "name": "NIS2 Compliance Workflow",
-      "description": "Complete NIS2 compliance framework covering Asset Management, Business Environment, and Governance",
+      "id": "flow-1763045244692",
+      "name": "SampleFlow",
+      "description": "Sample NIS2 compliance workflow migrated from V6 - Complete ID.AM, ID.BE, and ID.GV categories",
       "icon": "",
-      "createdAt": "2025-11-11T12:00:00.000Z",
-      "updatedAt": "2025-11-11T12:00:00.000Z",
+      "createdAt": "2025-11-13T14:47:24.692466",
+      "updatedAt": "2025-11-13T14:47:24.692481",
       "templateId": "template-classic-compliance",
       "templateSnapshot": {
         "id": "template-classic-compliance",
@@ -108,19 +108,16 @@
       "data": [
         {
           "id": "cat-1761691229395-98uze",
-          "levelId": "level-rules",
           "name": "ID.AM - Asset Management",
           "subcategories": [
             {
               "id": "act-1761691229395-p0u6n",
-              "levelId": "level-actions",
               "name": "ID.AM-1: Inventarisatie van de binnen de organisatie gebruikte fysieke apparaten en systemen.",
               "text": "",
               "completed": false,
               "subcategories": [
                 {
                   "id": "evi-1761691229395-z6krz",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-1.1",
                   "text": "Een inventaris van activa in verband met informatie en informatieverwerkingsfaciliteiten binnen de organisatie moet worden gedocumenteerd, geëvalueerd en bijgewerkt wanneer zich wijzigingen voordoen.",
                   "completed": false,
@@ -143,11 +140,12 @@
                       "Vereiste Implementatie: Procedure of logging voor updates van de activalijst → Bewijs dat de inventaris actueel wordt gehouden, bijvoorbeeld via: - changelog of wijzigingsgeschiedenis in het beheersysteem, - een procedure of SOP voor update-registratie bij wijziging, - bewijs van periodieke controles (bv. jaarlijkse review), - screenshot of logboek van recente wijzigingen."
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-1l14m",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-1.2",
                   "text": "De inventaris van activa die verband houden met informatie en informatieverwerkingsfaciliteiten moet veranderingen in de context van de organisatie weerspiegelen en alle informatie bevatten die nodig is voor een effectieve verantwoording.",
                   "completed": false,
@@ -169,11 +167,12 @@
                       "Vereiste Implementatie: Logboek of workflow-acties van levenscyclusbeheer → Praktisch bewijs van uitvoering, zoals: - registratie van activagebruikers (e.g. in CMDB, tickets), - logboek van updates, overdrachten, of buitengebruikstellingen, - audit trail van verwijderingsacties (met dataverwijdering), - recente voorbeelden van activa die zijn uitgefaseerd volgens procedure."
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-mfjh3",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-1.3",
                   "text": "Wanneer niet-toegestane hardware wordt ontdekt, moet deze in quarantaine worden geplaatst voor eventuele uitzonderingsbehandeling, verwijderd of vervangen, en wordt de inventaris dienovereenkomstig bijgewerkt.",
                   "completed": false,
@@ -193,11 +192,12 @@
                       "Vereiste Implementatie: 1. Snapshot aanmerking 'niet geautoriseerde hardware' → Voorbeeld van geregistreerde ongeautoriseerde hardware (bv. uit CMDB, scanningtool of SOC-rapport), met aanduiding van status: in quarantaine, verwijderd, of in aanvraag voor uitzondering. 2. Logboek of registraties van afgehandelde incidenten → Bewijs dat het proces daadwerkelijk wordt gevolgd: logging van incidenten, beslissingen over toestaan of verwijderen, en updates aan activaregister."
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-0b7cp",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-1.4",
                   "text": "De mechanismen voor het detecteren van de aanwezigheid van niet-geautoriseerde hardware en firmwarecomponenten in het netwerk van de organisatie moeten worden geïdentificeerd.",
                   "completed": false,
@@ -216,21 +216,21 @@
                       "Vereist Documentatie: 1. Document 'Detectiemechanismen ongeautoriseerde hardware' [SSOT] → Beschrijving van gebruikte tools, processen en/of systemen om niet-geautoriseerde hardware of firmware op het netwerk op te sporen. Inclusief: - gebruikte monitoringtools of netwerkdetectie-oplossingen (bv. NAC, asset discovery), - hoe vaak detectie gebeurt (real-time, periodiek), - wie verantwoordelijk is, - hoe updates en uitzonderingen beheerd worden. 2. Procedure quarantaine- of verwijderactie → Procesbeschrijving wat er gebeurt bij detectie: blokkeren, verwijderen, isoleren of manueel opvolgen."
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 }
               ],
               "tags": []
             },
             {
               "id": "act-1761691229395-mejij",
-              "levelId": "level-actions",
               "name": "ID.AM-2: Inventarisatie van de binnen de organisatie gebruikte softwareplatforms en -toepassingen.",
               "text": "",
               "completed": false,
               "subcategories": [
                 {
                   "id": "evi-1761691229395-jz8lj",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-2.1",
                   "text": "Een inventaris die aangeeft welke softwareplatforms en -toepassingen in de organisatie worden gebruikt, moet worden gedocumenteerd, geëvalueerd en bijgewerkt wanneer zich wijzigingen voordoen.",
                   "completed": false,
@@ -249,11 +249,12 @@
                       "Vereist Documentatie: Inventaris softwareplatforms en - toepassingen"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-ckp9l",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-2.2",
                   "text": "De inventaris van softwareplatforms en -toepassingen die verband houden met informatie en informatieverwerking, moet veranderingen in de context van de organisatie weerspiegelen en alle informatie bevatten die nodig is voor een doeltreffende verantwoording.",
                   "completed": false,
@@ -275,11 +276,12 @@
                       "Vereist Documentatie: Inventaris softwareplatforms en - toepassingen"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-lwba5",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-2.3",
                   "text": "De personen die binnen de organisatie verantwoordelijk en aansprakelijk zijn voor het beheer van softwareplatforms en -toepassingen moeten worden geïdentificeerd.",
                   "completed": false,
@@ -293,11 +295,12 @@
                       "Vereist Documentatie: Inventaris softwareplatforms en - toepassingen"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-9ot8k",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-2.4",
                   "text": "Wanneer niet-geautoriseerde software wordt ontdekt, wordt deze in quarantaine geplaatst voor eventuele uitzonderingsbehandeling, verwijderd of vervangen, en wordt de inventaris dienovereenkomstig bijgewerkt.",
                   "completed": false,
@@ -316,11 +319,12 @@
                       "Vereist Documentatie: Proces niet-geautorseerde bedrijfsmiddelen"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-mg4wx",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-2.5",
                   "text": "De mechanismen voor het opsporen van de aanwezigheid van niet-geautoriseerde software in de ICT/OT-omgeving van de organisatie moeten worden geïdentificeerd.",
                   "completed": false,
@@ -339,21 +343,21 @@
                       "Vereist Documentatie: Uitzonderingsdocumentatie voor niet ondersteunde software Snapshot aanmerking 'niet geautoriseerde software'"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 }
               ],
               "tags": []
             },
             {
               "id": "act-1761691229395-umzq9",
-              "levelId": "level-actions",
               "name": "ID.AM-3: De organisatorische communicatie- en gegevensstromen worden in kaart gebracht.",
               "text": "",
               "completed": false,
               "subcategories": [
                 {
                   "id": "evi-1761691229395-uu4sm",
-                  "levelId": "level-evidences",
                   "name": "ID.AM.3-1",
                   "text": "Informatie die de organisatie opslaat en gebruikt, moet worden geïdentificeerd.",
                   "completed": false,
@@ -370,11 +374,12 @@
                     ],
                     "comments": []
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-feyav",
-                  "levelId": "level-evidences",
                   "name": "ID.AM.3-2",
                   "text": "Alle verbindingen binnen de ICT/OT-omgeving van de organisatie en met andere interne platforms van de organisatie moeten in kaart worden gebracht, gedocumenteerd, goedgekeurd en zo nodig bijgewerkt.",
                   "completed": false,
@@ -393,11 +398,12 @@
                     ],
                     "comments": []
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-qv2ml",
-                  "levelId": "level-evidences",
                   "name": "ID.A.3-3",
                   "text": "De informatiestromen/gegevensstromen binnen de ICT/OT-omgeving van de organisatie en naar andere interne systemen van de organisatie moeten in kaart worden gebracht, gedocumenteerd, geautoriseerd en bijgewerkt wanneer zich wijzigingen voordoen.",
                   "completed": false,
@@ -414,21 +420,21 @@
                     ],
                     "comments": []
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 }
               ],
               "tags": []
             },
             {
               "id": "act-1761691229395-dmelz",
-              "levelId": "level-actions",
               "name": "ID.AM-4: Externe informatiesystemen worden gecatalogiseerd.",
               "text": "",
               "completed": false,
               "subcategories": [
                 {
                   "id": "evi-1761691229395-ewpmo",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-4.1",
                   "text": "De organisatie moet alle externe diensten en de daarmee gemaakte verbindingen in kaart brengen, documenteren, autoriseren en bij wijzigingen bijwerken.",
                   "completed": false,
@@ -445,11 +451,12 @@
                     ],
                     "comments": []
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-fd1g9",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-4.2",
                   "text": "De informatiestroom van en naar externe systemen moet in kaart worden gebracht, gedocumenteerd en geautoriseerd, en worden bijgewerkt wanneer zich wijzigingen voordoen.",
                   "completed": false,
@@ -468,21 +475,21 @@
                     ],
                     "comments": []
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 }
               ],
               "tags": []
             },
             {
               "id": "act-1761691229395-327r4",
-              "levelId": "level-actions",
               "name": "ID.AM-5: Middelen worden geprioriteerd op basis van hun classificatie, kriticiteit en bedrijfswaarde.",
               "text": "",
               "completed": false,
               "subcategories": [
                 {
                   "id": "evi-1761691229395-gbof1",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-5.1",
                   "text": "De middelen van de organisatie (hardware, apparaten, gegevens, tijd, personeel, informatie en software) moeten worden geprioriteerd op basis van hun classificatie, kriticiteit en bedrijfswaarde.",
                   "completed": false,
@@ -503,21 +510,21 @@
                       "Vereist Documentatie: Data classificatiesysteem"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 }
               ],
               "tags": []
             },
             {
               "id": "act-1761691229395-wx7zs",
-              "levelId": "level-actions",
               "name": "ID.AM-6: Rollen, verantwoordelijkheden en bevoegdheden op het gebied van informatie en cyberbeveiliging worden vastgesteld voor het gehele personeel en belanghebbenden van derden.",
               "text": "",
               "completed": false,
               "subcategories": [
                 {
                   "id": "evi-1761691229395-3g1t8",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-6.1",
                   "text": "De rollen, verantwoordelijkheden en bevoegdheden op het gebied van informatie- en cyberbeveiliging binnen de organisatie moeten worden gedocumenteerd, geëvalueerd, geautoriseerd en bijgewerkt en afgestemd op de andere interne rollen van de organisatie en die van externe partners.",
                   "completed": false,
@@ -538,11 +545,12 @@
                       "Vereist Documentatie: RASCI"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-53l5b",
-                  "levelId": "level-evidences",
                   "name": "ID.AM-6.2",
                   "text": "De organisatie zal een informatiebeveiligingsfunctionaris (Information Security Officer) aanstellen.",
                   "completed": false,
@@ -561,7 +569,9 @@
                       "Vereist Documentatie: Target Operating Model (TOM) Security RASCI"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 }
               ],
               "tags": []
@@ -571,19 +581,16 @@
         },
         {
           "id": "cat-1761691229395-miynx",
-          "levelId": "level-rules",
           "name": "ID.BE - Business Environment",
           "subcategories": [
             {
               "id": "act-1761691229395-xg74h",
-              "levelId": "level-actions",
               "name": "ID.BE-1: De rol van de organisatie in de toeleveringsketen moet worden vastgesteld, gedocumenteerd en gecommuniceerd.",
               "text": "",
               "completed": false,
               "subcategories": [
                 {
                   "id": "evi-1761691229395-spdzu",
-                  "levelId": "level-evidences",
                   "name": "ID.BE-1.1",
                   "text": "De rol van de organisatie in de toeleveringsketen moet worden vastgesteld en gecommuniceerd.",
                   "completed": false,
@@ -604,11 +611,12 @@
                       "Vereist Documentatie: Value /Suppy Chain documentation"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-wes2g",
-                  "levelId": "level-evidences",
                   "name": "ID.BE-1.2",
                   "text": "De organisatie moet haar ICT/OT-omgeving beschermen tegen bedreigingen vanuit de toeleveringsketen door beveiligingswaarborgen toe te passen als onderdeel van een gedocumenteerde alomvattende beveiligingsstrategie.",
                   "completed": false,
@@ -622,21 +630,21 @@
                       "Vereist Documentatie: Value /Suppy Chain documentation"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 }
               ],
               "tags": []
             },
             {
               "id": "act-1761691229395-3h4b4",
-              "levelId": "level-actions",
               "name": "ID.BE-2: De plaats van de organisatie in de kritieke infrastructuur en haar bedrijfstak wordt vastgesteld en gecommuniceerd.",
               "text": "",
               "completed": false,
               "subcategories": [
                 {
                   "id": "evi-1761691229395-uvfz9",
-                  "levelId": "level-evidences",
                   "name": "ID.BE-2.1",
                   "text": "De plaats van de organisatie in de kritieke infrastructuur en haar bedrijfstak wordt vastgesteld en gecommuniceerd",
                   "completed": false,
@@ -655,7 +663,9 @@
                       "Vereist Documentatie: Value /Suppy Chain documentation"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 }
               ],
               "tags": [
@@ -664,14 +674,12 @@
             },
             {
               "id": "act-1761691229395-asn2l",
-              "levelId": "level-actions",
               "name": "ID.BE-3: Prioriteiten met betrekking tot de missie, doelstellingen en activiteiten van de organisatie worden vastgesteld en gecommuniceerd.",
               "text": "",
               "completed": false,
               "subcategories": [
                 {
                   "id": "evi-1761691229395-xcuo0",
-                  "levelId": "level-evidences",
                   "name": "ID.BE-3.1",
                   "text": "Prioriteiten met betrekking tot de missie, doelstellingen en activiteiten van de organisatie worden vastgesteld en gecommuniceerd.",
                   "completed": false,
@@ -690,21 +698,21 @@
                     ],
                     "comments": []
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 }
               ],
               "tags": []
             },
             {
               "id": "act-1761691229395-kwiel",
-              "levelId": "level-actions",
               "name": "ID.BE-4: Afhankelijkheden en kritieke functies voor de levering van kritieke diensten zijn vastgesteld.",
               "text": "",
               "completed": false,
               "subcategories": [
                 {
                   "id": "evi-1761691229395-5cerx",
-                  "levelId": "level-evidences",
                   "name": "ID.BE-4.1",
                   "text": "De afhankelijkheden en missie-kritische functies voor de levering van kritieke diensten moeten als onderdeel van het risicobeoordelingsproces worden geïdentificeerd, gedocumenteerd en geprioriteerd op basis van hun kriticiteit.",
                   "completed": false,
@@ -723,21 +731,21 @@
                       "Vereist Documentatie: Value /Suppy Chain documentation"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 }
               ],
               "tags": []
             },
             {
               "id": "act-1761691229395-t6nnh",
-              "levelId": "level-actions",
               "name": "ID.BE-5: Voor alle operationele staten (bv. onder dwang/aanval, tijdens herstel, normale operaties) worden vereisten vastgesteld met betrekking tot weerbaarheid ter ondersteuning van de levering van kritieke diensten.",
               "text": "",
               "completed": false,
               "subcategories": [
                 {
                   "id": "evi-1761691229395-g97iq",
-                  "levelId": "level-evidences",
                   "name": "ID.BE-5.1",
                   "text": "Om de cyberveerkracht te ondersteunen en de levering van kritieke diensten te beveiligen, moeten de nodige eisen worden vastgesteld, gedocumenteerd en de uitvoering ervan getest en goedgekeurd.",
                   "completed": false,
@@ -754,11 +762,12 @@
                     ],
                     "comments": []
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-z3794",
-                  "levelId": "level-evidences",
                   "name": "ID.BE-5.2",
                   "text": "Informatie verwerkende en ondersteunende faciliteiten moeten redundantie toepassen om te voldoen aan de beschikbaarheidseisen, zoals gedefinieerd door de organisatie en/of regelgevende kaders.",
                   "completed": false,
@@ -777,11 +786,12 @@
                     ],
                     "comments": []
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-hhaz9",
-                  "levelId": "level-evidences",
                   "name": "ID.BE-5.3",
                   "text": "Er moeten doelstellingen voor hersteltijd en herstelpunten worden vastgesteld voor het herstel van essentiële ICT/OT-systeemprocessen.",
                   "completed": false,
@@ -800,7 +810,9 @@
                     ],
                     "comments": []
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 }
               ],
               "tags": []
@@ -810,19 +822,16 @@
         },
         {
           "id": "cat-1761691229395-wcofp",
-          "levelId": "level-rules",
           "name": "ID.GV - Governance",
           "subcategories": [
             {
               "id": "act-1761691229395-44vnq",
-              "levelId": "level-actions",
               "name": "ID.GV-1: Het cyberbeveiligingsbeleid van de organisatie wordt vastgesteld en gecommuniceerd.",
               "text": "",
               "completed": false,
               "subcategories": [
                 {
                   "id": "evi-1761691229395-1pm0u",
-                  "levelId": "level-evidences",
                   "name": "ID.GV-1.1",
                   "text": "Beleid en procedures voor informatiebeveiliging en cyberveiligheid moeten worden opgesteld, gedocumenteerd, geëvalueerd, goedgekeurd en bijgewerkt wanneer zich wijzigingen voordoen.",
                   "completed": false,
@@ -841,11 +850,12 @@
                       "Vereist Documentatie: Policy, Procedures"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 },
                 {
                   "id": "evi-1761691229395-2blyt",
-                  "levelId": "level-evidences",
                   "name": "ID.GV-1.2",
                   "text": "Er moet een door het hoger management goedgekeurd informatie- en cyberbeveiligingsbeleid voor de gehele organisatie worden vastgesteld, gedocumenteerd, bijgewerkt bij wijzigingen, en verspreid.",
                   "completed": false,
@@ -864,7 +874,9 @@
                       "Vereist Documentatie: Cybersecurity Policy"
                     ]
                   },
-                  "subcategories": []
+                  "subcategories": [],
+                  "isLocked": false,
+                  "isActive": false
                 }
               ],
               "tags": [
