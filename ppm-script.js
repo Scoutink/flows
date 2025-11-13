@@ -2485,6 +2485,7 @@ const PPM = (() => {
         ui,
         closeModal,
         closeCardModal,
+        openCardModal,
         convertControlToBoard,
         saveBoards,
         createBoard,
@@ -2778,54 +2779,286 @@ PPM.dynamicList = {
                     description: '',
                     priority: 'medium',
                     tags: [],
-                    assignments: {owner: null, executor: null, supervisor: null},
-                    schedule: {startDate: null, dueDate: null, estimatedHours: null},
                     checklist: [],
-                    comments: [],
                     attachments: []
                 };
             }
             
-            // Create a temporary card object to use with existing modal
-            const tempCard = {
-                id: `node-task-${nodeId}`,
-                title: node.taskData.title || node.title,
-                description: node.taskData.description || '',
-                priority: node.taskData.priority || 'medium',
-                tags: node.taskData.tags || [],
-                assignments: node.taskData.assignments || {owner: null, executor: null, supervisor: null},
-                schedule: node.taskData.schedule || {startDate: null, dueDate: null, estimatedHours: null},
-                checklist: node.taskData.checklist || [],
-                comments: node.taskData.comments || [],
-                attachments: node.taskData.attachments || [],
-                linkedBacklogItems: [],
-                milestoneId: null,
-                categoryId: null,
-                groupIds: [],
-                columnId: null,
-                _isNodeTask: true,
-                _nodeId: nodeId
-            };
+            // Render modal content for node task
+            const modalContent = this.renderNodeTaskModal(board, node);
             
-            // Use PPM.ui.openCardDetails if available
-            if (PPM.ui && PPM.ui.openCardDetails) {
-                PPM.ui.openCardDetails(tempCard);
-            } else {
-                // Fallback: show basic info
-                const desc = node.taskData.description || 'No description';
-                const priority = node.taskData.priority;
-                alert(`Task: ${node.title}
-
-Description: ${desc}
-
-Priority: ${priority}
-
-Note: Full task editing will be available when the card modal is properly integrated.`);
-            }
+            // Open modal with custom content
+            PPM.openCardModal(`✓ ${node.title}`, modalContent, () => {
+                // On close, save any changes
+                this.saveNodeTaskFromModal(nodeId);
+            });
+            
         } catch (err) {
             console.error('openTaskModal error:', err);
             alert('Failed to open task modal: ' + err.message);
         }
+    },
+    
+    // Render modal content for node task
+    renderNodeTaskModal: function(board, node) {
+        const taskData = node.taskData;
+        
+        return `
+            <div class="card-detail">
+                <div class="card-detail-main">
+                    <div class="detail-section">
+                        <label>Title</label>
+                        <input type="text" id="node-task-title" class="form-input" 
+                               value="${node.title}" 
+                               placeholder="Task title">
+                    </div>
+                    
+                    <div class="detail-section">
+                        <label>Description</label>
+                        <textarea id="node-task-desc" rows="4" class="form-input"
+                                  placeholder="Task description">${taskData.description || ''}</textarea>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <label>Priority</label>
+                        <select id="node-task-priority" class="form-input">
+                            <option value="low" ${taskData.priority === 'low' ? 'selected' : ''}>Low</option>
+                            <option value="medium" ${taskData.priority === 'medium' ? 'selected' : ''}>Medium</option>
+                            <option value="high" ${taskData.priority === 'high' ? 'selected' : ''}>High</option>
+                        </select>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <label>Tags (comma-separated)</label>
+                        <input type="text" id="node-task-tags" class="form-input"
+                               value="${(taskData.tags || []).join(', ')}"
+                               placeholder="tag1, tag2, tag3">
+                    </div>
+                    
+                    ${taskData.checklist && taskData.checklist.length > 0 ? `
+                        <div class="detail-section">
+                            <label>Checklist</label>
+                            <div class="checklist" id="node-task-checklist">
+                                ${taskData.checklist.map((item, i) => `
+                                    <div class="checklist-item">
+                                        <input type="checkbox" 
+                                               id="node-check-${i}" 
+                                               ${item.completed ? 'checked' : ''}
+                                               onchange="PPM.dynamicList.toggleNodeChecklistItem('${node.id}', ${i})">
+                                        <label for="node-check-${i}">${item.text}</label>
+                                        <button class="btn-icon-sm" onclick="PPM.dynamicList.removeNodeChecklistItem('${node.id}', ${i})">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="detail-section">
+                        <label>Add Checklist Item</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="node-task-new-checklist" class="form-input"
+                                   placeholder="New checklist item"
+                                   onkeypress="if(event.key==='Enter') PPM.dynamicList.addNodeChecklistItem('${node.id}')">
+                            <button class="btn-primary" onclick="PPM.dynamicList.addNodeChecklistItem('${node.id}')">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    ${taskData.attachments && taskData.attachments.length > 0 ? `
+                        <div class="detail-section">
+                            <label>Attachments</label>
+                            <div class="attachments-list">
+                                ${taskData.attachments.map((att, idx) => `
+                                    <div class="attachment-item">
+                                        <i class="fa-solid fa-${att.type === 'link' ? 'link' : att.type === 'note' ? 'note' : 'file'}"></i>
+                                        <span>${att.title || att.url || att.content}</span>
+                                        <button class="btn-icon-sm" onclick="PPM.dynamicList.removeNodeAttachment('${node.id}', ${idx})">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="detail-section">
+                        <button class="btn-secondary" onclick="PPM.dynamicList.showAddAttachmentDialog('${node.id}')">
+                            <i class="fa-solid fa-paperclip"></i> Add Attachment
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card-detail-sidebar">
+                    <div class="detail-section">
+                        <label>Actions</label>
+                        <button class="btn-primary btn-block" onclick="PPM.dynamicList.saveNodeTaskFromModal('${node.id}')">
+                            <i class="fa-solid fa-save"></i> Save Changes
+                        </button>
+                        <button class="btn-danger btn-block" onclick="PPM.dynamicList.deleteNodeTask('${node.id}')">
+                            <i class="fa-solid fa-trash"></i> Delete Task
+                        </button>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <label>Info</label>
+                        <p class="text-muted" style="font-size: 0.9em;">
+                            This is a standalone task in the Dynamic List, separate from board tasks.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    // Save node task from modal
+    saveNodeTaskFromModal: function(nodeId) {
+        try {
+            const board = PPM.getCurrentBoard();
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            
+            if (!node) return;
+            
+            // Get values from form
+            const title = document.getElementById('node-task-title')?.value?.trim();
+            const description = document.getElementById('node-task-desc')?.value?.trim();
+            const priority = document.getElementById('node-task-priority')?.value;
+            const tagsStr = document.getElementById('node-task-tags')?.value?.trim();
+            
+            if (title) {
+                node.title = title;
+            }
+            
+            if (!node.taskData) {
+                node.taskData = {};
+            }
+            
+            node.taskData.title = title || node.title;
+            node.taskData.description = description || '';
+            node.taskData.priority = priority || 'medium';
+            node.taskData.tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => t) : [];
+            node.updatedAt = new Date().toISOString();
+            
+            PPM.saveBoards();
+            this.render();
+            
+            console.log('Node task saved:', nodeId);
+        } catch (err) {
+            console.error('saveNodeTaskFromModal error:', err);
+        }
+    },
+    
+    // Toggle checklist item in node task
+    toggleNodeChecklistItem: function(nodeId, index) {
+        const board = PPM.getCurrentBoard();
+        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+        
+        if (node && node.taskData && node.taskData.checklist && node.taskData.checklist[index]) {
+            node.taskData.checklist[index].completed = !node.taskData.checklist[index].completed;
+            PPM.saveBoards();
+        }
+    },
+    
+    // Add checklist item to node task
+    addNodeChecklistItem: function(nodeId) {
+        const board = PPM.getCurrentBoard();
+        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+        const input = document.getElementById('node-task-new-checklist');
+        
+        if (!input) return;
+        
+        const text = input.value.trim();
+        if (!text) {
+            alert('Please enter checklist item text');
+            return;
+        }
+        
+        if (!node.taskData) node.taskData = {};
+        if (!node.taskData.checklist) node.taskData.checklist = [];
+        
+        node.taskData.checklist.push({
+            text: text,
+            completed: false
+        });
+        
+        PPM.saveBoards();
+        input.value = '';
+        
+        // Re-render modal
+        this.openTaskModal(nodeId);
+    },
+    
+    // Remove checklist item from node task
+    removeNodeChecklistItem: function(nodeId, index) {
+        if (!confirm('Remove this checklist item?')) return;
+        
+        const board = PPM.getCurrentBoard();
+        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+        
+        if (node && node.taskData && node.taskData.checklist) {
+            node.taskData.checklist.splice(index, 1);
+            PPM.saveBoards();
+            this.openTaskModal(nodeId);
+        }
+    },
+    
+    // Show add attachment dialog
+    showAddAttachmentDialog: function(nodeId) {
+        const type = prompt('Attachment type:\n1. Link\n2. Note\n3. File\n\nEnter 1, 2, or 3:');
+        
+        if (!type || !['1', '2', '3'].includes(type)) return;
+        
+        const board = PPM.getCurrentBoard();
+        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+        if (!node) return;
+        
+        if (!node.taskData) node.taskData = {};
+        if (!node.taskData.attachments) node.taskData.attachments = [];
+        
+        let attachment;
+        
+        if (type === '1') {
+            const url = prompt('Enter URL:');
+            if (!url) return;
+            const title = prompt('Link title (optional):') || url;
+            attachment = { type: 'link', url, title };
+        } else if (type === '2') {
+            const content = prompt('Enter note:');
+            if (!content) return;
+            const title = prompt('Note title (optional):') || 'Note';
+            attachment = { type: 'note', content, title };
+        } else {
+            alert('File attachments will be available in future updates');
+            return;
+        }
+        
+        node.taskData.attachments.push(attachment);
+        PPM.saveBoards();
+        this.openTaskModal(nodeId);
+    },
+    
+    // Remove attachment from node task
+    removeNodeAttachment: function(nodeId, index) {
+        if (!confirm('Remove this attachment?')) return;
+        
+        const board = PPM.getCurrentBoard();
+        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+        
+        if (node && node.taskData && node.taskData.attachments) {
+            node.taskData.attachments.splice(index, 1);
+            PPM.saveBoards();
+            this.openTaskModal(nodeId);
+        }
+    },
+    
+    // Delete node task
+    deleteNodeTask: function(nodeId) {
+        if (!confirm('Delete this task and the entire node?')) return;
+        
+        this.deleteNode(nodeId);
+        PPM.closeCardModal();
     },
     
     // Filter board by node
