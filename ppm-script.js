@@ -2529,16 +2529,32 @@ PPM.dynamicList = {
     
     // Render tree
     render: function() {
-        const board = PPM.getCurrentBoard();
-        const container = document.getElementById('dynamic-list-tree');
-        const emptyState = document.getElementById('tree-empty-state');
+        try {
+            const board = PPM.getCurrentBoard();
+            if (!board || !board.dynamicList) {
+                console.error('Board or dynamicList not found in render()');
+                return;
+            }
+            
+            const container = document.getElementById('dynamic-list-tree');
+            const emptyState = document.getElementById('tree-empty-state');
+            
+            if (!container) {
+                console.error('dynamic-list-tree container not found');
+                return;
+            }
         
         if (!board.dynamicList.nodes || board.dynamicList.nodes.length === 0) {
-            emptyState.classList.remove('hidden');
-            return;
-        }
-        
-        emptyState.classList.add('hidden');
+                if (emptyState) {
+                    emptyState.classList.remove('hidden');
+                }
+                container.innerHTML = '';
+                return;
+            }
+            
+            if (emptyState) {
+                emptyState.classList.add('hidden');
+            }
         
         // Render root nodes
         const rootNodes = board.dynamicList.nodes.filter(n => !n.parentId);
@@ -2549,7 +2565,10 @@ PPM.dynamicList = {
         }
         
         container.innerHTML = html;
-        this.updateModeUI();
+            this.updateModeUI();
+        } catch (err) {
+            console.error('render() error:', err);
+        }
     },
     
     // Render single node
@@ -2680,27 +2699,70 @@ PPM.dynamicList = {
     
     // Open task modal for task nodes
     openTaskModal: function(nodeId) {
-        const board = PPM.getCurrentBoard();
-        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
-        
-        if (!node || !node.taskData) {
+        try {
+            const board = PPM.getCurrentBoard();
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            
+            if (!node) {
+                alert('Node not found');
+                return;
+            }
+            
             // Initialize task data if doesn't exist
-            node.taskData = {
-                title: node.title,
-                description: '',
-                priority: 'medium',
-                tags: [],
-                assignments: {owner: null, executor: null, supervisor: null},
-                schedule: {startDate: null, dueDate: null, estimatedHours: null},
-                checklist: [],
-                comments: [],
-                attachments: []
+            if (!node.taskData) {
+                node.taskData = {
+                    title: node.title,
+                    description: '',
+                    priority: 'medium',
+                    tags: [],
+                    assignments: {owner: null, executor: null, supervisor: null},
+                    schedule: {startDate: null, dueDate: null, estimatedHours: null},
+                    checklist: [],
+                    comments: [],
+                    attachments: []
+                };
+            }
+            
+            // Create a temporary card object to use with existing modal
+            const tempCard = {
+                id: `node-task-${nodeId}`,
+                title: node.taskData.title || node.title,
+                description: node.taskData.description || '',
+                priority: node.taskData.priority || 'medium',
+                tags: node.taskData.tags || [],
+                assignments: node.taskData.assignments || {owner: null, executor: null, supervisor: null},
+                schedule: node.taskData.schedule || {startDate: null, dueDate: null, estimatedHours: null},
+                checklist: node.taskData.checklist || [],
+                comments: node.taskData.comments || [],
+                attachments: node.taskData.attachments || [],
+                linkedBacklogItems: [],
+                milestoneId: null,
+                categoryId: null,
+                groupIds: [],
+                columnId: null,
+                _isNodeTask: true,
+                _nodeId: nodeId
             };
+            
+            // Use PPM.ui.openCardDetails if available
+            if (PPM.ui && PPM.ui.openCardDetails) {
+                PPM.ui.openCardDetails(tempCard);
+            } else {
+                // Fallback: show basic info
+                const desc = node.taskData.description || 'No description';
+                const priority = node.taskData.priority;
+                alert(`Task: ${node.title}
+
+Description: ${desc}
+
+Priority: ${priority}
+
+Note: Full task editing will be available when the card modal is properly integrated.`);
+            }
+        } catch (err) {
+            console.error('openTaskModal error:', err);
+            alert('Failed to open task modal: ' + err.message);
         }
-        
-        // Use existing card modal but populate with task data
-        // TODO: Implement task modal integration
-        alert(`Task Modal: ${node.title}\n\nThis will open a full task modal in the complete implementation.`);
     },
     
     // Filter board by node
@@ -2855,7 +2917,7 @@ PPM.dynamicList = {
     },
     
     // Save node (create or update)
-    saveNode: function() {
+    saveNode: async function() {
         try {
             const board = PPM.getCurrentBoard();
             if (!board) {
@@ -2934,9 +2996,16 @@ PPM.dynamicList = {
                 board.dynamicList.nodes.push(newNode);
             }
             
-            PPM.saveBoards();
-            this.render();
+            // Close dialog first to avoid DOM conflicts
             this.closeNodeDialog();
+            
+            // Save and render
+            await PPM.saveBoards();
+            
+            // Delay render slightly to ensure DOM is ready
+            setTimeout(() => {
+                this.render();
+            }, 50);
         } catch (err) {
             console.error('saveNode error:', err);
             alert('Failed to save node: ' + err.message);
@@ -2944,7 +3013,7 @@ PPM.dynamicList = {
     },
     
     // Delete node
-    deleteNode: function(nodeId) {
+    deleteNode: async function(nodeId) {
         try {
             const board = PPM.getCurrentBoard();
             if (!board || !board.dynamicList) {
