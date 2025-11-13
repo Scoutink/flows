@@ -3124,60 +3124,114 @@ PPM.dynamicList = {
     
     // Filter board by node
     filterByNode: function(nodeId) {
-        const board = PPM.getCurrentBoard();
-        const taskIds = new Set();
-        
-        // Recursively get all task IDs from this node and descendants
-        const collectTasks = (nId) => {
-            const node = board.dynamicList.nodes.find(n => n.id === nId);
-            if (!node) return;
-            
-            if (node.linkedTaskIds) {
-                node.linkedTaskIds.forEach(id => taskIds.add(id));
+        try {
+            const board = PPM.getCurrentBoard();
+            if (!board || !board.dynamicList) {
+                console.error('Board or dynamicList not found');
+                return;
             }
             
-            const children = board.dynamicList.nodes.filter(n => n.parentId === nId);
-            children.forEach(child => collectTasks(child.id));
-        };
-        
-        collectTasks(nodeId);
-        
-        // Apply filter to board
-        this.activeFilterNodeId = nodeId;
-        const cards = document.querySelectorAll('.board-card');
-        
-        cards.forEach(card => {
-            const cardId = card.dataset.cardId;
-            if (taskIds.has(cardId)) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            if (!node) {
+                console.error('Node not found:', nodeId);
+                return;
             }
-        });
-        
-        // Show clear filter button
-        const clearBtn = document.getElementById('clear-list-filter-btn');
-        clearBtn.classList.remove('hidden');
-        
-        // Highlight the active node
-        this.render();
+            
+            const taskIds = new Set();
+            
+            // Recursively get all task IDs from this node and descendants
+            const collectTasks = (nId) => {
+                const n = board.dynamicList.nodes.find(node => node.id === nId);
+                if (!n) return;
+                
+                if (n.linkedTaskIds && Array.isArray(n.linkedTaskIds)) {
+                    n.linkedTaskIds.forEach(id => taskIds.add(id));
+                }
+                
+                const children = board.dynamicList.nodes.filter(node => node.parentId === nId);
+                children.forEach(child => collectTasks(child.id));
+            };
+            
+            collectTasks(nodeId);
+            
+            console.log(`Filtering by node "${node.title}" (${nodeId})`);
+            console.log(`Collected ${taskIds.size} task IDs:`, Array.from(taskIds));
+            
+            // Apply filter to board - use correct selector for cards in columns
+            const cards = document.querySelectorAll('.card[data-card-id]');
+            
+            console.log(`Found ${cards.length} cards in DOM`);
+            
+            if (cards.length === 0) {
+                alert('No cards found on board to filter');
+                return;
+            }
+            
+            let shownCount = 0;
+            let hiddenCount = 0;
+            
+            cards.forEach(card => {
+                const cardId = card.getAttribute('data-card-id');
+                if (taskIds.has(cardId)) {
+                    card.style.display = '';
+                    shownCount++;
+                } else {
+                    card.style.display = 'none';
+                    hiddenCount++;
+                }
+            });
+            
+            console.log(`Filtered: ${shownCount} shown, ${hiddenCount} hidden`);
+            
+            // Set active filter
+            this.activeFilterNodeId = nodeId;
+            
+            // Show clear filter button
+            const clearBtn = document.getElementById('clear-list-filter-btn');
+            if (clearBtn) {
+                clearBtn.classList.remove('hidden');
+            }
+            
+            // Highlight the active node
+            this.render();
+            
+            // Show user feedback
+            if (taskIds.size === 0) {
+                alert(`No tasks linked to "${node.title}"\n\nLink tasks by opening a task card and checking this node in the "Dynamic List Connections" section.`);
+            }
+        } catch (err) {
+            console.error('filterByNode error:', err);
+            alert('Failed to filter board: ' + err.message);
+        }
     },
     
     // Clear filter
     clearFilter: function() {
-        this.activeFilterNodeId = null;
-        
-        // Show all cards
-        const cards = document.querySelectorAll('.board-card');
-        cards.forEach(card => {
-            card.style.display = '';
-        });
-        
-        // Hide clear filter button
-        const clearBtn = document.getElementById('clear-list-filter-btn');
-        clearBtn.classList.add('hidden');
-        
-        this.render();
+        try {
+            this.activeFilterNodeId = null;
+            
+            // Show all cards - use correct selector
+            const cards = document.querySelectorAll('.card[data-card-id]');
+            
+            console.log(`Clearing filter, restoring ${cards.length} cards`);
+            
+            cards.forEach(card => {
+                card.style.display = '';
+            });
+            
+            // Hide clear filter button
+            const clearBtn = document.getElementById('clear-list-filter-btn');
+            if (clearBtn) {
+                clearBtn.classList.add('hidden');
+            }
+            
+            this.render();
+            
+            console.log('Filter cleared, all cards visible');
+        } catch (err) {
+            console.error('clearFilter error:', err);
+            alert('Failed to clear filter: ' + err.message);
+        }
     },
     
     // Show node dialog (create or add child)
