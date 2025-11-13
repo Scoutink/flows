@@ -12,7 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const flowSelect = document.getElementById('flow-select');
     const flowNewBtn = document.getElementById('flow-new');
     const flowRenameBtn = document.getElementById('flow-rename');
+    const flowUnlinkBtn = document.getElementById('flow-unlink');
     const flowDeleteBtn = document.getElementById('flow-delete');
+    const linkedIndicator = document.getElementById('linked-indicator');
     const modal = {
         backdrop: document.getElementById('modal-backdrop'),
         title: document.getElementById('modal-title'),
@@ -108,6 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const saveWorkflow = async () => {
         try {
+            // Propagate changes to linked workflows
+            if (appState.currentMode === 'creation') {
+                propagateToLinkedWorkflows(appState.currentFlowId);
+            }
+            
             const res = await fetch('save_workflow.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -180,6 +187,111 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Save workflow links error:', e);
             return false;
         }
+    };
+
+    // ===== LINKED WORKFLOWS MANAGEMENT =====
+    const getLinkedWorkflows = (flowId) => {
+        for (const linkGroup of appState.workflowLinks.links) {
+            if (linkGroup.workflows.includes(flowId)) {
+                return linkGroup.workflows.filter(id => id !== flowId);
+            }
+        }
+        return [];
+    };
+
+    const isWorkflowLinked = (flowId) => {
+        return appState.workflowLinks.links.some(group => group.workflows.includes(flowId));
+    };
+
+    const createLinkGroup = (flowId1, flowId2) => {
+        const linkGroup = {
+            groupId: generateId('link'),
+            workflows: [flowId1, flowId2]
+        };
+        appState.workflowLinks.links.push(linkGroup);
+        return linkGroup.groupId;
+    };
+
+    const addToLinkGroup = (flowId, existingFlowId) => {
+        for (const linkGroup of appState.workflowLinks.links) {
+            if (linkGroup.workflows.includes(existingFlowId)) {
+                if (!linkGroup.workflows.includes(flowId)) {
+                    linkGroup.workflows.push(flowId);
+                }
+                return linkGroup.groupId;
+            }
+        }
+        return null;
+    };
+
+    const unlinkWorkflow = (flowId) => {
+        appState.workflowLinks.links = appState.workflowLinks.links.map(group => {
+            return {
+                ...group,
+                workflows: group.workflows.filter(id => id !== flowId)
+            };
+        }).filter(group => group.workflows.length > 1);
+        saveWorkflowLinks();
+    };
+
+    const propagateToLinkedWorkflows = (sourceFlowId) => {
+        const linkedFlowIds = getLinkedWorkflows(sourceFlowId);
+        if (linkedFlowIds.length === 0) return;
+
+        const sourceFlow = appState.workflow.flows.find(f => f.id === sourceFlowId);
+        if (!sourceFlow) return;
+
+        linkedFlowIds.forEach(targetFlowId => {
+            const targetFlow = appState.workflow.flows.find(f => f.id === targetFlowId);
+            if (!targetFlow) return;
+
+            // Only propagate if templates match
+            if (targetFlow.templateId !== sourceFlow.templateId) {
+                console.warn(`Cannot propagate to ${targetFlow.name}: different template`);
+                return;
+            }
+
+            // Deep clone the structure from source
+            const clonedData = deepCopy(sourceFlow.data);
+            
+            // Map old IDs to new IDs for execution state preservation
+            const idMap = new Map();
+            
+            const regenerateIds = (node, targetNode) => {
+                if (targetNode) {
+                    idMap.set(node.id, targetNode.id);
+                    node.id = targetNode.id;
+                } else {
+                    const oldId = node.id;
+                    node.id = generateId(node.id.split('-')[0]);
+                    idMap.set(oldId, node.id);
+                }
+                
+                (node.subcategories || []).forEach((child, idx) => {
+                    const targetChild = targetNode?.subcategories?.[idx];
+                    regenerateIds(child, targetChild);
+                });
+            };
+            
+            // Match up nodes and regenerate IDs
+            clonedData.forEach((node, idx) => {
+                const targetNode = targetFlow.data[idx];
+                regenerateIds(node, targetNode);
+            });
+            
+            // Preserve execution state with ID mapping
+            const targetExec = appState.executions.flows[targetFlowId];
+            if (targetExec) {
+                const newCompleted = {};
+                Object.entries(targetExec.completed).forEach(([oldId, value]) => {
+                    const newId = idMap.get(oldId) || oldId;
+                    newCompleted[newId] = value;
+                });
+                targetExec.completed = newCompleted;
+            }
+            
+            targetFlow.data = clonedData;
+        });
     };
 
     // ===== FLOW HELPERS =====
@@ -279,8 +391,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ===== TEMPLATE-BASED WORKFLOW CREATION =====
-    const createFlowFromTemplate = async (name, templateId) => {
-        const template = appState.templates.find(t => t.id === templateId);
+    const createFlowFromTemplate = async (name, templateId, providedTemplate = null) => {
+        const template = providedTemplate || appState.templates.find(t => t.id === templateId);
         if (!template) {
             alert('Template not found!');
             return;
@@ -328,7 +440,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <label for="creation-mode">Creation Mode</label>
                 <select id="creation-mode" required onchange="toggleCreationMode(this.value)">
                     <option value="template">From Template</option>
+                    <option value="empty">Empty Workflow (Quick Start)</option>
                     <option value="copy">Copy Existing Workflow</option>
+                    <option value="linked">Linked Workflow (Synchronized)</option>
                 </select>
                 
                 <div id="template-section">
@@ -348,6 +462,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     </p>
                 </div>
                 
+                
+                
+                <div id="empty-section" style="display: none;">
+                    <label for="empty-name">Workflow Name <span style="color: #ef4444;">*</span></label>
+                    <input type="text" id="empty-name" placeholder="e.g., Quick Checklist">
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                        <i class="fa-solid fa-info-circle"></i> Creates a simple 1-level workflow with all properties enabled
+                    </p>
+                </div>
+                
                 <div id="copy-section" style="display: none;">
                     <label for="copy-name">New Workflow Name <span style="color: #ef4444;">*</span></label>
                     <input type="text" id="copy-name" placeholder="e.g., Copy of Workflow">
@@ -361,7 +485,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     </p>
                 </div>
                 
-                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
+
+                
+                <div id="linked-section" style="display: none;">
+                    <label for="linked-name">New Workflow Name <span style="color: #ef4444;">*</span></label>
+                    <input type="text" id="linked-name" placeholder="e.g., Team B Workflow">
+                    
+                    <label for="linked-source">Link To <span style="color: #ef4444;">*</span></label>
+                    <select id="linked-source">
+                        ${existingFlows || '<option value="">No workflows available</option>'}
+                    </select>
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                        <i class="fa-solid fa-link"></i> <strong>Linked workflows stay synchronized:</strong> structural changes in one automatically update all linked workflows
+                    </p>
+                    <p style="margin-top: 0.25rem; font-size: 0.875rem; color: var(--text-secondary);">
+                        <i class="fa-solid fa-info-circle"></i> Perfect for managing same requirements across multiple teams or regions
+                    </p>
+                </div>
+                
+                                <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem; justify-content: flex-end;">
                     <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn-primary">
                         <i class="fa-solid fa-plus"></i> Create Workflow
@@ -373,7 +515,9 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal('Create New Workflow', html, () => {
             window.toggleCreationMode = (mode) => {
                 document.getElementById('template-section').style.display = mode === 'template' ? 'block' : 'none';
+                document.getElementById('empty-section').style.display = mode === 'empty' ? 'block' : 'none';
                 document.getElementById('copy-section').style.display = mode === 'copy' ? 'block' : 'none';
+                document.getElementById('linked-section').style.display = mode === 'linked' ? 'block' : 'none';
             };
 
             const form = document.getElementById('create-flow-form');
@@ -385,10 +529,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     const name = document.getElementById('flow-name').value.trim();
                     const templateId = document.getElementById('flow-template').value;
                     await createFlowFromTemplate(name, templateId);
-                } else {
+                } else if (mode === 'empty') {
+                    const name = document.getElementById('empty-name').value.trim();
+                    await createEmptyWorkflow(name);
+                } else if (mode === 'copy') {
                     const name = document.getElementById('copy-name').value.trim();
                     const sourceId = document.getElementById('copy-source').value;
                     await copyWorkflow(name, sourceId);
+                } else if (mode === 'linked') {
+                    const name = document.getElementById('linked-name').value.trim();
+                    const sourceId = document.getElementById('linked-source').value;
+                    await createLinkedWorkflow(name, sourceId);
                 }
                 closeModal();
             });
@@ -441,6 +592,108 @@ document.addEventListener('DOMContentLoaded', () => {
         await saveWorkflow();
         await saveExecutions();
     };
+
+    const createEmptyWorkflow = async (name) => {
+        // Find or create "Empty" template (simple 1-level with all properties)
+        let emptyTemplate = appState.templates.find(t => t.name === 'Empty' || t.name === 'Simple Workflow');
+        
+        if (!emptyTemplate) {
+            // Create a basic empty template
+            emptyTemplate = {
+                id: 'template-empty-default',
+                name: 'Empty',
+                description: 'Simple 1-level workflow with all properties enabled',
+                isDefault: false,
+                version: '1.0.0',
+                workflowConfig: {
+                    enableIcon: true,
+                    enableDescription: true,
+                    enableSequentialOrder: true
+                },
+                levels: [{
+                    id: 'level-empty-1',
+                    order: 0,
+                    name: 'Item',
+                    singularName: 'Item',
+                    pluralName: 'Items',
+                    description: 'Workflow items',
+                    unitConfig: {
+                        enableIcon: true,
+                        enableUnitId: true,
+                        enableName: true,
+                        enableDescription: true,
+                        enableTags: true,
+                        enableDone: true,
+                        enableGrade: true,
+                        gradeCumulative: false,
+                        enableProgressBar: false,
+                        enableLinks: true,
+                        enableImages: true,
+                        enableNotes: true,
+                        enableComments: true
+                    }
+                }]
+            };
+        }
+        
+        await createFlowFromTemplate(name, emptyTemplate.id, emptyTemplate);
+    };
+
+    const createLinkedWorkflow = async (name, sourceFlowId) => {
+        const sourceFlow = appState.workflow.flows.find(f => f.id === sourceFlowId);
+        if (!sourceFlow) {
+            alert('Source workflow not found!');
+            return;
+        }
+
+        // Deep clone the source flow
+        const newFlow = deepCopy(sourceFlow);
+        newFlow.id = generateId('flow');
+        newFlow.name = name;
+        newFlow.createdAt = new Date().toISOString();
+        newFlow.updatedAt = new Date().toISOString();
+
+        // Regenerate all unit IDs to avoid conflicts
+        const regenerateUnitIds = (unit) => {
+            const oldId = unit.id;
+            unit.id = generateId('unit');
+            
+            // Update execution state mapping
+            const exec = ensureExecFlow(sourceFlowId);
+            if (exec.completed[oldId]) {
+                ensureExecFlow(newFlow.id).completed[unit.id] = exec.completed[oldId];
+            }
+            
+            if (unit.subcategories) {
+                unit.subcategories.forEach(regenerateUnitIds);
+            }
+        };
+
+        newFlow.data.forEach(regenerateUnitIds);
+
+        // Add to link group
+        if (isWorkflowLinked(sourceFlowId)) {
+            addToLinkGroup(newFlow.id, sourceFlowId);
+        } else {
+            createLinkGroup(sourceFlowId, newFlow.id);
+        }
+        await saveWorkflowLinks();
+
+        appState.workflow.flows.push(newFlow);
+        appState.currentFlowId = newFlow.id;
+        
+        // Set mode to creation for linked workflows
+        appState.currentMode = 'creation';
+        if (modeSwitch) {
+            modeSwitch.checked = false;
+        }
+        
+        populateFlowSelect();
+        render();
+        await saveWorkflow();
+        await saveExecutions();
+    };
+
 
     // ===== DYNAMIC RENDERING =====
     const render = () => {
@@ -1383,6 +1636,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (appState.workflow.flows.length === 0) {
             flowSelect.innerHTML = '<option value="">No workflows yet</option>';
         }
+        
+        // Update linked indicator
+        const currentFlow = getCurrentFlow();
+        if (linkedIndicator && currentFlow) {
+            const isLinked = isWorkflowLinked(currentFlow.id);
+            linkedIndicator.style.display = isLinked ? 'inline-flex' : 'none';
+            if (flowUnlinkBtn) {
+                flowUnlinkBtn.style.display = isLinked ? '' : 'none';
+            }
+        }
     };
 
     const renameFlow = () => {
@@ -1401,6 +1664,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!flow) return;
         
         if (!confirm(`Delete workflow "${flow.name}"? This cannot be undone.`)) return;
+        
+        // Unlink if linked
+        unlinkWorkflow(flow.id);
         
         appState.workflow.flows = appState.workflow.flows.filter(f => f.id !== flow.id);
         
@@ -1479,6 +1745,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (flowDeleteBtn) {
+        if (flowUnlinkBtn) {
+            flowUnlinkBtn.addEventListener('click', () => {
+                if (appState.currentMode !== 'creation') return;
+                if (!confirm('Unlink this workflow? It will become independent and stop syncing with linked workflows.')) return;
+                unlinkWorkflow(appState.currentFlowId);
+                render();
+            });
+        }
+        
             flowDeleteBtn.addEventListener('click', deleteFlow);
         }
         
