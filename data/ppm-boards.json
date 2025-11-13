@@ -1379,413 +1379,354 @@
       ]
     },
     {
-      "id": "board-1763046162721-94586",
+      "id": "board-1763046668981-ufv7d",
       "name": "BoardSample",
-      "description": "Sample board demonstrating V7 workflow integration with Rules as References, Actions as Categories, and Evidences as Tasks",
-      "createdAt": "2025-11-13T15:02:42.721430",
-      "updatedAt": "2025-11-13T15:02:42.721430",
-      "createdBy": "system",
-      "theme": "light",
-      "columns": [
+      "description": "Sample board demonstrating workflow integration",
+      "sourceControlId": null,
+      "sourceFlowId": null,
+      "createdAt": "2025-11-13T15:11:08.981Z",
+      "createdBy": "user-default-001",
+      "archived": false,
+      "members": [
         {
-          "id": "col-1763046162721-15047",
-          "name": "References",
-          "order": 0,
-          "locked": true,
-          "wipLimit": null
-        },
-        {
-          "id": "col-1763046162721-29615",
-          "name": "To Do",
-          "order": 1,
-          "locked": false,
-          "wipLimit": 5
-        },
-        {
-          "id": "col-1763046162721-72203",
-          "name": "In Progress",
-          "order": 2,
-          "locked": false,
-          "wipLimit": 5
-        },
-        {
-          "id": "col-1763046162721-13710",
-          "name": "Review",
-          "order": 3,
-          "locked": false,
-          "wipLimit": 5
-        },
-        {
-          "id": "col-1763046162721-70986",
-          "name": "Done",
-          "order": 4,
-          "locked": false,
-          "wipLimit": null
+          "userId": "user-default-001",
+          "name": "Default User",
+          "email": "user@company.com",
+          "role": "admin",
+          "avatar": "",
+          "joinedAt": "2025-11-13T15:11:08.981Z"
         }
       ],
-      "milestones": [
+      "columns": [
         {
-          "id": "milestone-1763046162721-59079",
-          "name": "Phase 1: Asset Discovery",
-          "description": "Initial asset inventory and identification phase",
-          "color": "#3b82f6",
-          "targetDate": "2025-12-13T15:02:42.721430",
-          "status": "in_progress",
-          "linkedCards": [
-            "card-1763046162721-72547",
-            "card-1763046202920-22215",
-            "card-1763046202920-92890",
-            "card-1763046202920-71997",
-            "card-1763046202920-83289"
-          ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "id": "col-1763046668981-tdndr",
+          "name": "References",
+          "order": 0,
+          "limit": null,
+          "color": "#6c757d",
+          "locked": true
         },
         {
-          "id": "milestone-1763046162721-55528",
+          "id": "col-1763046668981-hd0f3",
+          "name": "To Do",
+          "order": 1,
+          "limit": null,
+          "color": "#0d6efd"
+        },
+        {
+          "id": "col-1763046668981-i77m6",
+          "name": "In Progress",
+          "order": 2,
+          "limit": 5,
+          "color": "#0dcaf0"
+        },
+        {
+          "id": "col-1763046668981-bdazt",
+          "name": "Review",
+          "order": 3,
+          "limit": null,
+          "color": "#ffc107"
+        },
+        {
+          "id": "col-1763046668981-l0rbf",
+          "name": "Done",
+          "order": 4,
+          "limit": null,
+          "color": "#198754"
+        }
+      ],
+      "cards": [],
+      "labels": [],
+      "milestones": [
+        {
+          "id": "milestone-1763046855847-16571",
+          "name": "Phase 1: Asset Discovery",
+          "description": "Initial asset inventory and identification",
+          "color": "#3b82f6",
+          "targetDate": "2025-12-13",
+          "status": "in_progress",
+          "linkedCards": [
+            "card-1763046855847-62414",
+            "card-1763046855847-82321"
+          ],
+          "createdAt": "2025-11-13T15:14:15.846958"
+        },
+        {
+          "id": "milestone-1763046855847-71109",
           "name": "Phase 2: Documentation & Compliance",
           "description": "Documentation and compliance verification",
           "color": "#8b5cf6",
-          "targetDate": "2026-01-12T15:02:42.721430",
+          "targetDate": "2026-01-12",
           "status": "in_progress",
           "linkedCards": [
-            "card-1763046162721-41897",
-            "card-1763046162721-31119",
-            "card-1763046202920-73730",
-            "card-1763046202920-55385"
+            "card-1763046855847-53038",
+            "card-1763046855847-26771",
+            "card-1763046855847-15256",
+            "card-1763046855848-67187"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
-          "id": "milestone-1763046162721-18073",
+          "id": "milestone-1763046855847-54101",
           "name": "Phase 3: Governance Setup",
-          "description": "Establish governance frameworks and policies",
+          "description": "Establish governance frameworks",
           "color": "#ec4899",
-          "targetDate": "2026-02-11T15:02:42.721430",
+          "targetDate": "2026-02-11",
           "status": "in_progress",
           "linkedCards": [
-            "card-1763046162721-65352",
-            "card-1763046162721-75606",
-            "card-1763046162721-24179",
-            "card-1763046162721-62204",
-            "card-1763046162721-67156",
-            "card-1763046202920-90090",
-            "card-1763046202920-35909",
-            "card-1763046202920-10633",
-            "card-1763046202920-74016",
-            "card-1763046202920-34900",
-            "card-1763046202920-86204",
-            "card-1763046202920-72164",
-            "card-1763046202920-10976",
-            "card-1763046202920-46434"
+            "card-1763046855847-87093",
+            "card-1763046855847-76659",
+            "card-1763046855847-98192",
+            "card-1763046855847-33253",
+            "card-1763046855847-43925",
+            "card-1763046855848-47032"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
-          "id": "milestone-1763046162721-40279",
+          "id": "milestone-1763046855847-86735",
           "name": "Q4 Completion",
-          "description": "Final review and certification readiness",
+          "description": "Final review and certification",
           "color": "#f59e0b",
-          "targetDate": "2026-03-13T15:02:42.721430",
+          "targetDate": "2026-03-13",
           "status": "in_progress",
           "linkedCards": [
-            "card-1763046162721-63942",
-            "card-1763046162721-92705",
-            "card-1763046162721-31625",
-            "card-1763046202920-63893",
-            "card-1763046202920-84459",
-            "card-1763046202920-44483",
-            "card-1763046202920-45570",
-            "card-1763046202920-94346"
+            "card-1763046855847-65289",
+            "card-1763046855847-83514",
+            "card-1763046855847-10228",
+            "card-1763046855848-92787"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         }
       ],
       "categories": [
         {
           "id": "act-1761691229395-p0u6n",
-          "name": "ID.AM-1: Inventarisatie van de binnen de organisat...",
+          "name": "ID.AM-1: Inventarisatie van de binnen de organisatie gebruik...",
           "color": "#10b981",
-          "description": "Category for ID.AM-1: Inventarisatie van de...",
+          "description": "Category from workflow action",
           "linkedCards": [
-            "card-1763046162721-63942",
-            "card-1763046162721-95595",
-            "card-1763046162721-35879",
-            "card-1763046162721-46192",
-            "card-1763046202919-52393",
-            "card-1763046202920-90090",
-            "card-1763046202920-42707",
-            "card-1763046202920-35909"
+            "card-1763046855847-87093",
+            "card-1763046855847-76659",
+            "card-1763046855847-62414",
+            "card-1763046855847-72441"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
           "id": "act-1761691229395-mejij",
-          "name": "ID.AM-2: Inventarisatie van de binnen de organisat...",
+          "name": "ID.AM-2: Inventarisatie van de binnen de organisatie gebruik...",
           "color": "#06b6d4",
-          "description": "Category for ID.AM-2: Inventarisatie van de...",
+          "description": "Category from workflow action",
           "linkedCards": [
-            "card-1763046162721-72547",
-            "card-1763046162721-65352",
-            "card-1763046162721-41897",
-            "card-1763046162721-11503",
-            "card-1763046162721-17150",
-            "card-1763046202920-73730",
-            "card-1763046202920-10633",
-            "card-1763046202920-63893",
-            "card-1763046202920-74016",
-            "card-1763046202920-22215"
+            "card-1763046855847-65289",
+            "card-1763046855847-16584",
+            "card-1763046855847-43328",
+            "card-1763046855847-53038",
+            "card-1763046855847-98192"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
           "id": "act-1761691229395-umzq9",
-          "name": "ID.AM-3: De organisatorische communicatie- en gege...",
+          "name": "ID.AM-3: De organisatorische communicatie- en gegevensstrome...",
           "color": "#6366f1",
-          "description": "Category for ID.AM-3: De organisatorische c...",
+          "description": "Category from workflow action",
           "linkedCards": [
-            "card-1763046162721-60296",
-            "card-1763046162721-92705",
-            "card-1763046162721-19442",
-            "card-1763046202920-92890",
-            "card-1763046202920-71997",
-            "card-1763046202920-34900"
+            "card-1763046855847-33253",
+            "card-1763046855847-83514",
+            "card-1763046855847-10228"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
           "id": "act-1761691229395-dmelz",
-          "name": "ID.AM-4: Externe informatiesystemen worden gecatal...",
+          "name": "ID.AM-4: Externe informatiesystemen worden gecatalogiseerd.",
           "color": "#8b5cf6",
-          "description": "Category for ID.AM-4: Externe informatiesys...",
+          "description": "Category from workflow action",
           "linkedCards": [
-            "card-1763046162721-52306",
-            "card-1763046162721-77186",
-            "card-1763046202920-84459",
-            "card-1763046202920-86204"
+            "card-1763046855847-26771",
+            "card-1763046855847-43925"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
           "id": "act-1761691229395-327r4",
-          "name": "ID.AM-5: Middelen worden geprioriteerd op basis va...",
+          "name": "ID.AM-5: Middelen worden geprioriteerd op basis van hun clas...",
           "color": "#d946ef",
-          "description": "Category for ID.AM-5: Middelen worden gepri...",
+          "description": "Category from workflow action",
           "linkedCards": [
-            "card-1763046162721-76104",
-            "card-1763046202920-67546"
+            "card-1763046855847-81955"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
           "id": "act-1761691229395-wx7zs",
-          "name": "ID.AM-6: Rollen, verantwoordelijkheden en bevoegdh...",
+          "name": "ID.AM-6: Rollen, verantwoordelijkheden en bevoegdheden op he...",
           "color": "#f97316",
-          "description": "Category for ID.AM-6: Rollen, verantwoordel...",
+          "description": "Category from workflow action",
           "linkedCards": [
-            "card-1763046162721-31119",
-            "card-1763046162721-75606",
-            "card-1763046202920-58475",
-            "card-1763046202920-72164"
+            "card-1763046855847-58492",
+            "card-1763046855847-82321"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
           "id": "act-1761691229395-xg74h",
-          "name": "ID.BE-1: De rol van de organisatie in de toeleveri...",
+          "name": "ID.BE-1: De rol van de organisatie in de toeleveringsketen m...",
           "color": "#eab308",
-          "description": "Category for ID.BE-1: De rol van de organis...",
+          "description": "Category from workflow action",
           "linkedCards": [
-            "card-1763046162721-24179",
-            "card-1763046162721-31625",
-            "card-1763046202920-41747",
-            "card-1763046202920-46877"
+            "card-1763046855847-15789",
+            "card-1763046855847-15256"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
           "id": "act-1761691229395-3h4b4",
-          "name": "ID.BE-2: De plaats van de organisatie in de kritie...",
+          "name": "ID.BE-2: De plaats van de organisatie in de kritieke infrast...",
           "color": "#84cc16",
-          "description": "Category for ID.BE-2: De plaats van de orga...",
+          "description": "Category from workflow action",
           "linkedCards": [
-            "card-1763046162721-37766",
-            "card-1763046202920-44483"
+            "card-1763046855848-54702"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
           "id": "act-1761691229395-asn2l",
-          "name": "ID.BE-3: Prioriteiten met betrekking tot de missie...",
+          "name": "ID.BE-3: Prioriteiten met betrekking tot de missie, doelstel...",
           "color": "#14b8a6",
-          "description": "Category for ID.BE-3: Prioriteiten met betr...",
+          "description": "Category from workflow action",
           "linkedCards": [
-            "card-1763046162721-66452",
-            "card-1763046202920-55385"
+            "card-1763046855848-68880"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
           "id": "act-1761691229395-kwiel",
-          "name": "ID.BE-4: Afhankelijkheden en kritieke functies voo...",
+          "name": "ID.BE-4: Afhankelijkheden en kritieke functies voor de lever...",
           "color": "#0ea5e9",
-          "description": "Category for ID.BE-4: Afhankelijkheden en k...",
+          "description": "Category from workflow action",
           "linkedCards": [
-            "card-1763046162721-62204",
-            "card-1763046202920-10976"
+            "card-1763046855848-78620"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
           "id": "act-1761691229395-t6nnh",
-          "name": "ID.BE-5: Voor alle operationele staten (bv. onder ...",
+          "name": "ID.BE-5: Voor alle operationele staten (bv. onder dwang/aanv...",
           "color": "#6366f1",
-          "description": "Category for ID.BE-5: Voor alle operationel...",
+          "description": "Category from workflow action",
           "linkedCards": [
-            "card-1763046162721-67156",
-            "card-1763046162721-87621",
-            "card-1763046162721-86781",
-            "card-1763046202920-45570",
-            "card-1763046202920-10166",
-            "card-1763046202920-94346"
+            "card-1763046855848-92787",
+            "card-1763046855848-67321",
+            "card-1763046855848-47032"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
           "id": "act-1761691229395-44vnq",
-          "name": "ID.GV-1: Het cyberbeveiligingsbeleid van de organi...",
+          "name": "ID.GV-1: Het cyberbeveiligingsbeleid van de organisatie word...",
           "color": "#a855f7",
-          "description": "Category for ID.GV-1: Het cyberbeveiligings...",
+          "description": "Category from workflow action",
           "linkedCards": [
-            "card-1763046162721-54459",
-            "card-1763046162721-96249",
-            "card-1763046202920-46434",
-            "card-1763046202920-83289"
+            "card-1763046855848-67187",
+            "card-1763046855848-89898"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         }
       ],
       "groups": [
         {
-          "id": "group-1763046162721-68098",
+          "id": "group-1763046855847-55542",
           "name": "Critical Priority",
-          "description": "High-priority items requiring immediate attention",
+          "description": "High-priority items",
           "color": "#ef4444",
           "linkedCards": [
-            "card-1763046162721-35879",
-            "card-1763046162721-72547",
-            "card-1763046162721-65352",
-            "card-1763046162721-11503",
-            "card-1763046162721-17150",
-            "card-1763046162721-92705",
-            "card-1763046162721-52306",
-            "card-1763046162721-31119",
-            "card-1763046162721-66452",
-            "card-1763046162721-62204",
-            "card-1763046202920-42707",
-            "card-1763046202920-10633",
-            "card-1763046202920-74016",
-            "card-1763046202920-34900",
-            "card-1763046202920-84459",
-            "card-1763046202920-86204",
-            "card-1763046202920-46877"
+            "card-1763046855847-62414",
+            "card-1763046855847-65289",
+            "card-1763046855847-10228",
+            "card-1763046855847-81955",
+            "card-1763046855847-82321",
+            "card-1763046855847-15789",
+            "card-1763046855847-15256",
+            "card-1763046855848-68880",
+            "card-1763046855848-67321",
+            "card-1763046855848-47032",
+            "card-1763046855848-89898"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
-          "id": "group-1763046162721-95666",
+          "id": "group-1763046855847-35818",
           "name": "External Dependencies",
-          "description": "Tasks dependent on external vendors or partners",
+          "description": "External vendor dependencies",
           "color": "#f59e0b",
           "linkedCards": [
-            "card-1763046162721-95595",
-            "card-1763046162721-72547",
-            "card-1763046162721-65352",
-            "card-1763046162721-11503",
-            "card-1763046162721-92705",
-            "card-1763046162721-19442",
-            "card-1763046162721-52306",
-            "card-1763046162721-76104",
-            "card-1763046162721-31119",
-            "card-1763046162721-75606",
-            "card-1763046162721-62204",
-            "card-1763046162721-54459",
-            "card-1763046202920-90090",
-            "card-1763046202920-10633",
-            "card-1763046202920-63893",
-            "card-1763046202920-86204",
-            "card-1763046202920-67546",
-            "card-1763046202920-41747",
-            "card-1763046202920-44483",
-            "card-1763046202920-45570",
-            "card-1763046202920-10166",
-            "card-1763046202920-94346"
+            "card-1763046855847-87093",
+            "card-1763046855847-43328",
+            "card-1763046855848-68880",
+            "card-1763046855848-78620",
+            "card-1763046855848-92787",
+            "card-1763046855848-89898"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
-          "id": "group-1763046162721-12920",
+          "id": "group-1763046855847-28018",
           "name": "Quick Wins",
-          "description": "Low-effort, high-impact tasks",
+          "description": "Low-effort, high-impact",
           "color": "#84cc16",
           "linkedCards": [
-            "card-1763046162721-63942",
-            "card-1763046162721-35879",
-            "card-1763046162721-46192",
-            "card-1763046162721-72547",
-            "card-1763046162721-41897",
-            "card-1763046162721-77186",
-            "card-1763046162721-76104",
-            "card-1763046162721-24179",
-            "card-1763046162721-66452",
-            "card-1763046162721-62204",
-            "card-1763046162721-54459",
-            "card-1763046202919-52393",
-            "card-1763046202920-35909",
-            "card-1763046202920-73730",
-            "card-1763046202920-10633",
-            "card-1763046202920-63893",
-            "card-1763046202920-92890",
-            "card-1763046202920-34900",
-            "card-1763046202920-86204",
-            "card-1763046202920-67546",
-            "card-1763046202920-46877",
-            "card-1763046202920-94346",
-            "card-1763046202920-83289"
+            "card-1763046855847-87093",
+            "card-1763046855847-76659",
+            "card-1763046855847-65289",
+            "card-1763046855847-16584",
+            "card-1763046855847-43328",
+            "card-1763046855847-53038",
+            "card-1763046855847-33253",
+            "card-1763046855847-83514",
+            "card-1763046855848-67321",
+            "card-1763046855848-47032",
+            "card-1763046855848-89898"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         },
         {
-          "id": "group-1763046162721-17105",
+          "id": "group-1763046855847-58299",
           "name": "Technical Implementation",
-          "description": "Technical tasks requiring IT expertise",
+          "description": "IT expertise required",
           "color": "#06b6d4",
           "linkedCards": [
-            "card-1763046162721-65352",
-            "card-1763046162721-41897",
-            "card-1763046162721-60296",
-            "card-1763046162721-31119",
-            "card-1763046162721-75606",
-            "card-1763046162721-37766",
-            "card-1763046162721-62204",
-            "card-1763046162721-67156",
-            "card-1763046162721-86781",
-            "card-1763046202919-52393",
-            "card-1763046202920-42707",
-            "card-1763046202920-10633",
-            "card-1763046202920-92890",
-            "card-1763046202920-84459",
-            "card-1763046202920-67546"
+            "card-1763046855847-98192",
+            "card-1763046855847-26771",
+            "card-1763046855847-15256",
+            "card-1763046855848-92787",
+            "card-1763046855848-67321",
+            "card-1763046855848-67187"
           ],
-          "createdAt": "2025-11-13T15:02:42.721430"
+          "createdAt": "2025-11-13T15:14:15.846958"
         }
       ],
-      "tags": [],
-      "members": [],
       "settings": {
-        "allowGuests": false,
-        "emailNotifications": true,
-        "activityTracking": true
-      }
+        "notificationsEnabled": true,
+        "allowGuestView": false,
+        "enforceWIPLimit": false
+      },
+      "activity": [
+        {
+          "id": "act-1763046668981-tfvwo",
+          "boardId": "board-1763046668981-ufv7d",
+          "cardId": null,
+          "userId": "user-default-001",
+          "type": "board.created",
+          "timestamp": "2025-11-13T15:11:08.981Z",
+          "data": {
+            "boardName": "BoardSample"
+          },
+          "description": "Default User created board \"BoardSample\""
+        }
+      ]
     }
   ],
   "cards": [
@@ -3291,6 +3232,1322 @@
       "createdAt": "2025-11-13T15:03:22.919924",
       "updatedAt": "2025-11-13T15:03:22.919924",
       "createdBy": "system"
+    },
+    {
+      "id": "card-1763046855847-34950",
+      "title": "ID.AM - Asset Management",
+      "description": "Reference item for ID.AM - Asset Management",
+      "columnId": "col-1763046668981-tdndr",
+      "order": 0,
+      "categoryId": null,
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-25284",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-67127",
+      "title": "ID.BE - Business Environment",
+      "description": "Reference item for ID.BE - Business Environment",
+      "columnId": "col-1763046668981-tdndr",
+      "order": 1,
+      "categoryId": null,
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-41490",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-10064",
+      "title": "ID.GV - Governance",
+      "description": "Reference item for ID.GV - Governance",
+      "columnId": "col-1763046668981-tdndr",
+      "order": 2,
+      "categoryId": null,
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-74644",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-87093",
+      "title": "ID.AM-1.1",
+      "description": "Een inventaris van activa in verband met informatie en informatieverwerkingsfaciliteiten binnen de organisatie moet worden gedocumenteerd, geëvalueerd en bijgewerkt wanneer zich wijzigingen voordoen.",
+      "columnId": "col-1763046668981-hd0f3",
+      "order": 0,
+      "categoryId": "act-1761691229395-p0u6n",
+      "milestoneId": "milestone-1763046855847-54101",
+      "groupIds": [
+        "group-1763046855847-35818",
+        "group-1763046855847-28018"
+      ],
+      "tags": [
+        "incident reporting and handling",
+        "Firewall guidance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2025-12-11",
+        "estimatedHours": null
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-71707",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-76659",
+      "title": "ID.AM-1.2",
+      "description": "De inventaris van activa die verband houden met informatie en informatieverwerkingsfaciliteiten moet veranderingen in de context van de organisatie weerspiegelen en alle informatie bevatten die nodig is voor een effectieve verantwoording.",
+      "columnId": "col-1763046668981-i77m6",
+      "order": 0,
+      "categoryId": "act-1761691229395-p0u6n",
+      "milestoneId": "milestone-1763046855847-54101",
+      "groupIds": [
+        "group-1763046855847-28018"
+      ],
+      "tags": [
+        "Firewall guidance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-02-04",
+        "estimatedHours": 4
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-42620",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-62414",
+      "title": "ID.AM-1.3",
+      "description": "Wanneer niet-toegestane hardware wordt ontdekt, moet deze in quarantaine worden geplaatst voor eventuele uitzonderingsbehandeling, verwijderd of vervangen, en wordt de inventaris dienovereenkomstig bijgewerkt.",
+      "columnId": "col-1763046668981-i77m6",
+      "order": 1,
+      "categoryId": "act-1761691229395-p0u6n",
+      "milestoneId": "milestone-1763046855847-16571",
+      "groupIds": [
+        "group-1763046855847-55542"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-01-19",
+        "estimatedHours": 2
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-99288",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-72441",
+      "title": "ID.AM-1.4",
+      "description": "De mechanismen voor het detecteren van de aanwezigheid van niet-geautoriseerde hardware en firmwarecomponenten in het netwerk van de organisatie moeten worden geïdentificeerd.",
+      "columnId": "col-1763046668981-i77m6",
+      "order": 2,
+      "categoryId": "act-1761691229395-p0u6n",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2025-11-25",
+        "estimatedHours": 8
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-60259",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-65289",
+      "title": "ID.AM-2.1",
+      "description": "Een inventaris die aangeeft welke softwareplatforms en -toepassingen in de organisatie worden gebruikt, moet worden gedocumenteerd, geëvalueerd en bijgewerkt wanneer zich wijzigingen voordoen.",
+      "columnId": "col-1763046668981-hd0f3",
+      "order": 1,
+      "categoryId": "act-1761691229395-mejij",
+      "milestoneId": "milestone-1763046855847-86735",
+      "groupIds": [
+        "group-1763046855847-55542",
+        "group-1763046855847-28018"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-01-27",
+        "estimatedHours": 16
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-87602",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-16584",
+      "title": "ID.AM-2.2",
+      "description": "De inventaris van softwareplatforms en -toepassingen die verband houden met informatie en informatieverwerking, moet veranderingen in de context van de organisatie weerspiegelen en alle informatie bevatten die nodig is voor een doeltreffende verantwoording.",
+      "columnId": "col-1763046668981-hd0f3",
+      "order": 2,
+      "categoryId": "act-1761691229395-mejij",
+      "milestoneId": null,
+      "groupIds": [
+        "group-1763046855847-28018"
+      ],
+      "tags": [
+        "incident reporting and handling",
+        "Firewall guidance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-01-18",
+        "estimatedHours": 4
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-40839",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-43328",
+      "title": "ID.AM-2.3",
+      "description": "De personen die binnen de organisatie verantwoordelijk en aansprakelijk zijn voor het beheer van softwareplatforms en -toepassingen moeten worden geïdentificeerd.",
+      "columnId": "col-1763046668981-bdazt",
+      "order": 0,
+      "categoryId": "act-1761691229395-mejij",
+      "milestoneId": null,
+      "groupIds": [
+        "group-1763046855847-35818",
+        "group-1763046855847-28018"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-01-31",
+        "estimatedHours": 8
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-56801",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-53038",
+      "title": "ID.AM-2.4",
+      "description": "Wanneer niet-geautoriseerde software wordt ontdekt, wordt deze in quarantaine geplaatst voor eventuele uitzonderingsbehandeling, verwijderd of vervangen, en wordt de inventaris dienovereenkomstig bijgewerkt.",
+      "columnId": "col-1763046668981-i77m6",
+      "order": 3,
+      "categoryId": "act-1761691229395-mejij",
+      "milestoneId": "milestone-1763046855847-71109",
+      "groupIds": [
+        "group-1763046855847-28018"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-02-04",
+        "estimatedHours": 4
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-57391",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-98192",
+      "title": "ID.AM-2.5",
+      "description": "De mechanismen voor het opsporen van de aanwezigheid van niet-geautoriseerde software in de ICT/OT-omgeving van de organisatie moeten worden geïdentificeerd.",
+      "columnId": "col-1763046668981-hd0f3",
+      "order": 3,
+      "categoryId": "act-1761691229395-mejij",
+      "milestoneId": "milestone-1763046855847-54101",
+      "groupIds": [
+        "group-1763046855847-58299"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-02-05",
+        "estimatedHours": 4
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-28446",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-33253",
+      "title": "ID.AM.3-1",
+      "description": "Informatie die de organisatie opslaat en gebruikt, moet worden geïdentificeerd.",
+      "columnId": "col-1763046668981-i77m6",
+      "order": 4,
+      "categoryId": "act-1761691229395-umzq9",
+      "milestoneId": "milestone-1763046855847-54101",
+      "groupIds": [
+        "group-1763046855847-28018"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-01-19",
+        "estimatedHours": 4
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-70884",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-83514",
+      "title": "ID.AM.3-2",
+      "description": "Alle verbindingen binnen de ICT/OT-omgeving van de organisatie en met andere interne platforms van de organisatie moeten in kaart worden gebracht, gedocumenteerd, goedgekeurd en zo nodig bijgewerkt.",
+      "columnId": "col-1763046668981-hd0f3",
+      "order": 4,
+      "categoryId": "act-1761691229395-umzq9",
+      "milestoneId": "milestone-1763046855847-86735",
+      "groupIds": [
+        "group-1763046855847-28018"
+      ],
+      "tags": [
+        "Firewall guidance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2025-11-23",
+        "estimatedHours": null
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-90319",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-10228",
+      "title": "ID.A.3-3",
+      "description": "De informatiestromen/gegevensstromen binnen de ICT/OT-omgeving van de organisatie en naar andere interne systemen van de organisatie moeten in kaart worden gebracht, gedocumenteerd, geautoriseerd en bijgewerkt wanneer zich wijzigingen voordoen.",
+      "columnId": "col-1763046668981-l0rbf",
+      "order": 0,
+      "categoryId": "act-1761691229395-umzq9",
+      "milestoneId": "milestone-1763046855847-86735",
+      "groupIds": [
+        "group-1763046855847-55542"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-02-01",
+        "estimatedHours": 8
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-37661",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-26771",
+      "title": "ID.AM-4.1",
+      "description": "De organisatie moet alle externe diensten en de daarmee gemaakte verbindingen in kaart brengen, documenteren, autoriseren en bij wijzigingen bijwerken.",
+      "columnId": "col-1763046668981-bdazt",
+      "order": 1,
+      "categoryId": "act-1761691229395-dmelz",
+      "milestoneId": "milestone-1763046855847-71109",
+      "groupIds": [
+        "group-1763046855847-58299"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2025-12-28",
+        "estimatedHours": null
+      },
+      "priority": "medium",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-91185",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-43925",
+      "title": "ID.AM-4.2",
+      "description": "De informatiestroom van en naar externe systemen moet in kaart worden gebracht, gedocumenteerd en geautoriseerd, en worden bijgewerkt wanneer zich wijzigingen voordoen.",
+      "columnId": "col-1763046668981-i77m6",
+      "order": 5,
+      "categoryId": "act-1761691229395-dmelz",
+      "milestoneId": "milestone-1763046855847-54101",
+      "groupIds": [],
+      "tags": [
+        "incident reporting and handling"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-01-04",
+        "estimatedHours": 16
+      },
+      "priority": "medium",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-43929",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-81955",
+      "title": "ID.AM-5.1",
+      "description": "De middelen van de organisatie (hardware, apparaten, gegevens, tijd, personeel, informatie en software) moeten worden geprioriteerd op basis van hun classificatie, kriticiteit en bedrijfswaarde.",
+      "columnId": "col-1763046668981-i77m6",
+      "order": 6,
+      "categoryId": "act-1761691229395-327r4",
+      "milestoneId": null,
+      "groupIds": [
+        "group-1763046855847-55542"
+      ],
+      "tags": [
+        "Firewall guidance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2025-12-29",
+        "estimatedHours": 4
+      },
+      "priority": "high",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-44844",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-58492",
+      "title": "ID.AM-6.1",
+      "description": "De rollen, verantwoordelijkheden en bevoegdheden op het gebied van informatie- en cyberbeveiliging binnen de organisatie moeten worden gedocumenteerd, geëvalueerd, geautoriseerd en bijgewerkt en afgestemd op de andere interne rollen van de organisatie en die van externe partners.",
+      "columnId": "col-1763046668981-bdazt",
+      "order": 2,
+      "categoryId": "act-1761691229395-wx7zs",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "Firewall guidance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2025-12-30",
+        "estimatedHours": 8
+      },
+      "priority": "medium",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-59600",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-82321",
+      "title": "ID.AM-6.2",
+      "description": "De organisatie zal een informatiebeveiligingsfunctionaris (Information Security Officer) aanstellen.",
+      "columnId": "col-1763046668981-i77m6",
+      "order": 7,
+      "categoryId": "act-1761691229395-wx7zs",
+      "milestoneId": "milestone-1763046855847-16571",
+      "groupIds": [
+        "group-1763046855847-55542"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2025-11-29",
+        "estimatedHours": 8
+      },
+      "priority": "medium",
+      "linkedBacklogItems": [
+        "card-1763046855847-34950"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-36504",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-15789",
+      "title": "ID.BE-1.1",
+      "description": "De rol van de organisatie in de toeleveringsketen moet worden vastgesteld en gecommuniceerd.",
+      "columnId": "col-1763046668981-bdazt",
+      "order": 3,
+      "categoryId": "act-1761691229395-xg74h",
+      "milestoneId": null,
+      "groupIds": [
+        "group-1763046855847-55542"
+      ],
+      "tags": [
+        "incident reporting and handling"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2025-12-26",
+        "estimatedHours": 2
+      },
+      "priority": "medium",
+      "linkedBacklogItems": [
+        "card-1763046855847-67127"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855847-12062",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855847-15256",
+      "title": "ID.BE-1.2",
+      "description": "De organisatie moet haar ICT/OT-omgeving beschermen tegen bedreigingen vanuit de toeleveringsketen door beveiligingswaarborgen toe te passen als onderdeel van een gedocumenteerde alomvattende beveiligingsstrategie.",
+      "columnId": "col-1763046668981-i77m6",
+      "order": 8,
+      "categoryId": "act-1761691229395-xg74h",
+      "milestoneId": "milestone-1763046855847-71109",
+      "groupIds": [
+        "group-1763046855847-55542",
+        "group-1763046855847-58299"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2025-12-18",
+        "estimatedHours": 2
+      },
+      "priority": "medium",
+      "linkedBacklogItems": [
+        "card-1763046855847-67127"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855848-25201",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855848-54702",
+      "title": "ID.BE-2.1",
+      "description": "De plaats van de organisatie in de kritieke infrastructuur en haar bedrijfstak wordt vastgesteld en gecommuniceerd",
+      "columnId": "col-1763046668981-bdazt",
+      "order": 4,
+      "categoryId": "act-1761691229395-3h4b4",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2025-12-26",
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [
+        "card-1763046855847-67127"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855848-89999",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855848-68880",
+      "title": "ID.BE-3.1",
+      "description": "Prioriteiten met betrekking tot de missie, doelstellingen en activiteiten van de organisatie worden vastgesteld en gecommuniceerd.",
+      "columnId": "col-1763046668981-bdazt",
+      "order": 5,
+      "categoryId": "act-1761691229395-asn2l",
+      "milestoneId": null,
+      "groupIds": [
+        "group-1763046855847-55542",
+        "group-1763046855847-35818"
+      ],
+      "tags": [
+        "Firewall guidance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2025-12-06",
+        "estimatedHours": 16
+      },
+      "priority": "high",
+      "linkedBacklogItems": [
+        "card-1763046855847-67127"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855848-98768",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855848-78620",
+      "title": "ID.BE-4.1",
+      "description": "De afhankelijkheden en missie-kritische functies voor de levering van kritieke diensten moeten als onderdeel van het risicobeoordelingsproces worden geïdentificeerd, gedocumenteerd en geprioriteerd op basis van hun kriticiteit.",
+      "columnId": "col-1763046668981-i77m6",
+      "order": 9,
+      "categoryId": "act-1761691229395-kwiel",
+      "milestoneId": null,
+      "groupIds": [
+        "group-1763046855847-35818"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-01-26",
+        "estimatedHours": 8
+      },
+      "priority": "high",
+      "linkedBacklogItems": [
+        "card-1763046855847-67127"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855848-55096",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855848-92787",
+      "title": "ID.BE-5.1",
+      "description": "Om de cyberveerkracht te ondersteunen en de levering van kritieke diensten te beveiligen, moeten de nodige eisen worden vastgesteld, gedocumenteerd en de uitvoering ervan getest en goedgekeurd.",
+      "columnId": "col-1763046668981-bdazt",
+      "order": 6,
+      "categoryId": "act-1761691229395-t6nnh",
+      "milestoneId": "milestone-1763046855847-86735",
+      "groupIds": [
+        "group-1763046855847-35818",
+        "group-1763046855847-58299"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-01-04",
+        "estimatedHours": 4
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-67127"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855848-25324",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855848-67321",
+      "title": "ID.BE-5.2",
+      "description": "Informatie verwerkende en ondersteunende faciliteiten moeten redundantie toepassen om te voldoen aan de beschikbaarheidseisen, zoals gedefinieerd door de organisatie en/of regelgevende kaders.",
+      "columnId": "col-1763046668981-hd0f3",
+      "order": 5,
+      "categoryId": "act-1761691229395-t6nnh",
+      "milestoneId": null,
+      "groupIds": [
+        "group-1763046855847-55542",
+        "group-1763046855847-28018",
+        "group-1763046855847-58299"
+      ],
+      "tags": [
+        "incident reporting and handling"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-02-10",
+        "estimatedHours": 2
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-67127"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855848-28282",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855848-47032",
+      "title": "ID.BE-5.3",
+      "description": "Er moeten doelstellingen voor hersteltijd en herstelpunten worden vastgesteld voor het herstel van essentiële ICT/OT-systeemprocessen.",
+      "columnId": "col-1763046668981-hd0f3",
+      "order": 6,
+      "categoryId": "act-1761691229395-t6nnh",
+      "milestoneId": "milestone-1763046855847-54101",
+      "groupIds": [
+        "group-1763046855847-55542",
+        "group-1763046855847-28018"
+      ],
+      "tags": [
+        "incident reporting and handling"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2025-12-17",
+        "estimatedHours": 16
+      },
+      "priority": "low",
+      "linkedBacklogItems": [
+        "card-1763046855847-67127"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855848-20397",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855848-67187",
+      "title": "ID.GV-1.1",
+      "description": "Beleid en procedures voor informatiebeveiliging en cyberveiligheid moeten worden opgesteld, gedocumenteerd, geëvalueerd, goedgekeurd en bijgewerkt wanneer zich wijzigingen voordoen.",
+      "columnId": "col-1763046668981-l0rbf",
+      "order": 1,
+      "categoryId": "act-1761691229395-44vnq",
+      "milestoneId": "milestone-1763046855847-71109",
+      "groupIds": [
+        "group-1763046855847-58299"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2025-12-21",
+        "estimatedHours": null
+      },
+      "priority": "medium",
+      "linkedBacklogItems": [
+        "card-1763046855847-10064"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855848-50956",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763046855848-89898",
+      "title": "ID.GV-1.2",
+      "description": "Er moet een door het hoger management goedgekeurd informatie- en cyberbeveiligingsbeleid voor de gehele organisatie worden vastgesteld, gedocumenteerd, bijgewerkt bij wijzigingen, en verspreid.",
+      "columnId": "col-1763046668981-l0rbf",
+      "order": 2,
+      "categoryId": "act-1761691229395-44vnq",
+      "milestoneId": null,
+      "groupIds": [
+        "group-1763046855847-55542",
+        "group-1763046855847-35818",
+        "group-1763046855847-28018"
+      ],
+      "tags": [
+        "compliance"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": "2026-01-07",
+        "estimatedHours": 8
+      },
+      "priority": "medium",
+      "linkedBacklogItems": [
+        "card-1763046855847-10064"
+      ],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "activity-1763046855848-64928",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:14:15.846958",
+          "details": "Task created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:14:15.846958",
+      "updatedAt": "2025-11-13T15:14:15.846958",
+      "createdBy": "user-default-001"
     }
   ]
 }
