@@ -193,20 +193,6 @@
         </div>
     </div>
 
-    <script src="ppm-script.js"></script>
-    <script>
-        // Initialize board view
-        const urlParams = new URLSearchParams(window.location.search);
-        const boardId = urlParams.get('id');
-        if (!boardId) {
-            window.location.href = 'boards.html';
-        } else {
-            PPM.init('board', boardId);
-        }
-    </script>
-</body>
-</html>
-
     <!-- Dynamic List Node Dialog -->
     <div id="node-dialog-backdrop" class="modal-backdrop hidden">
         <div class="modal-dialog modal-md">
@@ -272,3 +258,17 @@
             </div>
         </div>
     </div>
+
+    <script src="ppm-script.js"></script>
+    <script>
+        // Initialize board view
+        const urlParams = new URLSearchParams(window.location.search);
+        const boardId = urlParams.get('id');
+        if (!boardId) {
+            window.location.href = 'boards.html';
+        } else {
+            PPM.init('board', boardId);
+        }
+    </script>
+</body>
+</html>

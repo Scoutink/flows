@@ -2945,35 +2945,64 @@ PPM.dynamicList = {
     
     // Delete node
     deleteNode: function(nodeId) {
-        const board = PPM.getCurrentBoard();
-        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
-        if (!node) return;
-        
-        const children = board.dynamicList.nodes.filter(n => n.parentId === nodeId);
-        
-        let message = `Delete "${node.title}"?`;
-        if (children.length > 0) {
-            message += `\n\nThis node has ${children.length} child node(s). They will also be deleted.`;
+        try {
+            const board = PPM.getCurrentBoard();
+            if (!board || !board.dynamicList) {
+                alert('Board not found');
+                return;
+            }
+            
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            if (!node) {
+                alert('Node not found');
+                return;
+            }
+            
+            const children = board.dynamicList.nodes.filter(n => n.parentId === nodeId);
+            
+            let message = `Delete "${node.title}"?`;
+            if (children.length > 0) {
+                message += `\n\nThis node has ${children.length} child node(s). They will also be deleted.`;
+            }
+            
+            if (!confirm(message)) return;
+            
+            // Recursively delete node and all descendants
+            const deleteRecursive = (nId) => {
+                const descendants = board.dynamicList.nodes.filter(n => n.parentId === nId);
+                descendants.forEach(d => deleteRecursive(d.id));
+                board.dynamicList.nodes = board.dynamicList.nodes.filter(n => n.id !== nId);
+            };
+            
+            deleteRecursive(nodeId);
+            
+            // Save and re-render
+            PPM.saveBoards();
+            
+            // Force a complete re-render
+            setTimeout(() => {
+                this.render();
+            }, 100);
+            
+            console.log('Node deleted successfully:', nodeId);
+        } catch (err) {
+            console.error('deleteNode error:', err);
+            alert('Failed to delete node: ' + err.message);
         }
-        
-        if (!confirm(message)) return;
-        
-        // Recursively delete node and all descendants
-        const deleteRecursive = (nId) => {
-            const descendants = board.dynamicList.nodes.filter(n => n.parentId === nId);
-            descendants.forEach(d => deleteRecursive(d.id));
-            board.dynamicList.nodes = board.dynamicList.nodes.filter(n => n.id !== nId);
-        };
-        
-        deleteRecursive(nodeId);
-        PPM.saveBoards();
-        this.render();
     },
     
     // Close node dialog
     closeNodeDialog: function() {
-        const dialog = document.getElementById('node-dialog-backdrop');
-        dialog.classList.add('hidden');
+        try {
+            const dialog = document.getElementById('node-dialog-backdrop');
+            if (dialog) {
+                dialog.classList.add('hidden');
+            } else {
+                console.error('Node dialog element not found');
+            }
+        } catch (err) {
+            console.error('closeNodeDialog error:', err);
+        }
     },
     
     // Show task link dialog
