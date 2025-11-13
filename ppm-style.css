@@ -1562,3 +1562,329 @@ body.dark-theme .board-column-locked {
     background: white;
     color: var(--primary);
 }
+
+/* ===== BOARD CREATION FORM ===== */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.form-group .required {
+    color: var(--danger);
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.875rem;
+    transition: border-color 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+}
+
+.form-input::placeholder {
+    color: var(--text-muted);
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s;
+}
+
+.checkbox-label:hover {
+    background-color: var(--bg-secondary);
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-top: 0.25rem;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.checkbox-label span {
+    flex: 1;
+    font-weight: 500;
+}
+
+.form-help {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+
+/* ===== BOARD MANAGEMENT BAR (Milestones, Categories, Groups) ===== */
+.board-management-bar {
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 2rem;
+    display: flex;
+    gap: 2rem;
+    overflow-x: auto;
+}
+
+.management-section {
+    min-width: 250px;
+    flex-shrink: 0;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.section-header i {
+    color: var(--text-secondary);
+}
+
+.section-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: var(--radius-sm);
+}
+
+.btn-add {
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-add:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+.items-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    min-height: 36px;
+}
+
+/* Milestone Item */
+.milestone-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.milestone-item:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.milestone-item.completed {
+    background-color: var(--success);
+    border-color: var(--success);
+    color: white;
+}
+
+.milestone-item.completed .milestone-progress {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.milestone-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.milestone-progress {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.milestone-actions {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: 0.5rem;
+}
+
+.btn-milestone-action {
+    padding: 0.25rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s;
+}
+
+.btn-milestone-action:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
+}
+
+.milestone-item.completed .btn-milestone-action {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.milestone-item.completed .btn-milestone-action:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* Category Item */
+.category-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.category-item:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.category-item.active {
+    border-color: var(--primary);
+    background-color: var(--primary);
+    color: white;
+}
+
+.category-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.category-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.category-count {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    background-color: var(--bg-tertiary);
+    padding: 0.125rem 0.5rem;
+    border-radius: 10px;
+}
+
+.category-item.active .category-count {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+/* Group Item */
+.group-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.group-item:hover {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.group-color {
+    width: 12px;
+    height: 12px;
+    border-radius: var(--radius-sm);
+}
+
+.group-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.group-count {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Badge on cards */
+.card-milestone-badge,
+.card-category-badge,
+.card-group-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.625rem;
+    font-weight: 600;
+}
+
+.card-milestone-badge {
+    background-color: var(--primary);
+    color: white;
+}
+
+.card-category-badge {
+    background-color: var(--info);
+    color: white;
+}
+
+.card-group-badge {
+    background-color: var(--warning);
+    color: var(--text-primary);
+}
+
+
+/* Empty message styling */
+.empty-message {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 0.5rem;
+}
+

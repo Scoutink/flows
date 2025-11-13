@@ -12,7 +12,8 @@ const PPM = (() => {
         theme: 'light',
         draggedCard: null,
         draggedOverColumn: null,
-        backlogFilter: null // Filter cards by backlog item ID
+        backlogFilter: null, // Filter cards by backlog item ID
+        categoryFilter: null // Filter cards by category ID
     };
 
     // ===== UTILITIES =====
@@ -237,6 +238,180 @@ const PPM = (() => {
         logActivity(board, null, 'column.deleted', { columnName: column.name });
     };
 
+    // ===== MILESTONE OPERATIONS =====
+    const createMilestone = (board, data) => {
+        const milestone = {
+            id: generateId('milestone'),
+            name: data.name || 'New Milestone',
+            description: data.description || '',
+            linkedCards: data.linkedCards || [],
+            status: 'in_progress',
+            color: data.color || '#4a6cf7',
+            createdAt: new Date().toISOString()
+        };
+        
+        board.milestones.push(milestone);
+        logActivity(board, null, 'milestone.created', { milestoneName: milestone.name });
+        return milestone;
+    };
+
+    const updateMilestone = (board, milestoneId, data) => {
+        const milestone = board.milestones.find(m => m.id === milestoneId);
+        if (!milestone) return null;
+        
+        if (data.name !== undefined) milestone.name = data.name;
+        if (data.description !== undefined) milestone.description = data.description;
+        if (data.linkedCards !== undefined) milestone.linkedCards = data.linkedCards;
+        if (data.color !== undefined) milestone.color = data.color;
+        
+        // Auto-update status based on linked cards
+        updateMilestoneStatus(board, milestoneId);
+        
+        logActivity(board, null, 'milestone.updated', { milestoneName: milestone.name });
+        return milestone;
+    };
+
+    const deleteMilestone = (board, milestoneId) => {
+        const index = board.milestones.findIndex(m => m.id === milestoneId);
+        if (index === -1) return false;
+        
+        const milestone = board.milestones[index];
+        
+        // Remove milestone reference from all cards
+        board.cards.forEach(card => {
+            if (card.milestoneId === milestoneId) {
+                delete card.milestoneId;
+            }
+        });
+        
+        board.milestones.splice(index, 1);
+        logActivity(board, null, 'milestone.deleted', { milestoneName: milestone.name });
+        return true;
+    };
+
+    const updateMilestoneStatus = (board, milestoneId) => {
+        const milestone = board.milestones.find(m => m.id === milestoneId);
+        if (!milestone || milestone.linkedCards.length === 0) return;
+        
+        // Check if all linked cards are in "Done" column
+        const doneColumn = board.columns.find(c => c.name === 'Done');
+        if (!doneColumn) return;
+        
+        const allDone = milestone.linkedCards.every(cardId => {
+            const card = board.cards.find(c => c.id === cardId);
+            return card && card.columnId === doneColumn.id;
+        });
+        
+        const oldStatus = milestone.status;
+        milestone.status = allDone ? 'completed' : 'in_progress';
+        
+        if (oldStatus !== milestone.status && milestone.status === 'completed') {
+            logActivity(board, null, 'milestone.completed', { milestoneName: milestone.name });
+        }
+    };
+
+    const getMilestoneById = (board, milestoneId) => {
+        return board.milestones.find(m => m.id === milestoneId);
+    };
+
+    // ===== CATEGORY OPERATIONS =====
+    const createCategory = (board, data) => {
+        const category = {
+            id: generateId('category'),
+            name: data.name || 'New Category',
+            color: data.color || '#28a745',
+            icon: data.icon || 'fa-tag',
+            createdAt: new Date().toISOString()
+        };
+        
+        board.categories.push(category);
+        logActivity(board, null, 'category.created', { categoryName: category.name });
+        return category;
+    };
+
+    const updateCategory = (board, categoryId, data) => {
+        const category = board.categories.find(c => c.id === categoryId);
+        if (!category) return null;
+        
+        if (data.name !== undefined) category.name = data.name;
+        if (data.color !== undefined) category.color = data.color;
+        if (data.icon !== undefined) category.icon = data.icon;
+        
+        logActivity(board, null, 'category.updated', { categoryName: category.name });
+        return category;
+    };
+
+    const deleteCategory = (board, categoryId) => {
+        const index = board.categories.findIndex(c => c.id === categoryId);
+        if (index === -1) return false;
+        
+        const category = board.categories[index];
+        
+        // Remove category reference from all cards
+        board.cards.forEach(card => {
+            if (card.categoryId === categoryId) {
+                delete card.categoryId;
+            }
+        });
+        
+        board.categories.splice(index, 1);
+        logActivity(board, null, 'category.deleted', { categoryName: category.name });
+        return true;
+    };
+
+    const getCategoryById = (board, categoryId) => {
+        return board.categories.find(c => c.id === categoryId);
+    };
+
+    // ===== GROUP OPERATIONS =====
+    const createGroup = (board, data) => {
+        const group = {
+            id: generateId('group'),
+            name: data.name || 'New Group',
+            linkedCards: data.linkedCards || [],
+            color: data.color || '#ffc107',
+            createdAt: new Date().toISOString()
+        };
+        
+        board.groups.push(group);
+        logActivity(board, null, 'group.created', { groupName: group.name });
+        return group;
+    };
+
+    const updateGroup = (board, groupId, data) => {
+        const group = board.groups.find(g => g.id === groupId);
+        if (!group) return null;
+        
+        if (data.name !== undefined) group.name = data.name;
+        if (data.linkedCards !== undefined) group.linkedCards = data.linkedCards;
+        if (data.color !== undefined) group.color = data.color;
+        
+        logActivity(board, null, 'group.updated', { groupName: group.name });
+        return group;
+    };
+
+    const deleteGroup = (board, groupId) => {
+        const index = board.groups.findIndex(g => g.id === groupId);
+        if (index === -1) return false;
+        
+        const group = board.groups[index];
+        
+        // Remove group reference from all cards
+        board.cards.forEach(card => {
+            if (card.groupIds && card.groupIds.includes(groupId)) {
+                card.groupIds = card.groupIds.filter(id => id !== groupId);
+            }
+        });
+        
+        board.groups.splice(index, 1);
+        logActivity(board, null, 'group.deleted', { groupName: group.name });
+        return true;
+    };
+
+    const getGroupById = (board, groupId) => {
+        return board.groups.find(g => g.id === groupId);
+    };
+
     // ===== CARD OPERATIONS =====
     const createCard = (board, columnId, cardData) => {
         const cardsInColumn = getCardsByColumn(board, columnId);
@@ -278,6 +453,9 @@ const PPM = (() => {
             labels: cardData.labels || [],
             attachments: cardData.attachments || [],
             linkedBacklogItems: cardData.linkedBacklogItems || [], // IDs of backlog cards this task is linked to
+            milestoneId: cardData.milestoneId || null,  // NEW: Link to milestone
+            categoryId: cardData.categoryId || null,    // NEW: Link to category  
+            groupIds: cardData.groupIds || [],          // NEW: Link to multiple groups
             status: {
                 current: 'pending',
                 blocked: false,
@@ -641,11 +819,123 @@ const PPM = (() => {
         // Render members
         renderBoardMembers(board);
         
+        // Render management items
+        renderMilestones(board);
+        renderCategories(board);
+        renderGroups(board);
+        
         // Render columns
         renderColumns(board);
         
         // Update backlog filter banner
         updateBacklogFilterBanner();
+    };
+
+    const renderMilestones = (board) => {
+        const container = document.getElementById('milestones-container');
+        if (!container) return;
+        
+        if (!board.milestones || board.milestones.length === 0) {
+            container.innerHTML = '<span class="empty-message">No milestones yet</span>';
+            return;
+        }
+        
+        container.innerHTML = board.milestones.map(milestone => {
+            const linkedCount = milestone.linkedCards.length;
+            const doneCount = milestone.linkedCards.filter(cardId => {
+                const card = board.cards.find(c => c.id === cardId);
+                const doneColumn = board.columns.find(col => col.name === 'Done');
+                return card && doneColumn && card.columnId === doneColumn.id;
+            }).length;
+            
+            const isCompleted = milestone.status === 'completed';
+            const progress = linkedCount > 0 ? `${doneCount}/${linkedCount}` : '0/0';
+            
+            return `
+                <div class="milestone-item ${isCompleted ? 'completed' : ''}" 
+                     onclick="PPM.ui.showMilestoneDetails('${milestone.id}')"
+                     title="${milestone.description || milestone.name}">
+                    <span class="milestone-name">${milestone.name}</span>
+                    <span class="milestone-progress">${progress}</span>
+                    <div class="milestone-actions" onclick="event.stopPropagation()">
+                        <button class="btn-milestone-action" onclick="PPM.ui.showEditMilestoneDialog('${milestone.id}')" title="Edit">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="btn-milestone-action" onclick="PPM.ui.deleteMilestoneConfirm('${milestone.id}')" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    };
+
+    const renderCategories = (board) => {
+        const container = document.getElementById('categories-container');
+        if (!container) return;
+        
+        if (!board.categories || board.categories.length === 0) {
+            container.innerHTML = '<span class="empty-message">No categories yet</span>';
+            return;
+        }
+        
+        container.innerHTML = board.categories.map(category => {
+            const cardCount = board.cards.filter(c => c.categoryId === category.id).length;
+            const isActive = state.categoryFilter === category.id;
+            
+            return `
+                <div class="category-item ${isActive ? 'active' : ''}" 
+                     onclick="PPM.ui.toggleCategoryFilter('${category.id}')"
+                     title="Click to filter by ${category.name}">
+                    <div class="category-color" style="background-color: ${category.color}"></div>
+                    <span class="category-name">${category.name}</span>
+                    <span class="category-count">${cardCount}</span>
+                    <div class="category-actions" onclick="event.stopPropagation()">
+                        <button class="btn-milestone-action" onclick="PPM.ui.showEditCategoryDialog('${category.id}')" title="Edit">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="btn-milestone-action" onclick="PPM.ui.deleteCategoryConfirm('${category.id}')" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    };
+
+    const renderGroups = (board) => {
+        const container = document.getElementById('groups-container');
+        if (!container) return;
+        
+        if (!board.groups || board.groups.length === 0) {
+            container.innerHTML = '<span class="empty-message">No groups yet</span>';
+            return;
+        }
+        
+        container.innerHTML = board.groups.map(group => {
+            const cardCount = group.linkedCards.length;
+            
+            return `
+                <div class="group-item" 
+                     onclick="PPM.ui.showGroupDetails('${group.id}')"
+                     title="Click to manage group">
+                    <div class="group-color" style="background-color: ${group.color}"></div>
+                    <span class="group-name">${group.name}</span>
+                    <span class="group-count">${cardCount} cards</span>
+                    <div class="group-actions" onclick="event.stopPropagation()">
+                        <button class="btn-milestone-action" onclick="PPM.ui.showEditGroupDialog('${group.id}')" title="Edit">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="btn-milestone-action" onclick="PPM.ui.showGroupBulkActions('${group.id}')" title="Bulk Actions">
+                            <i class="fa-solid fa-bolt"></i>
+                        </button>
+                        <button class="btn-milestone-action" onclick="PPM.ui.deleteGroupConfirm('${group.id}')" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
     };
 
     const renderBoardMembers = (board) => {
@@ -889,6 +1179,396 @@ const PPM = (() => {
 
     // ===== UI ACTIONS =====
     const ui = {
+        // Board creation dialogs
+        showCreateBoardDialog: () => {
+            const modal = document.getElementById('create-board-modal');
+            if (modal) {
+                document.getElementById('new-board-name').value = '';
+                document.getElementById('new-board-description').value = '';
+                document.getElementById('include-references-column').checked = true;
+                modal.classList.remove('hidden');
+            }
+        },
+        
+        closeCreateBoardDialog: () => {
+            const modal = document.getElementById('create-board-modal');
+            if (modal) modal.classList.add('hidden');
+        },
+        
+        // ===== MILESTONE UI =====
+        showCreateMilestoneDialog: () => {
+            const board = getCurrentBoard();
+            openModal('Create Milestone', `
+                <form id="create-milestone-form" class="modal-form">
+                    <label for="milestone-name">Milestone Name *</label>
+                    <input type="text" id="milestone-name" required autofocus placeholder="e.g., Sprint 1, Q4 Goals">
+                    
+                    <label for="milestone-description">Description (optional)</label>
+                    <textarea id="milestone-description" rows="2" placeholder="What does this milestone represent?"></textarea>
+                    
+                    <label for="milestone-color">Color</label>
+                    <input type="color" id="milestone-color" value="#4a6cf7">
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Create Milestone</button>
+                    </div>
+                </form>
+            `, () => {
+                document.getElementById('create-milestone-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('milestone-name').value.trim();
+                    const description = document.getElementById('milestone-description').value.trim();
+                    const color = document.getElementById('milestone-color').value;
+                    
+                    if (name) {
+                        createMilestone(board, { name, description, color });
+                        await saveBoards();
+                        closeModal();
+                        renderMilestones(board);
+                    }
+                });
+            });
+        },
+
+        showEditMilestoneDialog: (milestoneId) => {
+            const board = getCurrentBoard();
+            const milestone = getMilestoneById(board, milestoneId);
+            if (!milestone) return;
+            
+            openModal('Edit Milestone', `
+                <form id="edit-milestone-form" class="modal-form">
+                    <label for="edit-milestone-name">Milestone Name *</label>
+                    <input type="text" id="edit-milestone-name" value="${milestone.name}" required autofocus>
+                    
+                    <label for="edit-milestone-description">Description</label>
+                    <textarea id="edit-milestone-description" rows="2">${milestone.description || ''}</textarea>
+                    
+                    <label for="edit-milestone-color">Color</label>
+                    <input type="color" id="edit-milestone-color" value="${milestone.color}">
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            `, () => {
+                document.getElementById('edit-milestone-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('edit-milestone-name').value.trim();
+                    const description = document.getElementById('edit-milestone-description').value.trim();
+                    const color = document.getElementById('edit-milestone-color').value;
+                    
+                    if (name) {
+                        updateMilestone(board, milestoneId, { name, description, color });
+                        await saveBoards();
+                        closeModal();
+                        renderMilestones(board);
+                    }
+                });
+            });
+        },
+
+        showMilestoneDetails: (milestoneId) => {
+            const board = getCurrentBoard();
+            const milestone = getMilestoneById(board, milestoneId);
+            if (!milestone) return;
+            
+            const linkedCards = milestone.linkedCards.map(cardId => {
+                const card = board.cards.find(c => c.id === cardId);
+                const column = board.columns.find(col => col.id === card?.columnId);
+                return card ? { card, column } : null;
+            }).filter(Boolean);
+            
+            openModal(`Milestone: ${milestone.name}`, `
+                <div class="modal-form">
+                    <p><strong>Status:</strong> ${milestone.status === 'completed' ? '✅ Completed' : '⏳ In Progress'}</p>
+                    <p><strong>Description:</strong> ${milestone.description || 'No description'}</p>
+                    <p><strong>Linked Cards:</strong> ${linkedCards.length}</p>
+                    
+                    ${linkedCards.length > 0 ? `
+                        <div class="linked-cards-list" style="margin-top: 1rem;">
+                            ${linkedCards.map(({ card, column }) => `
+                                <div class="linked-card-item" style="padding: 0.5rem; background: var(--bg-secondary); border-radius: 4px; margin-bottom: 0.5rem;">
+                                    <strong>${card.title}</strong>
+                                    <br><small style="color: var(--text-secondary);">${column?.name || 'Unknown column'}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p style="color: var(--text-secondary); font-style: italic;">No cards linked to this milestone yet.</p>'}
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Close</button>
+                    </div>
+                </div>
+            `);
+        },
+
+        deleteMilestoneConfirm: async (milestoneId) => {
+            const board = getCurrentBoard();
+            const milestone = getMilestoneById(board, milestoneId);
+            if (!milestone) return;
+            
+            if (confirm(`Delete milestone "${milestone.name}"?\n\nCards will remain but won't be linked to this milestone.`)) {
+                deleteMilestone(board, milestoneId);
+                await saveBoards();
+                renderMilestones(board);
+                renderColumns(board);
+            }
+        },
+
+        // ===== CATEGORY UI =====
+        showCreateCategoryDialog: () => {
+            const board = getCurrentBoard();
+            openModal('Create Category', `
+                <form id="create-category-form" class="modal-form">
+                    <label for="category-name">Category Name *</label>
+                    <input type="text" id="category-name" required autofocus placeholder="e.g., Frontend, Backend, Design">
+                    
+                    <label for="category-color">Color</label>
+                    <input type="color" id="category-color" value="#28a745">
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Create Category</button>
+                    </div>
+                </form>
+            `, () => {
+                document.getElementById('create-category-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('category-name').value.trim();
+                    const color = document.getElementById('category-color').value;
+                    
+                    if (name) {
+                        createCategory(board, { name, color });
+                        await saveBoards();
+                        closeModal();
+                        renderCategories(board);
+                    }
+                });
+            });
+        },
+
+        showEditCategoryDialog: (categoryId) => {
+            const board = getCurrentBoard();
+            const category = getCategoryById(board, categoryId);
+            if (!category) return;
+            
+            openModal('Edit Category', `
+                <form id="edit-category-form" class="modal-form">
+                    <label for="edit-category-name">Category Name *</label>
+                    <input type="text" id="edit-category-name" value="${category.name}" required autofocus>
+                    
+                    <label for="edit-category-color">Color</label>
+                    <input type="color" id="edit-category-color" value="${category.color}">
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            `, () => {
+                document.getElementById('edit-category-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('edit-category-name').value.trim();
+                    const color = document.getElementById('edit-category-color').value;
+                    
+                    if (name) {
+                        updateCategory(board, categoryId, { name, color });
+                        await saveBoards();
+                        closeModal();
+                        renderCategories(board);
+                    }
+                });
+            });
+        },
+
+        deleteCategoryConfirm: async (categoryId) => {
+            const board = getCurrentBoard();
+            const category = getCategoryById(board, categoryId);
+            if (!category) return;
+            
+            const cardCount = board.cards.filter(c => c.categoryId === categoryId).length;
+            if (confirm(`Delete category "${category.name}"?\n\n${cardCount} card(s) will lose their category assignment.`)) {
+                deleteCategory(board, categoryId);
+                await saveBoards();
+                renderCategories(board);
+                renderColumns(board);
+            }
+        },
+
+        toggleCategoryFilter: (categoryId) => {
+            state.categoryFilter = state.categoryFilter === categoryId ? null : categoryId;
+            const board = getCurrentBoard();
+            renderCategories(board);
+            renderColumns(board);
+        },
+
+        // ===== GROUP UI =====
+        showCreateGroupDialog: () => {
+            const board = getCurrentBoard();
+            openModal('Create Group', `
+                <form id="create-group-form" class="modal-form">
+                    <label for="group-name">Group Name *</label>
+                    <input type="text" id="group-name" required autofocus placeholder="e.g., Critical Tasks, Design Sprint">
+                    
+                    <label for="group-color">Color</label>
+                    <input type="color" id="group-color" value="#ffc107">
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Create Group</button>
+                    </div>
+                </form>
+            `, () => {
+                document.getElementById('create-group-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('group-name').value.trim();
+                    const color = document.getElementById('group-color').value;
+                    
+                    if (name) {
+                        createGroup(board, { name, color });
+                        await saveBoards();
+                        closeModal();
+                        renderGroups(board);
+                    }
+                });
+            });
+        },
+
+        showEditGroupDialog: (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            if (!group) return;
+            
+            openModal('Edit Group', `
+                <form id="edit-group-form" class="modal-form">
+                    <label for="edit-group-name">Group Name *</label>
+                    <input type="text" id="edit-group-name" value="${group.name}" required autofocus>
+                    
+                    <label for="edit-group-color">Color</label>
+                    <input type="color" id="edit-group-color" value="${group.color}">
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            `, () => {
+                document.getElementById('edit-group-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('edit-group-name').value.trim();
+                    const color = document.getElementById('edit-group-color').value;
+                    
+                    if (name) {
+                        updateGroup(board, groupId, { name, color });
+                        await saveBoards();
+                        closeModal();
+                        renderGroups(board);
+                    }
+                });
+            });
+        },
+
+        showGroupDetails: (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            if (!group) return;
+            
+            const linkedCards = group.linkedCards.map(cardId => {
+                const card = board.cards.find(c => c.id === cardId);
+                const column = board.columns.find(col => col.id === card?.columnId);
+                return card ? { card, column } : null;
+            }).filter(Boolean);
+            
+            openModal(`Group: ${group.name}`, `
+                <div class="modal-form">
+                    <p><strong>Cards in Group:</strong> ${linkedCards.length}</p>
+                    
+                    ${linkedCards.length > 0 ? `
+                        <div class="linked-cards-list" style="margin-top: 1rem;">
+                            ${linkedCards.map(({ card, column }) => `
+                                <div class="linked-card-item" style="padding: 0.5rem; background: var(--bg-secondary); border-radius: 4px; margin-bottom: 0.5rem;">
+                                    <strong>${card.title}</strong>
+                                    <br><small style="color: var(--text-secondary);">${column?.name || 'Unknown column'}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p style="color: var(--text-secondary); font-style: italic;">No cards in this group yet.</p>'}
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-primary" onclick="PPM.ui.showGroupBulkActions('${groupId}')">Bulk Actions</button>
+                        <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Close</button>
+                    </div>
+                </div>
+            `);
+        },
+
+        showGroupBulkActions: (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            if (!group || group.linkedCards.length === 0) {
+                alert('No cards in this group for bulk actions.');
+                return;
+            }
+            
+            openModal(`Bulk Actions: ${group.name}`, `
+                <div class="modal-form">
+                    <p>Apply actions to all ${group.linkedCards.length} cards in this group:</p>
+                    
+                    <button type="button" class="btn-danger" style="width: 100%; margin-bottom: 0.5rem;" 
+                            onclick="PPM.ui.bulkDeleteCards('${groupId}')">
+                        <i class="fa-solid fa-trash"></i> Delete All Cards
+                    </button>
+                    
+                    <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
+                        Note: More bulk actions (assign, move, label) can be added as needed.
+                    </p>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Close</button>
+                    </div>
+                </div>
+            `);
+        },
+
+        bulkDeleteCards: async (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            if (!group) return;
+            
+            if (confirm(`Delete all ${group.linkedCards.length} cards in group "${group.name}"?\n\nThis cannot be undone!`)) {
+                group.linkedCards.forEach(cardId => {
+                    const cardIndex = board.cards.findIndex(c => c.id === cardId);
+                    if (cardIndex !== -1) {
+                        board.cards.splice(cardIndex, 1);
+                    }
+                });
+                
+                group.linkedCards = [];
+                
+                await saveBoards();
+                closeModal();
+                renderGroups(board);
+                renderColumns(board);
+                
+                alert('All cards deleted successfully.');
+            }
+        },
+
+        deleteGroupConfirm: async (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            if (!group) return;
+            
+            if (confirm(`Delete group "${group.name}"?\n\nCards will remain but won't be linked to this group.`)) {
+                deleteGroup(board, groupId);
+                await saveBoards();
+                renderGroups(board);
+                renderColumns(board);
+            }
+        },
+        
         openAddCardModal: (columnId) => {
             const board = getCurrentBoard();
             const column = getColumnById(board, columnId);
@@ -1549,12 +2229,23 @@ const PPM = (() => {
         document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
         
         document.getElementById('create-board-btn')?.addEventListener('click', () => {
-            const name = prompt('Board name:');
-            if (name && name.trim()) {
-                const board = createBoard(name.trim(), '');
-                saveBoards();
-                window.location.href = `board.html?id=${board.id}`;
+            ui.showCreateBoardDialog();
+        });
+        
+        document.getElementById('create-board-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('new-board-name').value.trim();
+            const description = document.getElementById('new-board-description').value.trim();
+            const includeReferences = document.getElementById('include-references-column').checked;
+            
+            if (!name) {
+                alert('Please enter a board name');
+                return;
             }
+            
+            const board = createBoard(name, description, null, { includeReferences });
+            await saveBoards();
+            window.location.href = `board.html?id=${board.id}`;
         });
         
         document.getElementById('add-column-btn')?.addEventListener('click', () => {

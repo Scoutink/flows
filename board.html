@@ -52,6 +52,51 @@
         </span>
     </div>
 
+    <!-- Board Management Bar -->
+    <div class="board-management-bar">
+        <!-- Milestones -->
+        <div class="management-section">
+            <div class="section-header">
+                <i class="fa-solid fa-flag-checkered"></i>
+                <span class="section-title">Milestones</span>
+                <button class="btn-sm btn-add" onclick="PPM.ui.showCreateMilestoneDialog()" title="Add Milestone">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
+            <div id="milestones-container" class="items-container">
+                <!-- Milestones will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="management-section">
+            <div class="section-header">
+                <i class="fa-solid fa-tag"></i>
+                <span class="section-title">Categories</span>
+                <button class="btn-sm btn-add" onclick="PPM.ui.showCreateCategoryDialog()" title="Add Category">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
+            <div id="categories-container" class="items-container">
+                <!-- Categories will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Groups -->
+        <div class="management-section">
+            <div class="section-header">
+                <i class="fa-solid fa-layer-group"></i>
+                <span class="section-title">Groups</span>
+                <button class="btn-sm btn-add" onclick="PPM.ui.showCreateGroupDialog()" title="Add Group">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
+            <div id="groups-container" class="items-container">
+                <!-- Groups will be rendered here -->
+            </div>
+        </div>
+    </div>
+
     <!-- Board Content -->
     <main class="board-container">
         <div id="board-columns" class="board-columns">

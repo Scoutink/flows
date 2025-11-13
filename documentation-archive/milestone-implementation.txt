@@ -1,0 +1,30 @@
+MILESTONE IMPLEMENTATION CHECKLIST:
+
+DATA STRUCTURE: ✅ Already added to board.milestones[]
+- id, name, description, linkedCards[], status, color, createdAt
+
+CRUD OPERATIONS:
+1. CREATE: createMilestone(board, data)
+2. READ: getMilestoneById(), getMilestones()
+3. UPDATE: updateMilestone(board, milestoneId, data)
+4. DELETE: deleteMilestone(board, milestoneId)
+
+AUTO-TRACKING:
+- updateMilestoneStatus(board, milestoneId) - check if all linked cards are done
+- Call after any card status change
+
+UI FUNCTIONS:
+- renderMilestones(board)
+- showCreateMilestoneDialog()
+- showEditMilestoneDialog(milestoneId)
+- showMilestoneCardSelector(milestoneId)
+
+CARD INTEGRATION:
+- Add milestoneId to card object
+- Show milestone badge on cards
+- Update renderCard() to display milestone
+
+DATA PERSISTENCE:
+- Save automatically after any milestone operation
+- All saved via existing saveBoards()
+
