@@ -106,7 +106,85 @@
         "allowGuestView": false,
         "enforceWIPLimit": false
       },
-      "activity": []
+      "activity": [],
+      "dynamicList": {
+        "isActive": false,
+        "nodes": [
+          {
+            "id": "node-sample-001",
+            "title": "Project Phases",
+            "type": "connection",
+            "parentId": null,
+            "level": 0,
+            "order": 0,
+            "collapsed": false,
+            "linkedTaskIds": [],
+            "taskData": null,
+            "createdAt": "2025-11-13T16:00:00.000Z",
+            "updatedAt": "2025-11-13T16:00:00.000Z"
+          },
+          {
+            "id": "node-sample-002",
+            "title": "Asset Management",
+            "type": "connection",
+            "parentId": "node-sample-001",
+            "level": 1,
+            "order": 0,
+            "collapsed": false,
+            "linkedTaskIds": [],
+            "taskData": null,
+            "createdAt": "2025-11-13T16:00:00.000Z",
+            "updatedAt": "2025-11-13T16:00:00.000Z"
+          },
+          {
+            "id": "node-sample-003",
+            "title": "Business Environment",
+            "type": "connection",
+            "parentId": "node-sample-001",
+            "level": 1,
+            "order": 1,
+            "collapsed": false,
+            "linkedTaskIds": [],
+            "taskData": null,
+            "createdAt": "2025-11-13T16:00:00.000Z",
+            "updatedAt": "2025-11-13T16:00:00.000Z"
+          },
+          {
+            "id": "node-sample-004",
+            "title": "Review Documentation",
+            "type": "task",
+            "parentId": null,
+            "level": 0,
+            "order": 1,
+            "collapsed": false,
+            "linkedTaskIds": [],
+            "taskData": {
+              "title": "Review Documentation",
+              "description": "Complete review of all compliance documentation",
+              "priority": "high",
+              "tags": [
+                "review",
+                "documentation"
+              ],
+              "assignments": {
+                "owner": null,
+                "executor": null,
+                "supervisor": null
+              },
+              "schedule": {
+                "startDate": null,
+                "dueDate": null,
+                "estimatedHours": 8
+              },
+              "checklist": [],
+              "comments": [],
+              "attachments": []
+            },
+            "createdAt": "2025-11-13T16:00:00.000Z",
+            "updatedAt": "2025-11-13T16:00:00.000Z"
+          }
+        ]
+      }
     }
   ],
   "cards": [

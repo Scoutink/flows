@@ -2347,6 +2347,11 @@ const PPM = (() => {
             renderBoardsView();
         } else if (view === 'board') {
             renderBoardView();
+            
+            // Initialize dynamic list
+            if (PPM.dynamicList) {
+                PPM.dynamicList.init();
+            }
         }
         
         // Setup global handlers
@@ -2421,3 +2426,560 @@ const PPM = (() => {
 
 // Make PPM available globally
 window.PPM = PPM;
+// ============================================================================
+// DYNAMIC LIST TREE FEATURE
+// ============================================================================
+
+PPM.dynamicList = {
+    currentNodeId: null,
+    activeFilterNodeId: null,
+    
+    // Initialize dynamic list
+    init: function() {
+        const board = PPM.getCurrentBoard();
+        if (!board.dynamicList) {
+            board.dynamicList = {
+                isActive: false,
+                nodes: []
+            };
+        }
+        
+        this.render();
+        this.setupEventListeners();
+    },
+    
+    // Setup event listeners
+    setupEventListeners: function() {
+        const toggleBtn = document.getElementById('toggle-dynamic-list');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => this.toggleCollapse());
+        }
+    },
+    
+    // Toggle collapse/expand
+    toggleCollapse: function() {
+        const container = document.getElementById('dynamic-list-container');
+        const icon = document.querySelector('#toggle-dynamic-list i');
+        container.classList.toggle('collapsed');
+        icon.classList.toggle('fa-chevron-up');
+        icon.classList.toggle('fa-chevron-down');
+    },
+    
+    // Toggle mode (Creation/Active)
+    toggleMode: function() {
+        const board = PPM.getCurrentBoard();
+        board.dynamicList.isActive = !board.dynamicList.isActive;
+        PPM.saveBoards();
+        this.render();
+        this.updateModeUI();
+    },
+    
+    // Update mode UI
+    updateModeUI: function() {
+        const board = PPM.getCurrentBoard();
+        const modeBtn = document.getElementById('dynamic-list-mode-btn');
+        const modeText = document.getElementById('mode-text');
+        const icon = modeBtn.querySelector('i');
+        
+        if (board.dynamicList.isActive) {
+            modeText.textContent = 'Active';
+            icon.className = 'fa-solid fa-check-circle';
+            modeBtn.classList.add('mode-active');
+        } else {
+            modeText.textContent = 'Creation';
+            icon.className = 'fa-solid fa-edit';
+            modeBtn.classList.remove('mode-active');
+        }
+    },
+    
+    // Render tree
+    render: function() {
+        const board = PPM.getCurrentBoard();
+        const container = document.getElementById('dynamic-list-tree');
+        const emptyState = document.getElementById('tree-empty-state');
+        
+        if (!board.dynamicList.nodes || board.dynamicList.nodes.length === 0) {
+            emptyState.classList.remove('hidden');
+            return;
+        }
+        
+        emptyState.classList.add('hidden');
+        
+        // Render root nodes
+        const rootNodes = board.dynamicList.nodes.filter(n => !n.parentId);
+        let html = '';
+        
+        for (const node of rootNodes) {
+            html += this.renderNode(node, 0);
+        }
+        
+        container.innerHTML = html;
+        this.updateModeUI();
+    },
+    
+    // Render single node
+    renderNode: function(node, level) {
+        const board = PPM.getCurrentBoard();
+        const children = board.dynamicList.nodes.filter(n => n.parentId === node.id);
+        const hasChildren = children.length > 0;
+        const isCollapsed = node.collapsed || false;
+        const isActive = board.dynamicList.isActive;
+        const isFiltered = this.activeFilterNodeId === node.id;
+        
+        // Get task count for connection nodes
+        let taskCount = 0;
+        if (node.type === 'connection') {
+            taskCount = this.getLinkedTaskCount(node.id);
+        }
+        
+        // Icon based on type
+        const icon = node.type === 'task' ? 'fa-check-square' : 'fa-link';
+        const typeClass = `node-${node.type}`;
+        
+        let html = `
+            <div class="tree-node ${typeClass} ${isFiltered ? 'node-filtered' : ''}" 
+                 data-node-id="${node.id}" 
+                 data-level="${level}" 
+                 style="margin-left: ${level * 20}px">
+                <div class="node-content">
+                    ${hasChildren ? `
+                        <button class="node-toggle" onclick="PPM.dynamicList.toggleNode('${node.id}')">
+                            <i class="fa-solid fa-chevron-${isCollapsed ? 'right' : 'down'}"></i>
+                        </button>
+                    ` : '<span class="node-spacer"></span>'}
+                    
+                    <span class="node-icon">
+                        <i class="fa-solid ${icon}"></i>
+                    </span>
+                    
+                    <span class="node-title" onclick="PPM.dynamicList.onNodeClick('${node.id}')">
+                        ${node.title}
+                        ${node.type === 'connection' && taskCount > 0 ? `<span class="task-count-badge">${taskCount}</span>` : ''}
+                    </span>
+                    
+                    ${!isActive ? `
+                        <div class="node-actions">
+                            ${level < 9 ? `
+                                <button class="btn-icon-sm" onclick="PPM.dynamicList.showNodeDialog('${node.id}')" title="Add child">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            ` : ''}
+                            ${node.type === 'connection' ? `
+                                <button class="btn-icon-sm" onclick="PPM.dynamicList.showTaskLinkDialog('${node.id}')" title="Link tasks">
+                                    <i class="fa-solid fa-link"></i>
+                                </button>
+                            ` : ''}
+                            <button class="btn-icon-sm" onclick="PPM.dynamicList.editNode('${node.id}')" title="Edit">
+                                <i class="fa-solid fa-edit"></i>
+                            </button>
+                            <button class="btn-icon-sm btn-danger" onclick="PPM.dynamicList.deleteNode('${node.id}')" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+        
+        // Render children if not collapsed
+        if (hasChildren && !isCollapsed) {
+            for (const child of children) {
+                html += this.renderNode(child, level + 1);
+            }
+        }
+        
+        return html;
+    },
+    
+    // Get linked task count (including descendants)
+    getLinkedTaskCount: function(nodeId) {
+        const board = PPM.getCurrentBoard();
+        const taskIds = new Set();
+        
+        const addTasksRecursive = (nId) => {
+            const node = board.dynamicList.nodes.find(n => n.id === nId);
+            if (!node) return;
+            
+            // Add this node's tasks
+            if (node.linkedTaskIds) {
+                node.linkedTaskIds.forEach(id => taskIds.add(id));
+            }
+            
+            // Add children's tasks
+            const children = board.dynamicList.nodes.filter(n => n.parentId === nId);
+            children.forEach(child => addTasksRecursive(child.id));
+        };
+        
+        addTasksRecursive(nodeId);
+        return taskIds.size;
+    },
+    
+    // Toggle node collapse
+    toggleNode: function(nodeId) {
+        const board = PPM.getCurrentBoard();
+        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+        if (node) {
+            node.collapsed = !node.collapsed;
+            PPM.saveBoards();
+            this.render();
+        }
+    },
+    
+    // Node click handler
+    onNodeClick: function(nodeId) {
+        const board = PPM.getCurrentBoard();
+        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+        
+        if (!board.dynamicList.isActive) {
+            return; // Do nothing in creation mode
+        }
+        
+        if (node.type === 'task') {
+            // Open task modal
+            this.openTaskModal(nodeId);
+        } else if (node.type === 'connection') {
+            // Filter board by this node
+            this.filterByNode(nodeId);
+        }
+    },
+    
+    // Open task modal for task nodes
+    openTaskModal: function(nodeId) {
+        const board = PPM.getCurrentBoard();
+        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+        
+        if (!node || !node.taskData) {
+            // Initialize task data if doesn't exist
+            node.taskData = {
+                title: node.title,
+                description: '',
+                priority: 'medium',
+                tags: [],
+                assignments: {owner: null, executor: null, supervisor: null},
+                schedule: {startDate: null, dueDate: null, estimatedHours: null},
+                checklist: [],
+                comments: [],
+                attachments: []
+            };
+        }
+        
+        // Use existing card modal but populate with task data
+        // TODO: Implement task modal integration
+        alert(`Task Modal: ${node.title}\n\nThis will open a full task modal in the complete implementation.`);
+    },
+    
+    // Filter board by node
+    filterByNode: function(nodeId) {
+        const board = PPM.getCurrentBoard();
+        const taskIds = new Set();
+        
+        // Recursively get all task IDs from this node and descendants
+        const collectTasks = (nId) => {
+            const node = board.dynamicList.nodes.find(n => n.id === nId);
+            if (!node) return;
+            
+            if (node.linkedTaskIds) {
+                node.linkedTaskIds.forEach(id => taskIds.add(id));
+            }
+            
+            const children = board.dynamicList.nodes.filter(n => n.parentId === nId);
+            children.forEach(child => collectTasks(child.id));
+        };
+        
+        collectTasks(nodeId);
+        
+        // Apply filter to board
+        this.activeFilterNodeId = nodeId;
+        const cards = document.querySelectorAll('.board-card');
+        
+        cards.forEach(card => {
+            const cardId = card.dataset.cardId;
+            if (taskIds.has(cardId)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        // Show clear filter button
+        const clearBtn = document.getElementById('clear-list-filter-btn');
+        clearBtn.classList.remove('hidden');
+        
+        // Highlight the active node
+        this.render();
+    },
+    
+    // Clear filter
+    clearFilter: function() {
+        this.activeFilterNodeId = null;
+        
+        // Show all cards
+        const cards = document.querySelectorAll('.board-card');
+        cards.forEach(card => {
+            card.style.display = '';
+        });
+        
+        // Hide clear filter button
+        const clearBtn = document.getElementById('clear-list-filter-btn');
+        clearBtn.classList.add('hidden');
+        
+        this.render();
+    },
+    
+    // Show node dialog (create or add child)
+    showNodeDialog: function(parentId) {
+        this.currentNodeId = null;
+        const dialog = document.getElementById('node-dialog-backdrop');
+        const title = document.getElementById('node-dialog-title');
+        const titleInput = document.getElementById('node-title');
+        const typeSelect = document.getElementById('node-type');
+        const parentSelect = document.getElementById('node-parent');
+        const editIdInput = document.getElementById('node-edit-id');
+        
+        title.textContent = parentId ? 'Add Child Node' : 'Add Root Node';
+        titleInput.value = '';
+        typeSelect.value = 'connection';
+        editIdInput.value = '';
+        
+        // Populate parent options
+        this.populateParentOptions(parentSelect, parentId);
+        
+        if (parentId) {
+            parentSelect.value = parentId;
+            parentSelect.disabled = true;
+        } else {
+            parentSelect.disabled = false;
+        }
+        
+        dialog.classList.remove('hidden');
+        titleInput.focus();
+    },
+    
+    // Edit node
+    editNode: function(nodeId) {
+        const board = PPM.getCurrentBoard();
+        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+        if (!node) return;
+        
+        this.currentNodeId = nodeId;
+        const dialog = document.getElementById('node-dialog-backdrop');
+        const title = document.getElementById('node-dialog-title');
+        const titleInput = document.getElementById('node-title');
+        const typeSelect = document.getElementById('node-type');
+        const parentSelect = document.getElementById('node-parent');
+        const editIdInput = document.getElementById('node-edit-id');
+        
+        title.textContent = 'Edit Node';
+        titleInput.value = node.title;
+        typeSelect.value = node.type;
+        editIdInput.value = nodeId;
+        
+        this.populateParentOptions(parentSelect, node.parentId, nodeId);
+        parentSelect.value = node.parentId || '';
+        
+        dialog.classList.remove('hidden');
+        titleInput.focus();
+    },
+    
+    // Populate parent select options
+    populateParentOptions: function(select, currentParentId, excludeNodeId) {
+        const board = PPM.getCurrentBoard();
+        select.innerHTML = '<option value="">Root Level</option>';
+        
+        const addOptions = (nodes, level) => {
+            for (const node of nodes) {
+                if (node.id === excludeNodeId) continue; // Don't allow node to be its own parent
+                
+                const indent = '&nbsp;&nbsp;'.repeat(level);
+                const option = document.createElement('option');
+                option.value = node.id;
+                option.innerHTML = `${indent}${node.title}`;
+                
+                // Disable if at level 9 (can't add children)
+                if (level >= 9) {
+                    option.disabled = true;
+                }
+                
+                select.appendChild(option);
+                
+                // Add children
+                const children = board.dynamicList.nodes.filter(n => n.parentId === node.id);
+                if (children.length > 0) {
+                    addOptions(children, level + 1);
+                }
+            }
+        };
+        
+        const rootNodes = board.dynamicList.nodes.filter(n => !n.parentId && n.id !== excludeNodeId);
+        addOptions(rootNodes, 0);
+    },
+    
+    // Node type change handler
+    onNodeTypeChange: function() {
+        // Could add additional UI changes based on type if needed
+    },
+    
+    // Save node (create or update)
+    saveNode: function() {
+        const board = PPM.getCurrentBoard();
+        const title = document.getElementById('node-title').value.trim();
+        const type = document.getElementById('node-type').value;
+        const parentId = document.getElementById('node-parent').value || null;
+        const editId = document.getElementById('node-edit-id').value;
+        
+        if (!title) {
+            alert('Please enter a title');
+            return;
+        }
+        
+        // Calculate level
+        let level = 0;
+        if (parentId) {
+            const parent = board.dynamicList.nodes.find(n => n.id === parentId);
+            if (parent) {
+                level = (parent.level || 0) + 1;
+            }
+        }
+        
+        if (level > 9) {
+            alert('Maximum level depth (10) reached');
+            return;
+        }
+        
+        if (editId) {
+            // Update existing node
+            const node = board.dynamicList.nodes.find(n => n.id === editId);
+            if (node) {
+                node.title = title;
+                node.type = type;
+                node.parentId = parentId;
+                node.level = level;
+                node.updatedAt = new Date().toISOString();
+            }
+        } else {
+            // Create new node
+            const newNode = {
+                id: `node-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+                title: title,
+                type: type,
+                parentId: parentId,
+                level: level,
+                order: board.dynamicList.nodes.filter(n => n.parentId === parentId).length,
+                collapsed: false,
+                linkedTaskIds: [],
+                taskData: type === 'task' ? {} : null,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            board.dynamicList.nodes.push(newNode);
+        }
+        
+        PPM.saveBoards();
+        this.render();
+        this.closeNodeDialog();
+    },
+    
+    // Delete node
+    deleteNode: function(nodeId) {
+        const board = PPM.getCurrentBoard();
+        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+        if (!node) return;
+        
+        const children = board.dynamicList.nodes.filter(n => n.parentId === nodeId);
+        
+        let message = `Delete "${node.title}"?`;
+        if (children.length > 0) {
+            message += `\n\nThis node has ${children.length} child node(s). They will also be deleted.`;
+        }
+        
+        if (!confirm(message)) return;
+        
+        // Recursively delete node and all descendants
+        const deleteRecursive = (nId) => {
+            const descendants = board.dynamicList.nodes.filter(n => n.parentId === nId);
+            descendants.forEach(d => deleteRecursive(d.id));
+            board.dynamicList.nodes = board.dynamicList.nodes.filter(n => n.id !== nId);
+        };
+        
+        deleteRecursive(nodeId);
+        PPM.saveBoards();
+        this.render();
+    },
+    
+    // Close node dialog
+    closeNodeDialog: function() {
+        const dialog = document.getElementById('node-dialog-backdrop');
+        dialog.classList.add('hidden');
+    },
+    
+    // Show task link dialog
+    showTaskLinkDialog: function(nodeId) {
+        const board = PPM.getCurrentBoard();
+        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+        if (!node || node.type !== 'connection') return;
+        
+        this.currentNodeId = nodeId;
+        const dialog = document.getElementById('task-link-dialog-backdrop');
+        const nodeTitle = document.getElementById('link-node-title');
+        const taskList = document.getElementById('task-link-list');
+        
+        nodeTitle.textContent = node.title;
+        
+        // Get all board cards (excluding reference column)
+        const cards = PPM.state.cards || [];
+        const boardCards = cards.filter(c => {
+            const col = board.columns.find(col => col.id === c.columnId);
+            return col && !col.locked;
+        });
+        
+        // Render task list with checkboxes
+        let html = '';
+        for (const card of boardCards) {
+            const isLinked = node.linkedTaskIds && node.linkedTaskIds.includes(card.id);
+            html += `
+                <div class="task-link-item">
+                    <label>
+                        <input type="checkbox" 
+                               value="${card.id}" 
+                               ${isLinked ? 'checked' : ''}
+                               onchange="PPM.dynamicList.toggleTaskLink('${nodeId}', '${card.id}', this.checked)">
+                        <span>${card.title}</span>
+                    </label>
+                </div>
+            `;
+        }
+        
+        taskList.innerHTML = html || '<p class="text-muted">No tasks available</p>';
+        dialog.classList.remove('hidden');
+    },
+    
+    // Toggle task link
+    toggleTaskLink: function(nodeId, taskId, checked) {
+        const board = PPM.getCurrentBoard();
+        const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+        if (!node) return;
+        
+        if (!node.linkedTaskIds) {
+            node.linkedTaskIds = [];
+        }
+        
+        if (checked) {
+            if (!node.linkedTaskIds.includes(taskId)) {
+                node.linkedTaskIds.push(taskId);
+            }
+        } else {
+            node.linkedTaskIds = node.linkedTaskIds.filter(id => id !== taskId);
+        }
+        
+        PPM.saveBoards();
+        this.render(); // Update task counts
+    },
+    
+    // Close task link dialog
+    closeTaskLinkDialog: function() {
+        const dialog = document.getElementById('task-link-dialog-backdrop');
+        dialog.classList.add('hidden');
+    }
+};
+
