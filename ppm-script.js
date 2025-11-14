@@ -76,22 +76,10 @@ const PPM = (() => {
             if (!res.ok) throw new Error('Failed to load boards');
             const data = await res.json();
             state.boards = data.boards || [];
-            state.cards = data.cards || []; // Load cards from root level
-            
-            // Populate each board's cards array from root-level cards
-            // This maintains compatibility with existing code that expects board.cards
-            state.boards.forEach(board => {
-                board.cards = state.cards.filter(card => {
-                    // Cards belong to a board if their column belongs to the board
-                    const column = board.columns.find(col => col.id === card.columnId);
-                    return column !== undefined;
-                });
-            });
         } catch (e) {
             console.error('Load boards error:', e);
             alert('Failed to load boards. Please refresh the page.');
             state.boards = [];
-            state.cards = [];
         }
     };
 
@@ -112,24 +100,10 @@ const PPM = (() => {
 
     const saveBoards = async () => {
         try {
-            // Collect all cards from all boards into root-level cards array
-            const allCards = [];
-            state.boards.forEach(board => {
-                if (board.cards && board.cards.length > 0) {
-                    allCards.push(...board.cards);
-                }
-            });
-            
-            // Update state.cards with latest card data
-            state.cards = allCards;
-            
             const res = await fetch('save_board.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    boards: state.boards,
-                    cards: state.cards  // Save cards at root level
-                })
+                body: JSON.stringify({ boards: state.boards })
             });
             const json = await res.json();
             if (!res.ok || json.status !== 'success') throw new Error(json.message || 'Save failed');
@@ -798,16 +772,9 @@ const PPM = (() => {
     };
 
     const renderBoardCard = (board) => {
-        // Get cards for this board from root-level cards array
-        const boardCards = (state.cards || []).filter(c => {
-            // Cards are linked to boards via columnId -> find column's boardId
-            const column = board.columns.find(col => col.id === c.columnId);
-            return column !== undefined;
-        });
-        
-        const cardCount = boardCards.length;
+        const cardCount = board.cards.length;
         const doneColumn = board.columns.find(c => c.name === 'Done');
-        const doneCount = doneColumn ? boardCards.filter(c => c.columnId === doneColumn.id).length : 0;
+        const doneCount = doneColumn ? board.cards.filter(c => c.columnId === doneColumn.id).length : 0;
         const progress = cardCount > 0 ? Math.round((doneCount / cardCount) * 100) : 0;
         
         return `
@@ -1972,37 +1939,20 @@ const PPM = (() => {
                         </div>
                     ` : ''}
                     
-                    ${card.checklist && card.checklist.length > 0 ? `
+                    ${card.checklist.length > 0 ? `
                         <div class="detail-section">
                             <label>Checklist</label>
-                            <div class="checklist" id="card-checklist-${card.id}">
+                            <div class="checklist">
                                 ${card.checklist.map((item, i) => `
                                     <div class="checklist-item">
-                                        <input type="checkbox" 
-                                               id="check-${i}" 
-                                               ${item.completed ? 'checked' : ''} 
+                                        <input type="checkbox" id="check-${i}" ${item.completed ? 'checked' : ''} 
                                                onchange="PPM.ui.toggleChecklistItem('${card.id}', ${i})">
                                         <label for="check-${i}">${item.text}</label>
-                                        <button class="btn-icon-sm" onclick="PPM.ui.removeChecklistItem('${card.id}', ${i})">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
                                     </div>
                                 `).join('')}
                             </div>
                         </div>
                     ` : ''}
-                    
-                    <div class="detail-section">
-                        <label>Add Checklist Item</label>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" id="card-new-checklist-${card.id}" class="form-input"
-                                   placeholder="New checklist item"
-                                   onkeypress="if(event.key==='Enter') PPM.ui.addChecklistItem('${card.id}')">
-                            <button class="btn-primary" onclick="PPM.ui.addChecklistItem('${card.id}')">
-                                <i class="fa-solid fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
                     
                     <!-- Activity Thread Section -->
                     <div class="detail-section">
@@ -2156,69 +2106,6 @@ const PPM = (() => {
             card.checklist[index].completedBy = card.checklist[index].completed ? state.currentUser?.id : null;
             card.checklist[index].completedAt = card.checklist[index].completed ? new Date().toISOString() : null;
             saveBoards();
-        }
-    };
-    
-    ui.addChecklistItem = async (cardId) => {
-        try {
-            const board = getCurrentBoard();
-            const card = getCardById(board, cardId);
-            const input = document.getElementById(`card-new-checklist-${cardId}`);
-            
-            if (!input) {
-                console.error('Checklist input not found');
-                return;
-            }
-            
-            const text = input.value.trim();
-            if (!text) {
-                alert('Please enter checklist item text');
-                return;
-            }
-            
-            if (!card.checklist) card.checklist = [];
-            
-            card.checklist.push({
-                text: text,
-                completed: false,
-                completedBy: null,
-                completedAt: null
-            });
-            
-            await saveBoards();
-            input.value = '';
-            
-            // Re-render modal to show new item
-            closeCardModal();
-            setTimeout(() => {
-                ui.openCardDetail(cardId);
-            }, 100);
-        } catch (err) {
-            console.error('addChecklistItem error:', err);
-            alert('Failed to add checklist item: ' + err.message);
-        }
-    };
-    
-    ui.removeChecklistItem = async (cardId, index) => {
-        if (!confirm('Remove this checklist item?')) return;
-        
-        try {
-            const board = getCurrentBoard();
-            const card = getCardById(board, cardId);
-            
-            if (card && card.checklist) {
-                card.checklist.splice(index, 1);
-                await saveBoards();
-                
-                // Re-render modal
-                closeCardModal();
-                setTimeout(() => {
-                    ui.openCardDetail(cardId);
-                }, 100);
-            }
-        } catch (err) {
-            console.error('removeChecklistItem error:', err);
-            alert('Failed to remove checklist item: ' + err.message);
         }
     };
 
@@ -4255,4 +4142,3 @@ PPM.dynamicList = {
         }
     }
 };
-
