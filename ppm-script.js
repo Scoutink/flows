@@ -76,10 +76,22 @@ const PPM = (() => {
             if (!res.ok) throw new Error('Failed to load boards');
             const data = await res.json();
             state.boards = data.boards || [];
+            state.cards = data.cards || []; // Load cards from root level
+            
+            // Populate each board's cards array from root-level cards
+            // This maintains compatibility with existing code that expects board.cards
+            state.boards.forEach(board => {
+                board.cards = state.cards.filter(card => {
+                    // Cards belong to a board if their column belongs to the board
+                    const column = board.columns.find(col => col.id === card.columnId);
+                    return column !== undefined;
+                });
+            });
         } catch (e) {
             console.error('Load boards error:', e);
             alert('Failed to load boards. Please refresh the page.');
             state.boards = [];
+            state.cards = [];
         }
     };
 
@@ -100,10 +112,24 @@ const PPM = (() => {
 
     const saveBoards = async () => {
         try {
+            // Collect all cards from all boards into root-level cards array
+            const allCards = [];
+            state.boards.forEach(board => {
+                if (board.cards && board.cards.length > 0) {
+                    allCards.push(...board.cards);
+                }
+            });
+            
+            // Update state.cards with latest card data
+            state.cards = allCards;
+            
             const res = await fetch('save_board.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ boards: state.boards })
+                body: JSON.stringify({ 
+                    boards: state.boards,
+                    cards: state.cards  // Save cards at root level
+                })
             });
             const json = await res.json();
             if (!res.ok || json.status !== 'success') throw new Error(json.message || 'Save failed');
@@ -772,9 +798,16 @@ const PPM = (() => {
     };
 
     const renderBoardCard = (board) => {
-        const cardCount = board.cards.length;
+        // Get cards for this board from root-level cards array
+        const boardCards = (state.cards || []).filter(c => {
+            // Cards are linked to boards via columnId -> find column's boardId
+            const column = board.columns.find(col => col.id === c.columnId);
+            return column !== undefined;
+        });
+        
+        const cardCount = boardCards.length;
         const doneColumn = board.columns.find(c => c.name === 'Done');
-        const doneCount = doneColumn ? board.cards.filter(c => c.columnId === doneColumn.id).length : 0;
+        const doneCount = doneColumn ? boardCards.filter(c => c.columnId === doneColumn.id).length : 0;
         const progress = cardCount > 0 ? Math.round((doneCount / cardCount) * 100) : 0;
         
         return `
