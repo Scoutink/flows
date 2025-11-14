@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Template Creation Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        input, textarea { display: block; margin: 10px 0; padding: 5px; width: 300px; }
+        button { padding: 10px 20px; margin: 10px 5px; }
+        .level-item { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+        #output { background: #f0f0f0; padding: 10px; margin-top: 20px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>Template Creation Test</h1>
+    
+    <h2>Template Info</h2>
+    <input type="text" id="template-name" placeholder="Template Name" value="Test Template">
+    <textarea id="template-description" placeholder="Description">Test description</textarea>
+    <label><input type="checkbox" id="template-default"> Set as default</label>
+    
+    <h2>Level 1</h2>
+    <div class="level-item" data-level-index="0">
+        <input type="text" class="level-name" placeholder="Level Name" value="Rules">
+        <input type="text" class="level-singular" placeholder="Singular" value="Rule">
+        <input type="text" class="level-plural" placeholder="Plural" value="Rules">
+        <input type="text" class="level-description" placeholder="Description">
+    </div>
+    
+    <button onclick="testRead()">Test Read Values</button>
+    <button onclick="testValidation()">Test Validation</button>
+    
+    <div id="output"></div>
+    
+    <script>
+        function testRead() {
+            const output = document.getElementById('output');
+            
+            // Test template fields
+            const nameEl = document.getElementById('template-name');
+            const descEl = document.getElementById('template-description');
+            const defEl = document.getElementById('template-default');
+            
+            // Test level fields
+            const levelEl = document.querySelector('[data-level-index="0"]');
+            const levelNameEl = levelEl ? levelEl.querySelector('.level-name') : null;
+            const levelSingularEl = levelEl ? levelEl.querySelector('.level-singular') : null;
+            const levelPluralEl = levelEl ? levelEl.querySelector('.level-plural') : null;
+            
+            const result = {
+                templateName: nameEl ? nameEl.value : 'NOT FOUND',
+                templateDesc: descEl ? descEl.value : 'NOT FOUND',
+                templateDefault: defEl ? defEl.checked : 'NOT FOUND',
+                levelElement: levelEl ? 'FOUND' : 'NOT FOUND',
+                levelName: levelNameEl ? levelNameEl.value : 'NOT FOUND',
+                levelSingular: levelSingularEl ? levelSingularEl.value : 'NOT FOUND',
+                levelPlural: levelPluralEl ? levelPluralEl.value : 'NOT FOUND'
+            };
+            
+            output.textContent = 'READ TEST:\n' + JSON.stringify(result, null, 2);
+            console.log('Read test:', result);
+        }
+        
+        function testValidation() {
+            const output = document.getElementById('output');
+            
+            const template = {
+                name: document.getElementById('template-name').value.trim(),
+                description: document.getElementById('template-description').value.trim(),
+                levels: []
+            };
+            
+            const levelEl = document.querySelector('[data-level-index="0"]');
+            if (levelEl) {
+                const level = {
+                    name: levelEl.querySelector('.level-name').value.trim(),
+                    singularName: levelEl.querySelector('.level-singular').value.trim(),
+                    pluralName: levelEl.querySelector('.level-plural').value.trim()
+                };
+                template.levels.push(level);
+            }
+            
+            // Validate
+            const errors = [];
+            if (!template.name) errors.push('Template name is required');
+            
+            template.levels.forEach((level, idx) => {
+                if (!level.name) errors.push(`Level ${idx + 1} name is required`);
+                if (!level.singularName) errors.push(`Level ${idx + 1} singular name is required`);
+                if (!level.pluralName) errors.push(`Level ${idx + 1} plural name is required`);
+            });
+            
+            output.textContent = 'VALIDATION TEST:\n' + 
+                'Template: ' + JSON.stringify(template, null, 2) + '\n\n' +
+                'Errors: ' + (errors.length > 0 ? errors.join('\n') : 'NONE - VALID!');
+            console.log('Validation test:', { template, errors });
+        }
+    </script>
+</body>
+</html>

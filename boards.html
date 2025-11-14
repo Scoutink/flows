@@ -76,6 +76,41 @@
         </div>
     </div>
 
+    <!-- Create Board Modal -->
+    <div id="create-board-modal" class="modal-backdrop hidden">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Create New Board</h3>
+                <button onclick="PPM.ui.closeCreateBoardDialog()" class="btn-icon">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="create-board-form">
+                    <div class="form-group">
+                        <label for="new-board-name">Board Name <span class="required">*</span></label>
+                        <input type="text" id="new-board-name" class="form-input" placeholder="e.g., Q4 Marketing Campaign" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-board-description">Description (optional)</label>
+                        <textarea id="new-board-description" class="form-input" rows="3" placeholder="Brief description of this board's purpose..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="include-references-column" checked>
+                            <span>Include References Column (locked for reference materials)</span>
+                        </label>
+                        <p class="form-help">The References column is locked and cards cannot be moved from it. Useful for keeping reference documents, links, and resources separate from active tasks.</p>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" onclick="PPM.ui.closeCreateBoardDialog()" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="btn-primary">Create Board</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="ppm-script.js"></script>
     <script>
         // Initialize boards view

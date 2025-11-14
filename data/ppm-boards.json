@@ -1,0 +1,684 @@
+{
+  "boards": [
+    {
+      "id": "board-sample-001",
+      "name": "SampleBoard",
+      "description": "Sample board from workflow",
+      "sourceControlId": null,
+      "sourceFlowId": null,
+      "createdAt": "2025-11-13T15:38:58.019885",
+      "createdBy": "user-default-001",
+      "archived": false,
+      "members": [
+        {
+          "userId": "user-default-001",
+          "name": "Default User",
+          "email": "user@company.com",
+          "role": "admin",
+          "avatar": "",
+          "joinedAt": "2025-11-13T15:38:58.019885"
+        }
+      ],
+      "columns": [
+        {
+          "id": "col-ref-001",
+          "name": "References",
+          "order": 0,
+          "limit": null,
+          "color": "#6c757d",
+          "locked": true
+        },
+        {
+          "id": "col-todo-002",
+          "name": "To Do",
+          "order": 1,
+          "limit": null,
+          "color": "#0d6efd"
+        },
+        {
+          "id": "col-prog-003",
+          "name": "In Progress",
+          "order": 2,
+          "limit": 5,
+          "color": "#0dcaf0"
+        },
+        {
+          "id": "col-rev-004",
+          "name": "Review",
+          "order": 3,
+          "limit": null,
+          "color": "#ffc107"
+        },
+        {
+          "id": "col-done-005",
+          "name": "Done",
+          "order": 4,
+          "limit": null,
+          "color": "#198754"
+        }
+      ],
+      "labels": [],
+      "categories": [
+        {
+          "id": "cat-1761691229395-98uze",
+          "name": "ID.AM - Asset Management",
+          "color": "#10b981",
+          "description": "Category from Rule: ID.AM - Asset Management",
+          "linkedCards": [
+            "card-1763048354709-92341",
+            "card-1763048354709-51181",
+            "card-1763048354709-76493",
+            "card-1763048354709-85343",
+            "card-1763048354709-58645",
+            "card-1763048354709-35374"
+          ],
+          "createdAt": "2025-11-13T15:39:14.709369"
+        },
+        {
+          "id": "cat-1761691229395-miynx",
+          "name": "ID.BE - Business Environment",
+          "color": "#06b6d4",
+          "description": "Category from Rule: ID.BE - Business Environment",
+          "linkedCards": [
+            "card-1763048354709-24124",
+            "card-1763048354709-33653",
+            "card-1763048354709-24745",
+            "card-1763048354709-28015",
+            "card-1763048354709-43295"
+          ],
+          "createdAt": "2025-11-13T15:39:14.709369"
+        },
+        {
+          "id": "cat-1761691229395-wcofp",
+          "name": "ID.GV - Governance",
+          "color": "#6366f1",
+          "description": "Category from Rule: ID.GV - Governance",
+          "linkedCards": [
+            "card-1763048354709-77723"
+          ],
+          "createdAt": "2025-11-13T15:39:14.709369"
+        }
+      ],
+      "milestones": [],
+      "groups": [],
+      "settings": {
+        "notificationsEnabled": true,
+        "allowGuestView": false,
+        "enforceWIPLimit": false
+      },
+      "activity": [],
+      "dynamicList": {
+        "isActive": false,
+        "nodes": [
+          {
+            "id": "node-sample-001",
+            "title": "Project Phases",
+            "type": "connection",
+            "parentId": null,
+            "level": 0,
+            "order": 0,
+            "collapsed": false,
+            "linkedTaskIds": [],
+            "taskData": null,
+            "createdAt": "2025-11-13T16:00:00.000Z",
+            "updatedAt": "2025-11-13T16:00:00.000Z"
+          },
+          {
+            "id": "node-sample-002",
+            "title": "Asset Management",
+            "type": "connection",
+            "parentId": "node-sample-001",
+            "level": 1,
+            "order": 0,
+            "collapsed": false,
+            "linkedTaskIds": [],
+            "taskData": null,
+            "createdAt": "2025-11-13T16:00:00.000Z",
+            "updatedAt": "2025-11-13T16:00:00.000Z"
+          },
+          {
+            "id": "node-sample-003",
+            "title": "Business Environment",
+            "type": "connection",
+            "parentId": "node-sample-001",
+            "level": 1,
+            "order": 1,
+            "collapsed": false,
+            "linkedTaskIds": [],
+            "taskData": null,
+            "createdAt": "2025-11-13T16:00:00.000Z",
+            "updatedAt": "2025-11-13T16:00:00.000Z"
+          },
+          {
+            "id": "node-sample-004",
+            "title": "Review Documentation",
+            "type": "task",
+            "parentId": null,
+            "level": 0,
+            "order": 1,
+            "collapsed": false,
+            "linkedTaskIds": [],
+            "taskData": {
+              "title": "Review Documentation",
+              "description": "Complete review of all compliance documentation",
+              "priority": "high",
+              "tags": [
+                "review",
+                "documentation"
+              ],
+              "assignments": {
+                "owner": null,
+                "executor": null,
+                "supervisor": null
+              },
+              "schedule": {
+                "startDate": null,
+                "dueDate": null,
+                "estimatedHours": 8
+              },
+              "checklist": [],
+              "comments": [],
+              "attachments": []
+            },
+            "createdAt": "2025-11-13T16:00:00.000Z",
+            "updatedAt": "2025-11-13T16:00:00.000Z"
+          }
+        ]
+      }
+    }
+  ],
+  "cards": [
+    {
+      "id": "card-1763048354709-92341",
+      "title": "ID.AM-1: Inventarisatie van de binnen de organisatie gebruikte fysieke apparaten en systemen.",
+      "description": "Action reference: ID.AM-1: Inventarisatie van de binnen de organisatie gebruikte fysieke apparaten en systemen.",
+      "columnId": "col-ref-001",
+      "order": 0,
+      "categoryId": "cat-1761691229395-98uze",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "action"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "act-1763048354709-77015",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:39:14.709369",
+          "details": "Action reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:39:14.709369",
+      "updatedAt": "2025-11-13T15:39:14.709369",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763048354709-51181",
+      "title": "ID.AM-2: Inventarisatie van de binnen de organisatie gebruikte softwareplatforms en -toepassingen.",
+      "description": "Action reference: ID.AM-2: Inventarisatie van de binnen de organisatie gebruikte softwareplatforms en -toepassingen.",
+      "columnId": "col-ref-001",
+      "order": 1,
+      "categoryId": "cat-1761691229395-98uze",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "action"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "act-1763048354709-98463",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:39:14.709369",
+          "details": "Action reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:39:14.709369",
+      "updatedAt": "2025-11-13T15:39:14.709369",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763048354709-76493",
+      "title": "ID.AM-3: De organisatorische communicatie- en gegevensstromen worden in kaart gebracht.",
+      "description": "Action reference: ID.AM-3: De organisatorische communicatie- en gegevensstromen worden in kaart gebracht.",
+      "columnId": "col-ref-001",
+      "order": 2,
+      "categoryId": "cat-1761691229395-98uze",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "action"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "act-1763048354709-57643",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:39:14.709369",
+          "details": "Action reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:39:14.709369",
+      "updatedAt": "2025-11-13T15:39:14.709369",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763048354709-85343",
+      "title": "ID.AM-4: Externe informatiesystemen worden gecatalogiseerd.",
+      "description": "Action reference: ID.AM-4: Externe informatiesystemen worden gecatalogiseerd.",
+      "columnId": "col-ref-001",
+      "order": 3,
+      "categoryId": "cat-1761691229395-98uze",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "action"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "act-1763048354709-88914",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:39:14.709369",
+          "details": "Action reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:39:14.709369",
+      "updatedAt": "2025-11-13T15:39:14.709369",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763048354709-58645",
+      "title": "ID.AM-5: Middelen worden geprioriteerd op basis van hun classificatie, kriticiteit en bedrijfswaarde.",
+      "description": "Action reference: ID.AM-5: Middelen worden geprioriteerd op basis van hun classificatie, kriticiteit en bedrijfswaarde.",
+      "columnId": "col-ref-001",
+      "order": 4,
+      "categoryId": "cat-1761691229395-98uze",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "action"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "act-1763048354709-54155",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:39:14.709369",
+          "details": "Action reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:39:14.709369",
+      "updatedAt": "2025-11-13T15:39:14.709369",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763048354709-35374",
+      "title": "ID.AM-6: Rollen, verantwoordelijkheden en bevoegdheden op het gebied van informatie en cyberbeveiliging worden vastgesteld voor het gehele personeel en belanghebbenden van derden.",
+      "description": "Action reference: ID.AM-6: Rollen, verantwoordelijkheden en bevoegdheden op het gebied van informatie en cyberbeveiliging worden vastgesteld voor het gehele personeel en belanghebbenden van derden.",
+      "columnId": "col-ref-001",
+      "order": 5,
+      "categoryId": "cat-1761691229395-98uze",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "action"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "act-1763048354709-55747",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:39:14.709369",
+          "details": "Action reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:39:14.709369",
+      "updatedAt": "2025-11-13T15:39:14.709369",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763048354709-24124",
+      "title": "ID.BE-1: De rol van de organisatie in de toeleveringsketen moet worden vastgesteld, gedocumenteerd en gecommuniceerd.",
+      "description": "Action reference: ID.BE-1: De rol van de organisatie in de toeleveringsketen moet worden vastgesteld, gedocumenteerd en gecommuniceerd.",
+      "columnId": "col-ref-001",
+      "order": 6,
+      "categoryId": "cat-1761691229395-miynx",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "action"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "act-1763048354709-38531",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:39:14.709369",
+          "details": "Action reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:39:14.709369",
+      "updatedAt": "2025-11-13T15:39:14.709369",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763048354709-33653",
+      "title": "ID.BE-2: De plaats van de organisatie in de kritieke infrastructuur en haar bedrijfstak wordt vastgesteld en gecommuniceerd.",
+      "description": "Action reference: ID.BE-2: De plaats van de organisatie in de kritieke infrastructuur en haar bedrijfstak wordt vastgesteld en gecommuniceerd.",
+      "columnId": "col-ref-001",
+      "order": 7,
+      "categoryId": "cat-1761691229395-miynx",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "action"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "act-1763048354709-38851",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:39:14.709369",
+          "details": "Action reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:39:14.709369",
+      "updatedAt": "2025-11-13T15:39:14.709369",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763048354709-24745",
+      "title": "ID.BE-3: Prioriteiten met betrekking tot de missie, doelstellingen en activiteiten van de organisatie worden vastgesteld en gecommuniceerd.",
+      "description": "Action reference: ID.BE-3: Prioriteiten met betrekking tot de missie, doelstellingen en activiteiten van de organisatie worden vastgesteld en gecommuniceerd.",
+      "columnId": "col-ref-001",
+      "order": 8,
+      "categoryId": "cat-1761691229395-miynx",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "action"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "act-1763048354709-22552",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:39:14.709369",
+          "details": "Action reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:39:14.709369",
+      "updatedAt": "2025-11-13T15:39:14.709369",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763048354709-28015",
+      "title": "ID.BE-4: Afhankelijkheden en kritieke functies voor de levering van kritieke diensten zijn vastgesteld.",
+      "description": "Action reference: ID.BE-4: Afhankelijkheden en kritieke functies voor de levering van kritieke diensten zijn vastgesteld.",
+      "columnId": "col-ref-001",
+      "order": 9,
+      "categoryId": "cat-1761691229395-miynx",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "action"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "act-1763048354709-56113",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:39:14.709369",
+          "details": "Action reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:39:14.709369",
+      "updatedAt": "2025-11-13T15:39:14.709369",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763048354709-43295",
+      "title": "ID.BE-5: Voor alle operationele staten (bv. onder dwang/aanval, tijdens herstel, normale operaties) worden vereisten vastgesteld met betrekking tot weerbaarheid ter ondersteuning van de levering van kritieke diensten.",
+      "description": "Action reference: ID.BE-5: Voor alle operationele staten (bv. onder dwang/aanval, tijdens herstel, normale operaties) worden vereisten vastgesteld met betrekking tot weerbaarheid ter ondersteuning van de levering van kritieke diensten.",
+      "columnId": "col-ref-001",
+      "order": 10,
+      "categoryId": "cat-1761691229395-miynx",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "action"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "act-1763048354709-47219",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:39:14.709369",
+          "details": "Action reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:39:14.709369",
+      "updatedAt": "2025-11-13T15:39:14.709369",
+      "createdBy": "user-default-001"
+    },
+    {
+      "id": "card-1763048354709-77723",
+      "title": "ID.GV-1: Het cyberbeveiligingsbeleid van de organisatie wordt vastgesteld en gecommuniceerd.",
+      "description": "Action reference: ID.GV-1: Het cyberbeveiligingsbeleid van de organisatie wordt vastgesteld en gecommuniceerd.",
+      "columnId": "col-ref-001",
+      "order": 11,
+      "categoryId": "cat-1761691229395-wcofp",
+      "milestoneId": null,
+      "groupIds": [],
+      "tags": [
+        "reference",
+        "action"
+      ],
+      "assignments": {
+        "owner": null,
+        "executor": null,
+        "supervisor": null
+      },
+      "schedule": {
+        "startDate": null,
+        "dueDate": null,
+        "estimatedHours": null
+      },
+      "priority": "high",
+      "linkedBacklogItems": [],
+      "checklist": [],
+      "attachments": [],
+      "comments": [],
+      "activityLog": [
+        {
+          "id": "act-1763048354709-96983",
+          "userId": "user-default-001",
+          "action": "created",
+          "timestamp": "2025-11-13T15:39:14.709369",
+          "details": "Action reference created"
+        }
+      ],
+      "createdAt": "2025-11-13T15:39:14.709369",
+      "updatedAt": "2025-11-13T15:39:14.709369",
+      "createdBy": "user-default-001"
+    }
+  ]
+}

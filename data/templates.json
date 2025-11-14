@@ -1,0 +1,97 @@
+{
+  "templates": [
+    {
+      "id": "template-classic-compliance",
+      "name": "Classic Compliance (3-Level)",
+      "description": "Traditional 3-level compliance structure: Rules → Actions → Evidences. Ideal for frameworks like NIST CSF, ISO 27001, and GDPR compliance tracking.",
+      "isDefault": true,
+      "version": "1.0.0",
+      "createdAt": "2025-11-11T00:00:00.000Z",
+      "createdBy": "system",
+      "updatedAt": "2025-11-11T00:00:00.000Z",
+      "icon": null,
+      "workflowConfig": {
+        "enableIcon": false,
+        "enableDescription": true,
+        "enableSequentialOrder": true
+      },
+      "levels": [
+        {
+          "id": "level-rules",
+          "order": 0,
+          "name": "Rules",
+          "pluralName": "Rules",
+          "singularName": "Rule",
+          "description": "Control categories or compliance requirements",
+          "icon": null,
+          "color": "#6366f1",
+          "unitConfig": {
+            "enableIcon": true,
+            "enableUnitId": false,
+            "enableName": true,
+            "enableDescription": false,
+            "enableTags": true,
+            "enableDone": false,
+            "enableGrade": false,
+            "gradeCumulative": false,
+            "enableProgressBar": true,
+            "enableLinks": false,
+            "enableImages": false,
+            "enableNotes": false,
+            "enableComments": false
+          }
+        },
+        {
+          "id": "level-actions",
+          "order": 1,
+          "name": "Actions",
+          "pluralName": "Actions",
+          "singularName": "Action",
+          "description": "Specific actions or tasks to perform",
+          "icon": null,
+          "color": "#8b5cf6",
+          "unitConfig": {
+            "enableIcon": true,
+            "enableUnitId": false,
+            "enableName": true,
+            "enableDescription": true,
+            "enableTags": true,
+            "enableDone": true,
+            "enableGrade": false,
+            "gradeCumulative": false,
+            "enableProgressBar": true,
+            "enableLinks": false,
+            "enableImages": false,
+            "enableNotes": false,
+            "enableComments": false
+          }
+        },
+        {
+          "id": "level-evidences",
+          "order": 2,
+          "name": "Evidences",
+          "pluralName": "Evidences",
+          "singularName": "Evidence",
+          "description": "Evidence items, documentation, and proof of compliance",
+          "icon": null,
+          "color": "#ec4899",
+          "unitConfig": {
+            "enableIcon": true,
+            "enableUnitId": true,
+            "enableName": true,
+            "enableDescription": true,
+            "enableTags": true,
+            "enableDone": true,
+            "enableGrade": true,
+            "gradeCumulative": true,
+            "enableProgressBar": false,
+            "enableLinks": true,
+            "enableImages": true,
+            "enableNotes": true,
+            "enableComments": true
+          }
+        }
+      ]
+    }
+  ]
+}

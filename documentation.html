@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Manual: Compliance Workflow Manager</title>
+    <title>User Manual: Compliance Workflow Manager V7</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -50,6 +50,12 @@
             margin-top: 30px;
             font-size: 1.3rem;
         }
+        h4 {
+            color: #495057;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
         p, li {
             margin-bottom: 15px;
             font-size: 1.05rem;
@@ -83,6 +89,16 @@
             margin: 20px 0;
             border-radius: 5px;
         }
+        .new-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
         ul {
             padding-left: 25px;
             list-style-type: none;
@@ -99,57 +115,56 @@
             margin-right: 10px;
             color: #10b981;
         }
-        strong {
-            color: #343a40;
-        }
-        .app-button {
-            display: inline-block;
-            margin: 20px 10px 10px 0;
-            padding: 12px 25px;
-            background-color: #4a6cf7;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background-color 0.2s;
-            font-size: 1.05rem;
-        }
-        .app-button:hover {
-            opacity: 0.85;
-        }
-        .icon-example {
-            font-size: 1em;
-            width: 24px;
-            display: inline-block;
-            text-align: center;
-            color: #4a6cf7;
-        }
-        .badge {
-            display: inline-block;
+        code {
+            background-color: #f1f3f5;
             padding: 3px 8px;
-            background-color: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 12px;
-            color: #6366f1;
-            font-size: 0.85em;
-            font-weight: 600;
-            margin-left: 8px;
+            border-radius: 4px;
+            font-family: "Courier New", monospace;
+            color: #e03e2d;
+            font-size: 0.9em;
         }
-        .workflow-comparison {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-        }
-        .comparison-card {
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
             padding: 15px;
-            text-align: center;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: "Courier New", monospace;
         }
-        .comparison-card h4 {
-            color: #4a6cf7;
+        .steps {
+            counter-reset: step;
+        }
+        .steps li {
+            counter-increment: step;
+            padding-left: 2.5em;
+            text-indent: -2.5em;
+        }
+        .steps li::before {
+            content: counter(step);
+            background-color: #4a6cf7;
+            color: white;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 50%;
+            margin-right: 12px;
+            font-size: 0.9em;
+        }
+        .nav {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .nav h3 {
             margin-top: 0;
+            color: #2c3e50;
+        }
+        .nav ul {
+            padding-left: 0;
+        }
+        .nav li::before {
+            content: "\f138";
+            color: #4a6cf7;
         }
         table {
             width: 100%;
@@ -157,610 +172,1840 @@
             margin: 20px 0;
         }
         th, td {
-            border: 1px solid #dee2e6;
             padding: 12px;
             text-align: left;
+            border-bottom: 1px solid #dee2e6;
         }
         th {
             background-color: #f8f9fa;
             font-weight: 600;
-            color: #495057;
-        }
-        .toc {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 30px 0;
-        }
-        .toc h3 {
-            margin-top: 0;
             color: #2c3e50;
         }
-        .toc ul {
-            margin-bottom: 0;
+        .example-box {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
         }
-        .toc li::before {
-            content: "\f0da";
+        .example-box h4 {
+            margin-top: 0;
             color: #4a6cf7;
         }
-        .toc a {
-            color: #4a6cf7;
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #4a6cf7;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
             text-decoration: none;
+            box-shadow: 0 4px 10px rgba(74, 108, 247, 0.3);
+            transition: all 0.3s;
         }
-        .toc a:hover {
-            text-decoration: underline;
+        .back-to-top:hover {
+            background-color: #3651d4;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(74, 108, 247, 0.4);
         }
     </style>
 </head>
 <body>
     <main>
         <header>
-            <h1>📚 User Manual</h1>
-            <p>Your complete guide to the Compliance Workflow Manager</p>
-            <div class="version">Version 6.2 - Updated October 2025</div>
-            <a href="index.html" class="app-button"><i class="fa-solid fa-arrow-right"></i> Open Application</a>
+            <h1><i class="fas fa-sitemap"></i> Compliance Workflow Manager</h1>
+            <p class="version">User Manual - Version 7.0 (Dynamic Templates)</p>
+            <p style="color: #6c757d; font-size: 0.95rem; margin-top: 15px;">
+                Complete guide to creating, managing, and executing compliance workflows with dynamic templates
+            </p>
         </header>
 
-        <div class="toc">
+        <div class="nav">
             <h3>📑 Quick Navigation</h3>
-            <ul>
+            <ul style="columns: 2; -webkit-columns: 2; -moz-columns: 2;">
+                <li><a href="#introduction">Introduction</a></li>
                 <li><a href="#getting-started">Getting Started</a></li>
-                <li><a href="#workflows">Managing Workflows</a></li>
-                <li><a href="#project-boards">Exporting to Project Boards</a></li>
-                <li><a href="#creation-mode">Creation Mode</a></li>
-                <li><a href="#execution-mode">Execution Mode</a></li>
-                <li><a href="#tags">Working with Tags</a></li>
+                <li><a href="#creation-methods">Workflow Creation</a></li>
+                <li><a href="#template-based">Template-Based Workflows</a></li>
+                <li><a href="#working-workflows">Working with Workflows</a></li>
+                <li><a href="#modes">Creation vs Execution</a></li>
+                <li><a href="#unit-properties">Unit Properties</a></li>
+                <li><a href="#attachments">Attachments</a></li>
                 <li><a href="#linked-workflows">Linked Workflows</a></li>
-                <li><a href="#tips">Tips & Best Practices</a></li>
+                <li><a href="#advanced-features">Advanced Features</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+                <li><a href="#faq">FAQ</a></li>
             </ul>
         </div>
 
-        <section id="getting-started">
-            <h2>1. Getting Started</h2>
+        <section id="introduction">
+            <h2>1. Introduction & Concepts</h2>
             
-            <h3>What is This Application?</h3>
-            <p>The Compliance Workflow Manager helps you organize and track complex compliance tasks. Think of it as a smart checklist system that lets you:</p>
-            <ul>
-                <li>Break down big compliance requirements into manageable pieces</li>
-                <li>Track your progress with visual indicators</li>
-                <li>Organize tasks with tags for easy filtering</li>
-                <li>Manage multiple workflows that can stay synchronized</li>
-                <li>Attach documentation, links, and notes to each task</li>
-            </ul>
-
-            <h3>The Three-Level Structure</h3>
-            <p>Every workflow is organized in three levels, like folders within folders:</p>
-            <ul>
-                <li><strong>Controls (Top Level):</strong> Major areas of compliance, like "Asset Management" or "Access Control"</li>
-                <li><strong>Actions (Middle Level):</strong> Specific objectives within a Control, like "Create inventory of all devices"</li>
-                <li><strong>Evidence (Bottom Level):</strong> Individual tasks and proof items needed, like "Document server list"</li>
-            </ul>
+            <h3>What is the Compliance Workflow Manager V7?</h3>
+            <p>
+                The Compliance Workflow Manager V7 is a powerful tool for creating, managing, and tracking compliance workflows. 
+                Version 7 introduces the revolutionary <strong>dynamic template system</strong>, allowing you to define custom 
+                workflow structures with unlimited flexibility.
+            </p>
 
             <div class="feature">
-                <strong><i class="fa-solid fa-lightbulb"></i> Why This Matters:</strong> This structure helps you see both the big picture and the details. You can focus on one action at a time without losing sight of the overall compliance goal.
-            </div>
-
-            <h3>The Two-Pane Layout</h3>
-            <p>The main screen is split into two panels:</p>
-            <ul>
-                <li><strong>Left Panel:</strong> Shows all Actions for the selected Control</li>
-                <li><strong>Right Panel:</strong> Shows Evidence items for the selected Action</li>
-            </ul>
-            <p>Click an Action on the left to see its Evidence on the right. This keeps your workspace clean and focused.</p>
-
-            <h3>Two Modes: Creation & Execution</h3>
-            <p>The application has two distinct modes, switched using the toggle at the top:</p>
-            <ul>
-                <li><strong>Creation Mode:</strong> For building and editing your workflows (like architect mode)</li>
-                <li><strong>Execution Mode:</strong> For actually doing the work (like worker mode)</li>
-            </ul>
-            
-            <div class="tip">
-                <strong><i class="fa-solid fa-info-circle"></i> Pro Tip:</strong> Start in Creation Mode to set up your workflow, then switch to Execution Mode to work through your tasks. The clean interface in Execution Mode helps you stay focused.
-            </div>
-        </section>
-
-        <section id="workflows">
-            <h2>2. Managing Workflows</h2>
-
-            <h3>What are Workflows?</h3>
-            <p>A workflow is a complete set of compliance requirements. You might have:</p>
-            <ul>
-                <li>Different workflows for different compliance frameworks (ISO 27001, SOC 2, etc.)</li>
-                <li>Workflows for different regions or departments</li>
-                <li>Test workflows to experiment before applying changes</li>
-            </ul>
-
-            <h3>Selecting a Workflow</h3>
-            <p>Use the <strong>Flow</strong> dropdown at the top to switch between workflows. The selected workflow is what you see on your board.</p>
-
-            <h3>Creating a New Workflow</h3>
-            <p>Click the <strong><i class="fa-solid fa-plus"></i> New</strong> button (only visible in Creation Mode) to create a workflow. You'll see three options:</p>
-
-            <div class="workflow-comparison">
-                <div class="comparison-card">
-                    <h4><i class="fa-solid fa-file"></i> Empty</h4>
-                    <p>Start from scratch with a blank workflow</p>
-                    <small><strong>Best for:</strong> Completely new compliance frameworks</small>
-                </div>
-                <div class="comparison-card">
-                    <h4><i class="fa-solid fa-copy"></i> Copy</h4>
-                    <p>Duplicate an existing workflow</p>
-                    <small><strong>Best for:</strong> Similar but independent requirements</small>
-                </div>
-                <div class="comparison-card">
-                    <h4><i class="fa-solid fa-link"></i> Linked</h4>
-                    <p>Create a synchronized workflow</p>
-                    <small><strong>Best for:</strong> Same requirements across regions</small>
-                </div>
-            </div>
-
-            <div class="feature">
-                <strong><i class="fa-solid fa-star"></i> The Power of Linked Workflows:</strong> When you create a Linked workflow, any structural changes you make to one automatically update all linked workflows. This is perfect for managing the same compliance framework across multiple teams or regions - update once, sync everywhere!
-            </div>
-
-            <h3>Renaming & Deleting Workflows</h3>
-            <ul>
-                <li><strong>Rename:</strong> Click the <i class="icon-example fa-solid fa-pen"></i> button next to the workflow selector</li>
-                <li><strong>Delete:</strong> Click the <i class="icon-example fa-solid fa-trash"></i> button (this is permanent!)</li>
-            </ul>
-
-            <h3>The Linked Indicator</h3>
-            <p>If you see a <span class="badge"><i class="fa-solid fa-link"></i> Linked</span> badge next to your workflow name, it means this workflow is synchronized with others. Changes you make will be reflected in all linked workflows when you save.</p>
-        </section>
-
-        <section id="project-boards">
-            <h2>3. Exporting to Project Boards</h2>
-            <p>One of the most powerful features is the ability to export your workflows to visual Kanban boards for project execution.</p>
-            
-            <h3>What are Project Boards?</h3>
-            <p>Project Boards are Trello-like Kanban boards that let you:</p>
-            <ul>
-                <li>Execute workflow requirements as real projects</li>
-                <li>Assign tasks to team members with different roles</li>
-                <li>Set deadlines and track progress visually</li>
-                <li>Drag and drop tasks through stages (Backlog → To Do → In Progress → Review → Done)</li>
-                <li>Collaborate with your team on compliance execution</li>
-            </ul>
-
-            <div class="feature">
-                <strong><i class="fa-solid fa-diagram-project"></i> Two Export Methods:</strong>
-                <p>You can create boards in two ways, depending on how you want to organize your work:</p>
-            </div>
-
-            <h3>Method 1: Export a Control to Board</h3>
-            <p>Create a board from a single Control (one compliance area):</p>
-            <ol style="list-style-type: decimal; padding-left: 40px;">
-                <li>Switch to <strong>Execution Mode</strong></li>
-                <li>Find the Control you want to execute</li>
-                <li>Click <strong>"📊 Create Board"</strong> button in the Control header</li>
-                <li>Confirm the export</li>
-                <li>Board opens with all Evidence from that Control as tasks</li>
-            </ol>
-
-            <div class="tip">
-                <strong><i class="fa-solid fa-info-circle"></i> What Gets Exported:</strong>
-                <ul style="list-style-type: disc; padding-left: 20px;">
-                    <li>Control name becomes Board name</li>
-                    <li>Each Evidence item becomes a Card (task)</li>
-                    <li>Tags become Labels</li>
-                    <li>Attachments (links, images, notes) transfer to cards</li>
-                    <li>All cards start in "Backlog" column</li>
+                <h4><i class="fas fa-star"></i> Key Features</h4>
+                <ul>
+                    <li><strong>Dynamic Templates:</strong> Create workflows with any number of levels and custom properties</li>
+                    <li><strong>4 Creation Methods:</strong> From Template, Empty, Copy, or Linked workflows</li>
+                    <li><strong>Dual Modes:</strong> Creation mode for building, Execution mode for tracking</li>
+                    <li><strong>Template Snapshots:</strong> Each workflow preserves its structure independently</li>
+                    <li><strong>Linked Workflows:</strong> Synchronize structure across multiple workflows</li>
+                    <li><strong>Rich Features:</strong> Tags, attachments, grading, progress tracking, and more</li>
                 </ul>
             </div>
 
-            <h3>Method 2: Export by Tag (Cross-Workflow Boards)</h3>
-            <p>Create a board from ALL items across the workflow that share a tag:</p>
-            <ol style="list-style-type: decimal; padding-left: 40px;">
-                <li>Switch to <strong>Execution Mode</strong></li>
-                <li>Click any tag (e.g., #firewall, #high-priority, #it-team)</li>
-                <li>Workflow filters to show tagged items</li>
-                <li>Click <strong>"Create Board from Tag"</strong> in the tag filter banner</li>
-                <li>Board is created with tasks from multiple Controls</li>
-            </ol>
+            <h3>The Template-Based Revolution <span class="new-badge">NEW IN V7</span></h3>
+            <p>
+                Version 7 transforms how you work with workflows by introducing <strong>Workflow Templates</strong>. 
+                Instead of a rigid 3-level structure (Rules → Actions → Evidences), you now define your own structure:
+            </p>
 
-            <div class="feature">
-                <strong><i class="fa-solid fa-magic"></i> Tag Export Benefits:</strong>
-                <ul style="list-style-type: disc; padding-left: 20px;">
-                    <li><strong>Priority Boards:</strong> #high-priority → Only urgent tasks from entire workflow</li>
-                    <li><strong>Department Boards:</strong> #it-team → All IT department tasks</li>
-                    <li><strong>Technology Boards:</strong> #firewall → All firewall tasks across all Controls</li>
-                    <li><strong>Schedule Boards:</strong> #quarterly → All quarterly review items</li>
-                    <li><strong>Cross-Control:</strong> Combine tasks from ID.AM, ID.RA, ID.SC into one board</li>
-                </ul>
-            </div>
-
-            <div class="highlight">
-                <strong>Control Export vs Tag Export:</strong>
-                <ul style="list-style-type: disc; padding-left: 20px;">
-                    <li><strong>Control Export:</strong> "ID.AM - Asset Management" → 20 tasks from one area</li>
-                    <li><strong>Tag Export:</strong> "#firewall" → 45 tasks from 5 different Controls</li>
-                </ul>
-            </div>
-
-            <h3>Using Project Boards</h3>
-            <p>Once a board is created, you can:</p>
-            <ul>
-                <li>Assign team members with 4 roles (👷 Executor, ✅ Approver, 👁️ Follower, 📊 Supervisor)</li>
-                <li>Set due dates with visual indicators</li>
-                <li>Drag tasks between columns as work progresses</li>
-                <li>Track completion percentage</li>
-                <li>Collaborate with your team</li>
-            </ul>
-
-            <p>See the <a href="boards-documentation.html" style="color: #4a6cf7; font-weight: 600;">Project Boards User Manual</a> for complete details on using boards.</p>
-        </section>
-
-        <section id="creation-mode">
-            <h2>4. Creation Mode - Building Your Workflow</h2>
-            <p>Switch to Creation Mode (toggle at top) to build and edit your workflow structure.</p>
-
-            <h3>Adding Items</h3>
-            <p>Use the green plus icons <i class="icon-example fa-solid fa-plus"></i> to add items:</p>
-            <ul>
-                <li><strong>Add Control:</strong> Click the big button at the bottom: <strong><i class="fa-solid fa-plus"></i> Add New Rule</strong></li>
-                <li><strong>Add Action:</strong> Click the plus icon in a Control's header (left panel)</li>
-                <li><strong>Add Evidence:</strong> Select an Action, then click the plus icon in its header (right panel)</li>
-            </ul>
-
-            <h3>Editing Items</h3>
-            <ul>
-                <li><strong>Edit Name:</strong> Click the yellow pencil icon <i class="icon-example fa-solid fa-pen"></i> on any item</li>
-                <li><strong>Edit Description:</strong> Type directly in the text area below each item's name</li>
-                <li><strong>Change Grade:</strong> Use the dropdown in each Evidence item's header (0.5 to 5.0)</li>
-            </ul>
-
-            <div class="important">
-                <strong><i class="fa-solid fa-exclamation-triangle"></i> Important: Grade Totals</strong><br>
-                All Evidence items under a single Action should have grades that add up to 5.0. This ensures accurate progress tracking. If your total is different, you'll see a warning message on that Action.
-            </div>
-
-            <h3>Deleting Items</h3>
-            <p>Click the red trash can icon <i class="icon-example fa-solid fa-trash-can"></i> to delete any Control, Action, or Evidence. <strong>Warning:</strong> Deleting a Control or Action also deletes everything inside it!</p>
-
-            <h3>Managing Attachments</h3>
-            <p>Each Evidence item can have multiple attachments. Click these icons in the Evidence footer to add:</p>
-            <ul>
-                <li><i class="icon-example fa-solid fa-link"></i> <strong>Link:</strong> Add a URL to external documentation or tools</li>
-                <li><i class="icon-example fa-solid fa-image"></i> <strong>Image:</strong> Add a screenshot or diagram URL</li>
-                <li><i class="icon-example fa-solid fa-book-open"></i> <strong>Note:</strong> Add formatted text notes with a rich text editor</li>
-                <li><i class="icon-example fa-solid fa-comment"></i> <strong>Comment:</strong> Add quick text comments</li>
-            </ul>
-            
-            <p>To edit or delete attachments, click the gear icon <i class="icon-example fa-solid fa-gear"></i> to open the attachment manager.</p>
-
-            <h3>Saving Your Work</h3>
-            <p>After making changes, click the blue <strong><i class="fa-solid fa-cloud-arrow-up"></i> Save Structure</strong> button. You'll see a confirmation when your changes are saved.</p>
-            
-            <div class="tip">
-                <strong><i class="fa-solid fa-info-circle"></i> Remember:</strong> If you're working with linked workflows, saving will update all workflows in the link group. This is automatic - no extra steps needed!
-            </div>
-        </section>
-
-        <section id="execution-mode">
-            <h2>4. Execution Mode - Getting Work Done</h2>
-            <p>Switch to Execution Mode (toggle at top) for a clean, focused interface to complete your tasks.</p>
-
-            <h3>Completing Tasks</h3>
-            <p>Check the box next to each Evidence item when you complete it. The checkboxes are the main way you interact with Execution Mode.</p>
-
-            <div class="feature">
-                <strong><i class="fa-solid fa-star"></i> Independent Progress:</strong> Each workflow tracks its own completion status. Even if workflows are linked structurally, their progress is independent. This means Team A can be 50% done while Team B is 20% done, even if they're working on the same structure.
-            </div>
-
-            <h3>Understanding Progress Bars</h3>
-            <ul>
-                <li><strong>Action Progress:</strong> Each Action shows a progress bar based on the grades of completed Evidence items. A 2.0-grade item contributes more to progress than a 0.5-grade item.</li>
-                <li><strong>Control Progress:</strong> Each Control's progress is the average of all its Action progress bars.</li>
-            </ul>
-
-            <h3>Sequential Order Option</h3>
-            <p>In Creation Mode, you can enable <strong>"Enforce Sequential Order"</strong>. When enabled in Execution Mode:</p>
-            <ul>
-                <li>Only the first incomplete Evidence item is available (highlighted with a blue border)</li>
-                <li>Other Evidence items are locked (grayed out) until you complete the active one</li>
-                <li>This ensures tasks are done in the correct order</li>
-            </ul>
-
-            <div class="tip">
-                <strong><i class="fa-solid fa-lightbulb"></i> Use Case:</strong> Sequential order is great for processes that must be done step-by-step, like security audits where each step builds on the previous one.
-            </div>
-
-            <h3>Viewing Attachments</h3>
-            <p>In Execution Mode, attachments appear as buttons in each Evidence item's footer. Click them to view:</p>
-            <ul>
-                <li><strong>Links:</strong> Open in an embedded frame with an option to open in a new tab</li>
-                <li><strong>Images:</strong> View in a gallery</li>
-                <li><strong>Notes:</strong> Read formatted content</li>
-                <li><strong>Comments:</strong> See all comments in a list</li>
-            </ul>
-
-            <h3>Saving Your Progress</h3>
-            <p>Click the <strong><i class="fa-solid fa-floppy-disk"></i> Save Execution</strong> button to save which items you've completed.</p>
-        </section>
-
-        <section id="tags">
-            <h2>6. Working with Tags</h2>
-
-            <h3>What are Tags?</h3>
-            <p>Tags are labels you can add to any Control, Action, or Evidence item. They help you organize and find related items across your workflow.</p>
-
-            <p><strong>Example tags:</strong> #firewall, #training, #quarterly, #high-priority, #external-audit</p>
-
-            <h3>Adding Tags (Creation Mode)</h3>
-            <p>In Creation Mode, you'll see a tag input field below each item's description:</p>
-            <ol style="list-style-type: decimal; padding-left: 40px;">
-                <li>Click in the input field that says "Add tag and press Enter"</li>
-                <li>Start typing - you'll see suggestions of existing tags in your workflow</li>
-                <li>Select a suggestion or type a new tag</li>
-                <li>Press Enter to add the tag</li>
-            </ol>
-
-            <div class="feature">
-                <strong><i class="fa-solid fa-magic"></i> Smart Autocomplete:</strong> The system shows you tags that already exist in your workflow as you type. This helps maintain consistency and avoid creating duplicate tags with slightly different names (like "firewall" vs "Firewall").
-            </div>
-
-            <h3>Removing Tags</h3>
-            <p>In Creation Mode, each tag has a small ✕ button. Click it to remove the tag.</p>
-
-            <h3>Filtering by Tags (Execution Mode)</h3>
-            <p>In Execution Mode, tags become powerful filters:</p>
-            <ul>
-                <li><strong>Click any tag</strong> to filter the entire board to show only items with that tag</li>
-                <li>A banner appears at the top showing your active filter</li>
-                <li>Click <strong>Clear</strong> or the ✕ to remove the filter</li>
-            </ul>
-
-            <h3>Smart Tag Filtering</h3>
-            <p>When you filter by a tag, the system uses smart inheritance:</p>
-            <ul>
-                <li>If a <strong>Control</strong> has the tag → shows the entire Control with all its Actions and Evidence</li>
-                <li>If an <strong>Action</strong> has the tag → shows that Action with all its Evidence</li>
-                <li>If only <strong>Evidence</strong> has the tag → shows just that Evidence item</li>
-            </ul>
-
-            <div class="tip">
-                <strong><i class="fa-solid fa-lightbulb"></i> Practical Example:</strong> Tag all firewall-related tasks with #firewall. When auditing your firewall compliance, click the #firewall tag to see only firewall items. Everything else is temporarily hidden so you can focus.
-            </div>
-
-            <h3>Tag Best Practices</h3>
-            <ul>
-                <li>Use consistent naming (all lowercase is easiest)</li>
-                <li>Be specific but not too specific (#security is too broad, #firewall-config is better)</li>
-                <li>Use tags for categories, priorities, responsible parties, or timeframes</li>
-                <li>Add multiple tags to items when appropriate</li>
-            </ul>
-        </section>
-
-        <section id="linked-workflows">
-            <h2>7. Linked Workflows in Detail</h2>
-
-            <h3>Understanding Linked Workflows</h3>
-            <p>Linked workflows stay structurally synchronized. This means:</p>
-            
             <table>
                 <thead>
                     <tr>
-                        <th>What Syncs</th>
-                        <th>What Doesn't Sync</th>
+                        <th>Version 6 (Old)</th>
+                        <th>Version 7 (New)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>
-                            • Adding/deleting Controls, Actions, Evidence<br>
-                            • Editing names and descriptions<br>
-                            • Changing grades<br>
-                            • Adding/removing tags<br>
-                            • Any structural changes in Creation Mode
-                        </td>
-                        <td>
-                            • Checkboxes (completion status)<br>
-                            • Attachments (links, images, notes)<br>
-                            • Workflow names<br>
-                            • Anything done in Execution Mode
-                        </td>
+                        <td>Fixed 3-level structure</td>
+                        <td>Unlimited custom levels (1-10+)</td>
+                    </tr>
+                    <tr>
+                        <td>Same features for all workflows</td>
+                        <td>Custom features per template</td>
+                    </tr>
+                    <tr>
+                        <td>Hard to reuse structures</td>
+                        <td>Reusable templates</td>
+                    </tr>
+                    <tr>
+                        <td>Manual consistency</td>
+                        <td>Template ensures consistency</td>
                     </tr>
                 </tbody>
             </table>
 
-            <h3>When to Use Linked Workflows</h3>
-            
-            <div class="feature">
-                <strong>Scenario 1: Multi-Region Compliance</strong><br>
-                You need the same compliance framework for EU, US, and APAC offices. Create one workflow, then link the others. When compliance requirements update, you only edit one workflow and all regions automatically get the updates. Each region tracks its own progress independently.
+            <div class="example-box">
+                <h4><i class="fas fa-lightbulb"></i> Real-World Example</h4>
+                <p><strong>Scenario:</strong> Your organization needs to track NIST CSF compliance across departments.</p>
+                <p><strong>Old Way (V6):</strong> Create multiple workflows, manually ensure they all have the same structure.</p>
+                <p><strong>New Way (V7):</strong> Create one "NIST CSF Compliance" template, then create workflows for each department from that template. All workflows share the same structure, and you can link them to synchronize changes!</p>
+            </div>
+
+            <h3>Understanding Template Snapshots</h3>
+            <p>
+                When you create a workflow from a template, the system creates a <strong>snapshot</strong> (copy) of that template 
+                and stores it with the workflow. This means:
+            </p>
+
+            <div class="highlight">
+                <p><i class="fas fa-info-circle"></i> <strong>Important:</strong> Changing a template does NOT affect existing workflows created from it. 
+                Each workflow has its own independent structure stored as a snapshot. This protects your workflows from accidental changes.</p>
+            </div>
+
+            <ul>
+                <li>Each workflow is independent and protected</li>
+                <li>Template changes don't affect existing workflows</li>
+                <li>Workflows can have different structures even from the same template</li>
+                <li>You can always see what template a workflow was based on</li>
+            </ul>
+        </section>
+
+        <section id="getting-started">
+            <h2>2. Getting Started</h2>
+
+            <h3>First Time Setup</h3>
+            <p>
+                When you first open the Compliance Workflow Manager, you'll need templates to create workflows. 
+                You have two options:
+            </p>
+
+            <div class="steps">
+                <ul>
+                    <li>
+                        <strong>Use the Empty Workflow option</strong> (Quick Start) - Creates a simple 1-level template automatically
+                    </li>
+                    <li>
+                        <strong>Create templates first</strong> in the Template Builder - Recommended for complex workflows
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tip">
+                <p><i class="fas fa-lightbulb"></i> <strong>Tip:</strong> If you're new to the system, start with an Empty Workflow 
+                to get familiar with the interface. Once comfortable, explore the Template Builder to create custom structures.</p>
+            </div>
+
+            <h3>Understanding the Interface</h3>
+            <p>The main interface is divided into key areas:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Area</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Top Bar</strong></td>
+                        <td>Workflow selector, creation buttons, mode toggle</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Workflow Area</strong></td>
+                        <td>Where you build and view your workflow structure</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Save Buttons</strong></td>
+                        <td>Save Structure (Creation) or Save Execution (Execution mode)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mode Toggle</strong></td>
+                        <td>Switch between Creation and Execution modes</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Creating Your First Workflow</h3>
+            <p>Let's create a simple workflow to get started:</p>
+
+            <div class="steps">
+                <ul>
+                    <li>Click the <strong>"New"</strong> button in the top bar</li>
+                    <li>A dialog opens with 4 creation options</li>
+                    <li>Select <strong>"Empty Workflow (Quick Start)"</strong></li>
+                    <li>Enter a name like "My First Workflow"</li>
+                    <li>Click <strong>"Create Workflow"</strong></li>
+                    <li>Your workflow appears in Creation mode!</li>
+                </ul>
             </div>
 
             <div class="feature">
-                <strong>Scenario 2: Multiple Teams, Same Process</strong><br>
-                Five departments need to complete the same onboarding checklist. Create linked workflows for each department. Update the checklist in one place, and all departments immediately see the updated structure.
+                <h4><i class="fas fa-rocket"></i> What Just Happened?</h4>
+                <p>The system automatically:</p>
+                <ul>
+                    <li>Created a simple 1-level template called "Empty"</li>
+                    <li>Created a workflow from that template</li>
+                    <li>Opened the workflow in Creation mode</li>
+                    <li>Enabled all properties (icons, names, tags, etc.)</li>
+                </ul>
+            </div>
+
+            <h3>Adding Your First Unit</h3>
+            <p>Now let's add content to your workflow:</p>
+
+            <div class="steps">
+                <ul>
+                    <li>You'll see a button like <strong>"+ Add Item"</strong> (or whatever your level is called)</li>
+                    <li>Click it to add a new unit</li>
+                    <li>A new unit appears with editable fields</li>
+                    <li>Fill in the name and any other properties</li>
+                    <li>Click <strong>"Save Structure"</strong> to save your changes</li>
+                </ul>
+            </div>
+
+            <div class="tip">
+                <p><i class="fas fa-save"></i> <strong>Remember to Save!</strong> Changes are NOT automatically saved. 
+                Always click "Save Structure" after making changes in Creation mode.</p>
+            </div>
+        </section>
+
+        <section id="creation-methods">
+            <h2>3. Workflow Creation Methods</h2>
+
+            <p>
+                Version 7 offers <strong>four powerful methods</strong> to create workflows, each suited for different scenarios:
+            </p>
+
+            <h3>Method 1: From Template <span class="new-badge">RECOMMENDED</span></h3>
+            <p>Create a workflow based on a predefined template structure.</p>
+
+            <div class="feature">
+                <h4><i class="fas fa-layer-group"></i> When to Use</h4>
+                <ul>
+                    <li>You have a custom template that fits your needs</li>
+                    <li>You want a specific multi-level structure</li>
+                    <li>You need consistency across multiple workflows</li>
+                    <li>You're working with industry standards (NIST, ISO, etc.)</li>
+                </ul>
+            </div>
+
+            <div class="steps">
+                <ul>
+                    <li>Click <strong>"New"</strong> button</li>
+                    <li>Select <strong>"From Template"</strong> (default option)</li>
+                    <li>Enter a workflow name</li>
+                    <li>Select a template from the dropdown</li>
+                    <li>Click <strong>"Create Workflow"</strong></li>
+                </ul>
+            </div>
+
+            <div class="example-box">
+                <h4><i class="fas fa-example"></i> Example Use Case</h4>
+                <p>
+                    <strong>Scenario:</strong> Your organization has a "NIST CSF Compliance" template with 5 levels: 
+                    Functions → Categories → Subcategories → Controls → Evidence.
+                </p>
+                <p>
+                    <strong>Action:</strong> Create workflows named "Finance Department NIST", "IT Department NIST", etc., 
+                    all from the same template.
+                </p>
+                <p>
+                    <strong>Result:</strong> All departments have identical structures, making compliance tracking consistent.
+                </p>
+            </div>
+
+            <h3>Method 2: Empty Workflow (Quick Start)</h3>
+            <p>Create a simple 1-level workflow instantly, without needing a template.</p>
+
+            <div class="feature">
+                <h4><i class="fas fa-bolt"></i> When to Use</h4>
+                <ul>
+                    <li>You need a quick checklist or simple tracking</li>
+                    <li>You're just exploring the system</li>
+                    <li>You don't have templates set up yet</li>
+                    <li>You need a flat list without hierarchy</li>
+                </ul>
+            </div>
+
+            <div class="steps">
+                <ul>
+                    <li>Click <strong>"New"</strong> button</li>
+                    <li>Select <strong>"Empty Workflow (Quick Start)"</strong></li>
+                    <li>Enter a workflow name</li>
+                    <li>Click <strong>"Create Workflow"</strong></li>
+                </ul>
+            </div>
+
+            <div class="highlight">
+                <p><i class="fas fa-magic"></i> The system automatically creates a simple template with all properties enabled. 
+                Your level will be called "Item" (singular) / "Items" (plural).</p>
+            </div>
+
+            <h3>Method 3: Copy Existing Workflow</h3>
+            <p>Duplicate an existing workflow with all its structure and units.</p>
+
+            <div class="feature">
+                <h4><i class="fas fa-copy"></i> When to Use</h4>
+                <ul>
+                    <li>You want to reuse a workflow as a starting point</li>
+                    <li>You need multiple similar workflows (e.g., per department)</li>
+                    <li>You want to preserve the exact structure and content</li>
+                    <li>You need a new version of an existing workflow</li>
+                </ul>
+            </div>
+
+            <div class="steps">
+                <ul>
+                    <li>Click <strong>"New"</strong> button</li>
+                    <li>Select <strong>"Copy Existing Workflow"</strong></li>
+                    <li>Enter a name for the copy</li>
+                    <li>Select the source workflow to copy from</li>
+                    <li>Click <strong>"Create Workflow"</strong></li>
+                </ul>
+            </div>
+
+            <div class="important">
+                <p><i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> Copying creates a complete independent duplicate. 
+                The copy includes:</p>
+                <ul>
+                    <li>The template snapshot (structure)</li>
+                    <li>All units with their names and properties</li>
+                    <li>All attachments (links, images, notes)</li>
+                    <li>New unique IDs for everything</li>
+                </ul>
+                <p style="margin-top: 10px;">The copy is NOT linked to the original - changes to one won't affect the other.</p>
+            </div>
+
+            <h3>Method 4: Linked Workflow (Synchronized) <span class="new-badge">V7 FEATURE</span></h3>
+            <p>Create a workflow that synchronizes its structure with other workflows.</p>
+
+            <div class="feature">
+                <h4><i class="fas fa-link"></i> When to Use</h4>
+                <ul>
+                    <li>Multiple workflows should share the same structure</li>
+                    <li>You need synchronized updates across workflows</li>
+                    <li>You're tracking the same requirements across departments/teams</li>
+                    <li>Changes in one should reflect in all linked workflows</li>
+                </ul>
+            </div>
+
+            <div class="steps">
+                <ul>
+                    <li>Click <strong>"New"</strong> button</li>
+                    <li>Select <strong>"Linked Workflow (Synchronized)"</strong></li>
+                    <li>Enter a name for the new workflow</li>
+                    <li>Select the workflow to link to</li>
+                    <li>Click <strong>"Create Workflow"</strong></li>
+                </ul>
+            </div>
+
+            <div class="highlight">
+                <p><i class="fas fa-link"></i> <strong>How Linking Works:</strong> When you add, remove, or rename units in Creation mode 
+                and save, those changes automatically propagate to all linked workflows. However, execution state (checkmarks, grades) 
+                remains independent for each workflow.</p>
+            </div>
+
+            <div class="example-box">
+                <h4><i class="fas fa-example"></i> Linked Workflow Example</h4>
+                <p>
+                    <strong>Scenario:</strong> You're tracking GDPR compliance across 5 regional offices.
+                </p>
+                <p>
+                    <strong>Setup:</strong><br>
+                    1. Create "GDPR Compliance - HQ" from template<br>
+                    2. Create "GDPR Compliance - Europe" as linked workflow<br>
+                    3. Create "GDPR Compliance - Asia" as linked workflow<br>
+                    4. All three are now synchronized
+                </p>
+                <p>
+                    <strong>Result:</strong> When HQ adds a new control, it appears in all regional workflows automatically. 
+                    But each region tracks their own completion status independently.
+                </p>
+            </div>
+
+            <div class="tip">
+                <p><i class="fas fa-question-circle"></i> <strong>Linked vs Copy:</strong> Use Copy when you want independent workflows. 
+                Use Linked when you want synchronized structure but independent tracking.</p>
+            </div>
+
+            <h3>Choosing the Right Method</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Best For</th>
+                        <th>Key Benefit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>From Template</strong></td>
+                        <td>Structured workflows</td>
+                        <td>Custom multi-level structure</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Empty</strong></td>
+                        <td>Quick lists</td>
+                        <td>Instant creation, no setup</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Copy</strong></td>
+                        <td>Reusing workflows</td>
+                        <td>Preserves all content</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Linked</strong></td>
+                        <td>Multi-team tracking</td>
+                        <td>Synchronized structure</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="template-based">
+            <h2>4. Understanding Template-Based Workflows</h2>
+
+            <h3>What is a Template Snapshot?</h3>
+            <p>
+                Every workflow in V7 contains a <strong>template snapshot</strong> - a complete copy of the template 
+                it was created from. This snapshot defines:
+            </p>
+
+            <ul>
+                <li><strong>Number of levels:</strong> How many hierarchical levels the workflow has</li>
+                <li><strong>Level names:</strong> What each level is called (singular and plural)</li>
+                <li><strong>Level properties:</strong> What features are available at each level</li>
+                <li><strong>Workflow properties:</strong> What workflow-level features are enabled</li>
+            </ul>
+
+            <div class="feature">
+                <h4><i class="fas fa-shield-alt"></i> Snapshot Protection</h4>
+                <p>Template snapshots protect your workflows:</p>
+                <ul>
+                    <li>Editing a template doesn't change existing workflows</li>
+                    <li>Deleting a template doesn't affect workflows created from it</li>
+                    <li>Each workflow is self-contained and independent</li>
+                    <li>You can always see what template a workflow was based on</li>
+                </ul>
+            </div>
+
+            <h3>Workflow-Level Properties</h3>
+            <p>Depending on the template, your workflow may have:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Workflow Icon</strong></td>
+                        <td>A visual icon displayed before the workflow name</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Description</strong></td>
+                        <td>A text description explaining the workflow's purpose</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sequential Order</strong></td>
+                        <td>Checkbox to enforce completion order (top-to-bottom)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="tip">
+                <p><i class="fas fa-eye"></i> <strong>Note:</strong> These properties are only visible if enabled in the template. 
+                If you don't see them, the template creator chose not to include them.</p>
+            </div>
+
+            <h3>Multi-Level Structure</h3>
+            <p>
+                Workflows can have anywhere from 1 to 10+ levels, each with its own configuration. Think of it like 
+                a folder structure:
+            </p>
+
+            <div class="example-box">
+                <h4><i class="fas fa-folder-tree"></i> Example: 4-Level Compliance Workflow</h4>
+                <pre style="background: #f8f9fa; color: #2c3e50; padding: 15px;">
+<strong>Level 1:</strong> Control Families (e.g., "Access Control")
+  └── <strong>Level 2:</strong> Controls (e.g., "AC-1: Access Control Policy")
+      └── <strong>Level 3:</strong> Requirements (e.g., "Document access control procedures")
+          └── <strong>Level 4:</strong> Evidence (e.g., "Policy document uploaded")</pre>
+            </div>
+
+            <h3>Level-Specific Configurations</h3>
+            <p>Each level can have different features enabled. For example:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Level 1</th>
+                        <th>Level 2</th>
+                        <th>Level 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Icons</strong></td>
+                        <td>✓</td>
+                        <td>✓</td>
+                        <td>✓</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Done Checkbox</strong></td>
+                        <td>✗</td>
+                        <td>✗</td>
+                        <td>✓</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Grade</strong></td>
+                        <td>✓ (Cumulative)</td>
+                        <td>✓ (Cumulative)</td>
+                        <td>✓ (Individual)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Attachments</strong></td>
+                        <td>✗</td>
+                        <td>✗</td>
+                        <td>✓ (All types)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight">
+                <p><i class="fas fa-info-circle"></i> This configuration means: Only the lowest level (Level 3) has checkboxes 
+                and attachments, while higher levels show cumulative grades that auto-calculate from their children.</p>
+            </div>
+        </section>
+
+        <section id="working-workflows">
+            <h2>5. Working with Workflows</h2>
+
+            <h3>The Workflow Selector</h3>
+            <p>
+                At the top of the screen, you'll find the workflow selector dropdown. This lets you:
+            </p>
+
+            <ul>
+                <li>View all your workflows in one place</li>
+                <li>Switch between workflows instantly</li>
+                <li>See which workflow is currently active</li>
+            </ul>
+
+            <div class="tip">
+                <p><i class="fas fa-keyboard"></i> <strong>Quick Tip:</strong> Click the dropdown to see all workflows, 
+                then click any workflow name to switch to it immediately.</p>
+            </div>
+
+            <h3>Workflow Management Buttons</h3>
+            <p>Next to the workflow selector, you'll find management buttons (only visible in Creation mode):</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Button</th>
+                        <th>Icon</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>New</strong></td>
+                        <td><i class="fas fa-plus"></i></td>
+                        <td>Create a new workflow (opens creation dialog)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rename</strong></td>
+                        <td><i class="fas fa-pen"></i></td>
+                        <td>Rename the current workflow</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Unlink</strong></td>
+                        <td><i class="fas fa-link-slash"></i></td>
+                        <td>Remove workflow from link group (only visible if linked)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Delete</strong></td>
+                        <td><i class="fas fa-trash"></i></td>
+                        <td>Delete the current workflow (with confirmation)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Adding Units</h3>
+            <p>To add content to your workflow in Creation mode:</p>
+
+            <div class="steps">
+                <ul>
+                    <li>Look for the <strong>"+ Add [Level Name]"</strong> button</li>
+                    <li>The button name changes based on your template (e.g., "+ Add Rule", "+ Add Control")</li>
+                    <li>Click it to add a unit at that level</li>
+                    <li>A new unit appears with editable fields</li>
+                    <li>Fill in the required information</li>
+                    <li>To add child units, click the + button on the parent unit</li>
+                </ul>
+            </div>
+
+            <div class="example-box">
+                <h4><i class="fas fa-example"></i> Adding a 3-Level Structure</h4>
+                <p>Let's say your template has Rules → Actions → Evidences:</p>
+                <div class="steps">
+                    <ul>
+                        <li>Click "+ Add Rule" → Creates "Rule 1"</li>
+                        <li>Click the + button on Rule 1 → Creates "Action 1" inside it</li>
+                        <li>Click the + button on Action 1 → Creates "Evidence 1" inside it</li>
+                        <li>Click "Save Structure" to save your work</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Editing Units</h3>
+            <p>In Creation mode, you can edit any unit property:</p>
+
+            <ul>
+                <li><strong>Name:</strong> Click in the name field and type</li>
+                <li><strong>Description:</strong> Click in the description textarea</li>
+                <li><strong>Icon:</strong> Click the icon to open the icon picker</li>
+                <li><strong>Unit ID:</strong> Type in the ID field (if enabled)</li>
+                <li><strong>Grade:</strong> Enter a number in the grade field</li>
+                <li><strong>Tags:</strong> Click "+ Add Tag" to add tags</li>
+            </ul>
+
+            <div class="important">
+                <p><i class="fas fa-save"></i> <strong>Remember:</strong> Changes are not saved automatically! 
+                Click "Save Structure" when you're done editing.</p>
+            </div>
+
+            <h3>Deleting Units</h3>
+            <p>To remove a unit from your workflow:</p>
+
+            <div class="steps">
+                <ul>
+                    <li>In Creation mode, hover over the unit you want to delete</li>
+                    <li>Click the trash icon (<i class="fas fa-trash"></i>) in the unit header</li>
+                    <li>Confirm the deletion in the popup dialog</li>
+                    <li>The unit and all its children are removed</li>
+                    <li>Click "Save Structure" to save the change</li>
+                </ul>
+            </div>
+
+            <div class="important">
+                <p><i class="fas fa-exclamation-triangle"></i> <strong>Warning:</strong> Deleting a unit also deletes 
+                all its child units. This action cannot be undone after saving!</p>
+            </div>
+
+            <h3>Saving Your Work</h3>
+            <p>The workflow manager has two types of saves:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Save Type</th>
+                        <th>When to Use</th>
+                        <th>What Gets Saved</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Save Structure</strong></td>
+                        <td>Creation mode</td>
+                        <td>Units, names, descriptions, structure changes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Save Execution</strong></td>
+                        <td>Execution mode</td>
+                        <td>Checkmarks, grades, completion status</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="tip">
+                <p><i class="fas fa-lightbulb"></i> <strong>Best Practice:</strong> Save frequently! Use Ctrl+S as a habit, 
+                and always save before switching workflows or closing the browser.</p>
+            </div>
+        </section>
+
+        <section id="modes">
+            <h2>6. Creation vs Execution Modes</h2>
+
+            <h3>Understanding the Two Modes</h3>
+            <p>
+                The workflow manager operates in two distinct modes, each with a specific purpose:
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mode</th>
+                        <th>Purpose</th>
+                        <th>What You Can Do</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Creation</strong></td>
+                        <td>Build & modify structure</td>
+                        <td>Add/edit/delete units, change names, modify structure</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Execution</strong></td>
+                        <td>Track progress</td>
+                        <td>Check off items, enter grades, view progress</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Creation Mode <i class="fas fa-hammer"></i></h3>
+            <p>
+                <strong>Purpose:</strong> Define and organize the workflow structure.
+            </p>
+
+            <div class="feature">
+                <h4>In Creation Mode You Can:</h4>
+                <ul>
+                    <li>Add new units at any level</li>
+                    <li>Edit unit names and descriptions</li>
+                    <li>Change icons and unit IDs</li>
+                    <li>Delete units and restructure</li>
+                    <li>Add tags and attachments</li>
+                    <li>Set up grading structure</li>
+                    <li>Create/rename/delete workflows</li>
+                </ul>
             </div>
 
             <div class="feature">
-                <strong>Scenario 3: Template Management</strong><br>
-                You have a standard ISO 27001 template. Create linked workflows for each new client project. When ISO standards update, you update the template and all client projects automatically reflect the new requirements.
+                <h4>In Creation Mode You Cannot:</h4>
+                <ul>
+                    <li>Check off "Done" checkboxes</li>
+                    <li>Mark items as complete</li>
+                    <li>Track execution progress</li>
+                </ul>
+            </div>
+
+            <h3>Execution Mode <i class="fas fa-check-circle"></i></h3>
+            <p>
+                <strong>Purpose:</strong> Track completion and progress.
+            </p>
+
+            <div class="feature">
+                <h4>In Execution Mode You Can:</h4>
+                <ul>
+                    <li>Check off "Done" checkboxes</li>
+                    <li>Enter/update grades</li>
+                    <li>View progress bars</li>
+                    <li>See cumulative grades</li>
+                    <li>View completion statistics</li>
+                    <li>Filter by tags</li>
+                    <li>Export to boards</li>
+                </ul>
+            </div>
+
+            <div class="feature">
+                <h4>In Execution Mode You Cannot:</h4>
+                <ul>
+                    <li>Add or delete units</li>
+                    <li>Change structure</li>
+                    <li>Edit names or descriptions</li>
+                    <li>Modify the workflow layout</li>
+                </ul>
+            </div>
+
+            <h3>Switching Between Modes</h3>
+            <p>The mode toggle is located in the top-right corner of the screen:</p>
+
+            <div class="steps">
+                <ul>
+                    <li>Look for the toggle switch labeled "Creation | Execution"</li>
+                    <li>Click the switch or the mode label to toggle</li>
+                    <li>The interface updates immediately</li>
+                    <li>Creation-only buttons disappear in Execution mode</li>
+                    <li>Done checkboxes become clickable in Execution mode</li>
+                </ul>
+            </div>
+
+            <div class="important">
+                <p><i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> Always save your work before 
+                switching modes! Changes in one mode don't automatically save to the other.</p>
+            </div>
+
+            <h3>Visual Differences</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Element</th>
+                        <th>Creation Mode</th>
+                        <th>Execution Mode</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Add Buttons</strong></td>
+                        <td>Visible</td>
+                        <td>Hidden</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Delete Buttons</strong></td>
+                        <td>Visible</td>
+                        <td>Hidden</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Done Checkboxes</strong></td>
+                        <td>Disabled (visual only)</td>
+                        <td>Clickable</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Name Fields</strong></td>
+                        <td>Editable</td>
+                        <td>Read-only</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Progress Bars</strong></td>
+                        <td>Shows estimate</td>
+                        <td>Shows actual progress</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Management Buttons</strong></td>
+                        <td>Visible</td>
+                        <td>Hidden</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Workflow for Using Both Modes</h3>
+            <div class="example-box">
+                <h4><i class="fas fa-route"></i> Typical Workflow</h4>
+                <div class="steps">
+                    <ul>
+                        <li><strong>Creation Mode:</strong> Build the workflow structure, add all units, organize hierarchy</li>
+                        <li>Click "Save Structure"</li>
+                        <li>Switch to <strong>Execution Mode</strong></li>
+                        <li>Start checking off completed items</li>
+                        <li>Click "Save Execution" periodically</li>
+                        <li>If you need to add more items, switch back to <strong>Creation Mode</strong></li>
+                        <li>Add the new items, save structure</li>
+                        <li>Switch to <strong>Execution Mode</strong> to continue tracking</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="unit-properties">
+            <h2>7. Unit Properties & Features</h2>
+
+            <p>
+                Each unit in your workflow can have various properties, depending on what's enabled in the template. 
+                Here's a complete guide to all available properties:
+            </p>
+
+            <h3>Icon <i class="fas fa-icons"></i></h3>
+            <p>
+                Units can have visual icons displayed in their headers.
+            </p>
+
+            <div class="steps">
+                <ul>
+                    <li>In Creation mode, click the icon placeholder (or existing icon)</li>
+                    <li>An icon picker modal opens showing available icons</li>
+                    <li>Click an icon to select it</li>
+                    <li>The icon appears immediately in the unit header</li>
+                    <li>Save structure to persist the change</li>
+                </ul>
+            </div>
+
+            <div class="tip">
+                <p><i class="fas fa-palette"></i> <strong>Tip:</strong> Use consistent icons for similar unit types 
+                (e.g., all policies use the same icon) to create visual consistency.</p>
+            </div>
+
+            <h3>Unit ID</h3>
+            <p>
+                A unique identifier for the unit (e.g., "AC-1", "REQ-001", "CTRL-42").
+            </p>
+
+            <ul>
+                <li>Appears in the unit header before the name</li>
+                <li>Useful for referencing units in documentation</li>
+                <li>Can follow your organization's naming convention</li>
+                <li>Completely optional - leave blank if not needed</li>
+            </ul>
+
+            <h3>Name & Description</h3>
+            <p>
+                Every unit has a name (required) and optionally a description.
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Purpose</th>
+                        <th>Best Practice</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Name</strong></td>
+                        <td>Short title for the unit</td>
+                        <td>Keep it concise (3-8 words)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Description</strong></td>
+                        <td>Detailed explanation</td>
+                        <td>Add context, requirements, notes</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Tags <i class="fas fa-tags"></i></h3>
+            <p>
+                Tags are labels you can add to units for categorization and filtering.
+            </p>
+
+            <div class="feature">
+                <h4>Common Tag Uses:</h4>
+                <ul>
+                    <li><strong>Priority:</strong> critical, high, medium, low</li>
+                    <li><strong>Status:</strong> in-progress, review, approved</li>
+                    <li><strong>Department:</strong> IT, finance, legal</li>
+                    <li><strong>Phase:</strong> Q1-2025, phase1, pilot</li>
+                    <li><strong>Type:</strong> technical, administrative, physical</li>
+                </ul>
+            </div>
+
+            <div class="steps">
+                <ul>
+                    <li>Click "+ Add Tag" on any unit</li>
+                    <li>Enter a tag name (e.g., "critical")</li>
+                    <li>Press Enter or click "Add Tag"</li>
+                    <li>The tag appears as a colored badge</li>
+                    <li>Add multiple tags to the same unit</li>
+                    <li>Click × on a tag to remove it</li>
+                </ul>
+            </div>
+
+            <div class="tip">
+                <p><i class="fas fa-filter"></i> <strong>Powerful Feature:</strong> In Execution mode, click any tag 
+                to filter and show only units with that tag. Great for focusing on specific priorities or phases!</p>
+            </div>
+
+            <h3>Done Checkbox <i class="fas fa-check-square"></i></h3>
+            <p>
+                A checkbox to mark units as complete (only available in Execution mode).
+            </p>
+
+            <ul>
+                <li>Only appears if enabled for that level in the template</li>
+                <li>Typically enabled on the lowest level (leaf nodes)</li>
+                <li>Checking a box marks the unit as done</li>
+                <li>Checked units can affect parent progress and grades</li>
+                <li>Click "Save Execution" to persist completion status</li>
+            </ul>
+
+            <div class="highlight">
+                <p><i class="fas fa-info-circle"></i> <strong>Auto-calculation:</strong> When you check child units, 
+                parent units' progress bars and cumulative grades update automatically.</p>
+            </div>
+
+            <h3>Grades <i class="fas fa-star"></i></h3>
+            <p>
+                Numeric scores assigned to units (0-100 typically).
+            </p>
+
+            <h4>Individual Grades</h4>
+            <ul>
+                <li>Enter any number in the grade field</li>
+                <li>Useful for scoring compliance, completion, or quality</li>
+                <li>Appears next to the unit name</li>
+                <li>Can be edited in both Creation and Execution modes</li>
+            </ul>
+
+            <h4>Cumulative Grades <span class="new-badge">POWERFUL</span></h4>
+            <p>
+                When enabled, a parent's grade automatically calculates from its children:
+            </p>
+
+            <div class="feature">
+                <h4>How Cumulative Grading Works:</h4>
+                <ul>
+                    <li>Parent grade = Average of all child grades</li>
+                    <li>Updates automatically when child grades change</li>
+                    <li>Provides instant visibility into overall progress</li>
+                    <li>Works across multiple levels</li>
+                    <li>If a child is marked "Done", its grade counts in the average</li>
+                </ul>
+            </div>
+
+            <div class="example-box">
+                <h4><i class="fas fa-calculator"></i> Cumulative Grade Example</h4>
+                <pre style="background: #f8f9fa; color: #2c3e50; padding: 15px;">
+<strong>Control Family</strong> (Grade: 75 - Cumulative)
+├── <strong>Control 1</strong> (Grade: 80 - Individual)
+├── <strong>Control 2</strong> (Grade: 90 - Individual)
+└── <strong>Control 3</strong> (Grade: 55 - Individual)
+
+Parent grade = (80 + 90 + 55) / 3 = 75</pre>
+            </div>
+
+            <h3>Progress Bars <i class="fas fa-tasks"></i></h3>
+            <p>
+                Visual indicators showing completion percentage for parent units.
+            </p>
+
+            <ul>
+                <li>Only appear on units that have children</li>
+                <li>Calculate based on "Done" checkboxes of children</li>
+                <li>Show percentage (e.g., "60% complete")</li>
+                <li>Green bar fills from left to right</li>
+                <li>Update automatically in Execution mode</li>
+            </ul>
+
+            <div class="highlight">
+                <p><i class="fas fa-chart-line"></i> <strong>Formula:</strong> Progress = (Number of checked children / Total children) × 100</p>
+            </div>
+        </section>
+
+        <section id="attachments">
+            <h2>8. Attachments</h2>
+
+            <p>
+                Workflows support four types of attachments, allowing you to add rich context and documentation to your units.
+            </p>
+
+            <h3>Links <i class="fas fa-link"></i></h3>
+            <p>
+                Add hyperlinks to external resources, documents, or websites.
+            </p>
+
+            <div class="steps">
+                <ul>
+                    <li>Scroll to the unit's footer section</li>
+                    <li>Click "+ Add Link"</li>
+                    <li>Enter link text (e.g., "Policy Document")</li>
+                    <li>Enter the URL (e.g., "https://example.com/policy.pdf")</li>
+                    <li>Click "Add Link"</li>
+                    <li>The link appears as a clickable button</li>
+                </ul>
+            </div>
+
+            <div class="tip">
+                <p><i class="fas fa-external-link-alt"></i> <strong>Tip:</strong> Links open in a new tab when clicked, 
+                so you won't lose your place in the workflow.</p>
+            </div>
+
+            <h3>Images <i class="fas fa-image"></i></h3>
+            <p>
+                Add image URLs to display screenshots, diagrams, or evidence photos.
+            </p>
+
+            <div class="steps">
+                <ul>
+                    <li>Click "+ Add Image" in the unit footer</li>
+                    <li>Enter a caption/description</li>
+                    <li>Enter the image URL</li>
+                    <li>Click "Add Image"</li>
+                    <li>A thumbnail appears in the footer</li>
+                    <li>Click the thumbnail to view full-size</li>
+                </ul>
+            </div>
+
+            <div class="important">
+                <p><i class="fas fa-globe"></i> <strong>Note:</strong> Images must be hosted online (URL required). 
+                The system doesn't currently support direct file uploads.</p>
+            </div>
+
+            <h3>Notes <i class="fas fa-sticky-note"></i></h3>
+            <p>
+                Add rich-text notes with formatting (bold, italic, lists, etc.).
+            </p>
+
+            <div class="feature">
+                <h4>Rich Text Editor Features:</h4>
+                <ul>
+                    <li><strong>Bold, italic, underline</strong> text formatting</li>
+                    <li>Bullet and numbered lists</li>
+                    <li>Headers and text sizes</li>
+                    <li>Links within notes</li>
+                    <li>Copy/paste from other documents</li>
+                </ul>
+            </div>
+
+            <div class="steps">
+                <ul>
+                    <li>Click "+ Add Note"</li>
+                    <li>A rich text editor appears</li>
+                    <li>Type or paste your content</li>
+                    <li>Use the toolbar for formatting</li>
+                    <li>Click "Add Note" when done</li>
+                    <li>Notes can be edited or deleted later</li>
+                </ul>
+            </div>
+
+            <h3>Comments <i class="fas fa-comments"></i></h3>
+            <p>
+                Add timestamped comments for discussion and collaboration.
+            </p>
+
+            <ul>
+                <li>Click "+ Add Comment"</li>
+                <li>Type your comment</li>
+                <li>Each comment shows timestamp</li>
+                <li>Great for team communication</li>
+                <li>Track decisions and discussions</li>
+            </ul>
+
+            <div class="example-box">
+                <h4><i class="fas fa-example"></i> Attachment Use Cases</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Attachment Type</th>
+                            <th>Best Used For</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Links</strong></td>
+                            <td>Policy docs, SharePoint files, external resources</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Images</strong></td>
+                            <td>Screenshots, architecture diagrams, evidence photos</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Notes</strong></td>
+                            <td>Implementation details, procedures, instructions</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Comments</strong></td>
+                            <td>Team discussion, questions, status updates</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Managing Attachments</h3>
+            <p>All attachment types can be managed after creation:</p>
+
+            <ul>
+                <li><strong>View:</strong> Click to expand and see details</li>
+                <li><strong>Edit:</strong> Click edit button to modify</li>
+                <li><strong>Delete:</strong> Click × or delete button to remove</li>
+            </ul>
+
+            <div class="important">
+                <p><i class="fas fa-save"></i> <strong>Don't Forget:</strong> Attachments are part of the workflow structure, 
+                so click "Save Structure" after adding/modifying them!</p>
+            </div>
+        </section>
+
+        <section id="linked-workflows">
+            <h2>9. Linked Workflows <span class="new-badge">V7 FEATURE</span></h2>
+
+            <h3>What Are Linked Workflows?</h3>
+            <p>
+                Linked workflows are workflows that share the same structural changes. When you modify the structure 
+                of one linked workflow (add/delete/rename units), those changes automatically propagate to all other 
+                linked workflows in the group.
+            </p>
+
+            <div class="feature">
+                <h4><i class="fas fa-sync-alt"></i> What Gets Synchronized:</h4>
+                <ul>
+                    <li>Adding new units (structure)</li>
+                    <li>Deleting units (structure)</li>
+                    <li>Renaming units (names only)</li>
+                    <li>Changing unit descriptions</li>
+                    <li>Unit IDs and icons</li>
+                </ul>
+            </div>
+
+            <div class="feature">
+                <h4><i class="fas fa-user"></i> What Stays Independent:</h4>
+                <ul>
+                    <li>Done checkboxes (execution state)</li>
+                    <li>Grades</li>
+                    <li>Tags</li>
+                    <li>Attachments (links, images, notes, comments)</li>
+                    <li>Workflow-level properties</li>
+                </ul>
             </div>
 
             <h3>Creating Linked Workflows</h3>
-            <ol style="list-style-type: decimal; padding-left: 40px;">
-                <li>Switch to <strong>Creation Mode</strong></li>
-                <li>Click <strong><i class="fa-solid fa-plus"></i> New</strong></li>
-                <li>Enter a name for the new workflow</li>
-                <li>Select <strong>Linked</strong> option</li>
-                <li>Choose which workflow to link from</li>
-                <li>Click <strong>Create</strong></li>
-            </ol>
+            <p>There are two ways to create linked workflows:</p>
 
-            <p>The new workflow will show a <span class="badge"><i class="fa-solid fa-link"></i> Linked</span> badge, confirming the synchronization is active.</p>
+            <h4>Method 1: Link to Existing Workflow</h4>
+            <div class="steps">
+                <ul>
+                    <li>Click "New" button</li>
+                    <li>Select "Linked Workflow (Synchronized)"</li>
+                    <li>Enter a name for the new workflow</li>
+                    <li>Select an existing workflow to link to</li>
+                    <li>Click "Create Workflow"</li>
+                </ul>
+            </div>
 
-            <h3>Working with Linked Workflows</h3>
+            <h4>Method 2: Link Multiple Workflows</h4>
+            <div class="steps">
+                <ul>
+                    <li>Create first workflow: "Team A - GDPR"</li>
+                    <li>Create linked: "Team B - GDPR" (linked to Team A)</li>
+                    <li>Create linked: "Team C - GDPR" (linked to Team A)</li>
+                    <li>All three are now in the same link group</li>
+                </ul>
+            </div>
+
+            <h3>Identifying Linked Workflows</h3>
+            <p>When a workflow is linked, you'll see:</p>
+
             <ul>
-                <li><strong>Making Changes:</strong> Edit any linked workflow in Creation Mode, then click Save. All linked workflows update automatically.</li>
-                <li><strong>Checking Link Status:</strong> Look for the <span class="badge"><i class="fa-solid fa-link"></i> Linked</span> badge next to the workflow name</li>
-                <li><strong>Which Workflows are Linked:</strong> Workflows in the same "link group" all sync together</li>
+                <li><strong>"Linked" indicator</strong> badge next to the workflow selector</li>
+                <li><strong>"Unlink" button</strong> becomes visible in the toolbar</li>
+                <li>Both indicators appear in Creation mode only</li>
             </ul>
 
-            <h3>Unlinking a Workflow</h3>
-            <p>Sometimes you need a workflow to become independent:</p>
-            <ol style="list-style-type: decimal; padding-left: 40px;">
-                <li>Switch to <strong>Creation Mode</strong></li>
-                <li>Select the workflow you want to unlink</li>
-                <li>Click the <strong><i class="fa-solid fa-link-slash"></i> Unlink</strong> button</li>
-                <li>Confirm your choice</li>
-            </ol>
+            <h3>How Synchronization Works</h3>
+            <p>
+                Synchronization happens automatically when you save changes in Creation mode:
+            </p>
+
+            <div class="steps">
+                <ul>
+                    <li>Open any linked workflow</li>
+                    <li>Switch to Creation mode</li>
+                    <li>Make structural changes (add, delete, rename units)</li>
+                    <li>Click "Save Structure"</li>
+                    <li>System automatically propagates changes to all linked workflows</li>
+                    <li>All linked workflows now have the same structure</li>
+                </ul>
+            </div>
+
+            <div class="highlight">
+                <p><i class="fas fa-shield-alt"></i> <strong>Template Protection:</strong> The system only synchronizes 
+                workflows that share the same template. You cannot accidentally sync a 3-level workflow with a 5-level 
+                workflow - they must be based on the same template structure.</p>
+            </div>
+
+            <h3>Execution State Preservation</h3>
+            <p>
+                One of the most powerful features of linked workflows is smart execution state preservation:
+            </p>
+
+            <div class="example-box">
+                <h4><i class="fas fa-magic"></i> Smart Synchronization Example</h4>
+                <p><strong>Scenario:</strong> You have 3 linked workflows. Team A has completed 10 items.</p>
+                <p><strong>Action:</strong> You add a new unit "Security Assessment" to Team A's workflow.</p>
+                <p><strong>Result:</strong></p>
+                <ul>
+                    <li>All 3 workflows get the new "Security Assessment" unit</li>
+                    <li>Team A's 10 completed items remain checked</li>
+                    <li>Team B and Team C's completion states are preserved</li>
+                    <li>The new unit is unchecked for all teams</li>
+                </ul>
+            </div>
+
+            <div class="tip">
+                <p><i class="fas fa-check-double"></i> <strong>Intelligent Matching:</strong> The system uses smart 
+                ID matching to preserve execution states even when structure changes. Your team's progress is safe!</p>
+            </div>
+
+            <h3>Unlinking Workflows</h3>
+            <p>To remove a workflow from a link group:</p>
+
+            <div class="steps">
+                <ul>
+                    <li>Select the workflow you want to unlink</li>
+                    <li>Make sure you're in Creation mode</li>
+                    <li>Click the "Unlink" button in the toolbar</li>
+                    <li>The workflow is removed from the link group</li>
+                    <li>"Linked" indicator disappears</li>
+                    <li>Workflow continues to function independently</li>
+                </ul>
+            </div>
 
             <div class="important">
-                <strong><i class="fa-solid fa-exclamation-triangle"></i> Important:</strong> Unlinking is permanent! The workflow will keep its current structure but will no longer receive updates from linked workflows. Think of it as "breaking away" to become independent.
+                <p><i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> Unlinking is permanent for that 
+                workflow. It won't receive future structural changes from the group. However, the workflow itself is not 
+                deleted - it just becomes independent.</p>
             </div>
 
-            <h3>Link Groups Explained</h3>
-            <p>When you create your first linked workflow, a "link group" is created containing both workflows. You can add more workflows to this group by creating new linked workflows from any workflow already in the group.</p>
+            <h3>Best Practices for Linked Workflows</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Do</th>
+                        <th>Don't</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Link workflows that track the same requirements</td>
+                        <td>Link workflows with different purposes</td>
+                    </tr>
+                    <tr>
+                        <td>Use descriptive names (e.g., "GDPR - Team A")</td>
+                        <td>Use generic names (e.g., "Workflow 1")</td>
+                    </tr>
+                    <tr>
+                        <td>Designate one workflow as the "master"</td>
+                        <td>Make structural changes from multiple workflows</td>
+                    </tr>
+                    <tr>
+                        <td>Communicate changes to team members</td>
+                        <td>Make surprise structural changes</td>
+                    </tr>
+                    <tr>
+                        <td>Test changes on a copy first</td>
+                        <td>Make untested changes to production workflows</td>
+                    </tr>
+                </tbody>
+            </table>
 
-            <p><strong>Example:</strong></p>
-            <ul>
-                <li>Create "EU Compliance"</li>
-                <li>Create "US Compliance" linked to EU → Creates link group with EU + US</li>
-                <li>Create "APAC Compliance" linked to EU → Adds to same group: EU + US + APAC</li>
-                <li>Now all three sync together!</li>
-            </ul>
-        </section>
+            <h3>Common Use Cases</h3>
+            <div class="example-box">
+                <h4><i class="fas fa-building"></i> Multi-Department Compliance</h4>
+                <p>Track the same compliance requirements across multiple departments:</p>
+                <ul>
+                    <li>IT Department - ISO 27001</li>
+                    <li>Finance Department - ISO 27001</li>
+                    <li>HR Department - ISO 27001</li>
+                </ul>
+                <p>When a new control is added to ISO 27001, all departments automatically get it.</p>
+            </div>
 
-        <section id="tips">
-            <h2>8. Tips & Best Practices</h2>
+            <div class="example-box">
+                <h4><i class="fas fa-globe"></i> Multi-Region Operations</h4>
+                <p>Same requirements, different regions:</p>
+                <ul>
+                    <li>GDPR Compliance - Europe</li>
+                    <li>GDPR Compliance - Asia</li>
+                    <li>GDPR Compliance - Americas</li>
+                </ul>
+                <p>Each region tracks their own progress, but all follow the same structure.</p>
+            </div>
 
-            <h3>🎯 Workflow Organization</h3>
-            <ul>
-                <li><strong>Start Simple:</strong> Begin with one workflow and a few Controls. Add complexity as you understand the system.</li>
-                <li><strong>Use Descriptive Names:</strong> "Q4 2024 SOC 2 Audit" is better than "Audit 3"</li>
-                <li><strong>Consistent Grading:</strong> Develop a grading system and stick to it (e.g., 0.5 = quick task, 2.0 = major effort)</li>
-                <li><strong>Regular Reviews:</strong> Periodically review and update your workflow structure in Creation Mode</li>
-            </ul>
-
-            <h3>💡 Tagging Strategy</h3>
-            <ul>
-                <li><strong>Categories:</strong> Use tags for types of work (#technical, #administrative, #training)</li>
-                <li><strong>Priority:</strong> Tag urgent items (#high-priority, #critical, #quick-win)</li>
-                <li><strong>Ownership:</strong> Tag by responsible party (#it-team, #hr, #security)</li>
-                <li><strong>Timeline:</strong> Tag by deadline (#q1, #monthly, #annual)</li>
-                <li><strong>Cross-Reference:</strong> Tag items that relate to multiple frameworks (#iso27001, #gdpr, #soc2)</li>
-            </ul>
-
-            <h3>🔗 Linked Workflow Strategy</h3>
-            <ul>
-                <li><strong>Link Similar Structures:</strong> Only link workflows that should always have the same structure</li>
-                <li><strong>Name Clearly:</strong> Use names that show the relationship: "ISO Template", "ISO - Region North", "ISO - Region South"</li>
-                <li><strong>Test Before Linking:</strong> Create your template workflow completely before linking others to it</li>
-                <li><strong>Unlink for Customization:</strong> If a workflow needs custom requirements, unlink it first</li>
-                <li><strong>Update Strategically:</strong> Remember that saving changes to one linked workflow updates all others</li>
-            </ul>
-
-            <h3>📊 Progress Tracking</h3>
-            <ul>
-                <li><strong>Use Sequential Order:</strong> Enable it for processes that must be done in order</li>
-                <li><strong>Balance Grades:</strong> Don't make everything 1.0 - use the full range to reflect actual effort</li>
-                <li><strong>Regular Check-ins:</strong> Review progress bars to identify stuck Actions</li>
-                <li><strong>Complete Incrementally:</strong> Check off Evidence as you complete it, not all at once at the end</li>
-            </ul>
-
-            <h3>🎨 Interface Tips</h3>
-            <ul>
-                <li><strong>Theme Toggle:</strong> Use the <i class="fa-solid fa-circle-half-stroke"></i> button to switch between light and dark themes</li>
-                <li><strong>Save Often:</strong> Save your work regularly in both Creation and Execution modes</li>
-                <li><strong>Mode Switching:</strong> Get comfortable switching between modes - Creation for structure, Execution for work</li>
-                <li><strong>Tag Filtering:</strong> Use tag filters in Execution Mode to focus on specific areas</li>
-            </ul>
-
-            <h3>⚠️ Common Pitfalls to Avoid</h3>
-            <ul>
-                <li><strong>Don't:</strong> Forget to save after making changes</li>
-                <li><strong>Don't:</strong> Link workflows with fundamentally different structures</li>
-                <li><strong>Don't:</strong> Expect completion status to sync across linked workflows (it doesn't - by design!)</li>
-                <li><strong>Don't:</strong> Delete workflows without checking if they're linked to others you need</li>
-                <li><strong>Don't:</strong> Create duplicate tags with different capitalization (#Firewall vs #firewall)</li>
-            </ul>
-
-            <h3>🚀 Advanced Workflows</h3>
-            <ul>
-                <li><strong>Quarterly Reviews:</strong> Create a linked workflow for each quarter's audit</li>
-                <li><strong>Department Tracking:</strong> Use tags to identify department-specific items, then filter by department</li>
-                <li><strong>Staged Rollouts:</strong> Create a test workflow (linked), perfect it, then roll to production</li>
-                <li><strong>Compliance Frameworks:</strong> Maintain separate workflows for different frameworks, using tags to identify overlaps</li>
-            </ul>
-        </section>
-
-        <section>
-            <h2>9. Keyboard & Interface Reference</h2>
-
-            <h3>Mode Toggle</h3>
-            <p>The switch at the top right toggles between Creation and Execution modes. The mode you're in affects what buttons and features are visible.</p>
-
-            <h3>Button Icons Reference</h3>
-            <ul style="list-style-type: none; padding-left: 0;">
-                <li><i class="icon-example fa-solid fa-plus" style="color: #10b981;"></i> <strong>Add:</strong> Create new items</li>
-                <li><i class="icon-example fa-solid fa-pen" style="color: #f59e0b;"></i> <strong>Edit:</strong> Modify names and properties</li>
-                <li><i class="icon-example fa-solid fa-trash-can" style="color: #ef4444;"></i> <strong>Delete:</strong> Remove items permanently</li>
-                <li><i class="icon-example fa-solid fa-gear"></i> <strong>Manage:</strong> Open attachment manager</li>
-                <li><i class="icon-example fa-solid fa-link"></i> <strong>Link:</strong> Add web links</li>
-                <li><i class="icon-example fa-solid fa-image"></i> <strong>Image:</strong> Add images</li>
-                <li><i class="icon-example fa-solid fa-book-open"></i> <strong>Note:</strong> Add formatted notes</li>
-                <li><i class="icon-example fa-solid fa-comment"></i> <strong>Comment:</strong> Add quick comments</li>
-                <li><i class="icon-example fa-solid fa-cloud-arrow-up"></i> <strong>Save Structure:</strong> Save workflow changes</li>
-                <li><i class="icon-example fa-solid fa-floppy-disk"></i> <strong>Save Execution:</strong> Save progress</li>
-                <li><i class="icon-example fa-solid fa-link-slash"></i> <strong>Unlink:</strong> Break workflow synchronization</li>
-                <li><i class="icon-example fa-solid fa-circle-half-stroke"></i> <strong>Theme:</strong> Toggle dark/light theme</li>
-            </ul>
-        </section>
-
-        <section>
-            <h2>10. Frequently Asked Questions</h2>
-
-            <h3>Can I undo changes?</h3>
-            <p>Currently, there's no undo button. Always save carefully. If needed, you can copy a workflow before making major changes as a backup.</p>
-
-            <h3>What happens if I delete a linked workflow?</h3>
-            <p>The workflow is removed from the link group. Other linked workflows continue to sync with each other.</p>
-
-            <h3>Can I link workflows after they're created?</h3>
-            <p>Not directly. You can create a new linked workflow and copy content, or start fresh with linked workflows.</p>
-
-            <h3>Do attachments sync across linked workflows?</h3>
-            <p>No. Each workflow maintains its own attachments. Only the structure (Controls, Actions, Evidence) syncs.</p>
-
-            <h3>Can I filter by multiple tags at once?</h3>
-            <p>Currently, you can filter by one tag at a time. To see multiple categories, consider creating combined tags like #firewall-priority.</p>
-
-            <h3>What's the difference between Copy and Linked?</h3>
-            <p><strong>Copy</strong> creates an independent duplicate. <strong>Linked</strong> creates a synchronized workflow that updates when others in its group update.</p>
-
-            <h3>Why do my grade totals need to equal 5.0?</h3>
-            <p>This ensures accurate progress tracking. If Action A has 2 Evidence items worth 2.5 each (total 5.0), completing one shows 50% progress. Other totals would show inaccurate progress percentages.</p>
-        </section>
-
-        <section>
-            <h2>11. Getting Help</h2>
-            
-            <p>If you encounter issues or have questions:</p>
-            <ul>
-                <li>Check this manual for guidance on features</li>
-                <li>Review the Tips & Best Practices section</li>
-                <li>Verify you're in the correct mode (Creation vs Execution)</li>
-                <li>Make sure you've saved your changes</li>
-                <li>Try refreshing the page if something seems stuck</li>
-            </ul>
-
-            <div class="feature" style="text-align: center; margin-top: 40px;">
-                <h3 style="margin-top: 0;">Ready to Get Started?</h3>
-                <p>You now have everything you need to effectively use the Compliance Workflow Manager!</p>
-                <a href="index.html" class="app-button"><i class="fa-solid fa-rocket"></i> Launch Application</a>
+            <div class="example-box">
+                <h4><i class="fas fa-users"></i> Multi-Team Projects</h4>
+                <p>Same project, different teams:</p>
+                <ul>
+                    <li>Product Launch - Engineering</li>
+                    <li>Product Launch - Marketing</li>
+                    <li>Product Launch - Sales</li>
+                </ul>
+                <p>When project requirements change, all teams get updated tasks.</p>
             </div>
         </section>
 
-        <hr style="margin: 40px 0; border: none; border-top: 2px solid #dee2e6;">
-        <footer style="text-align: center; color: #6c757d; font-size: 0.95rem;">
-            <p><strong>Compliance Workflow Manager</strong> - User Manual v6.2</p>
-            <p>Last Updated: October 2025</p>
+        <section id="advanced-features">
+            <h2>10. Advanced Features</h2>
+
+            <h3>Sequential Enforcement <i class="fas fa-sort-numeric-down"></i></h3>
+            <p>
+                When enabled at the workflow level, sequential enforcement requires units to be completed in order.
+            </p>
+
+            <ul>
+                <li>Only available if enabled in the template</li>
+                <li>Checkbox appears in the workflow info section</li>
+                <li>When checked, units must be completed top-to-bottom</li>
+                <li>Users cannot skip ahead</li>
+                <li>Useful for processes that must follow a specific order</li>
+            </ul>
+
+            <div class="tip">
+                <p><i class="fas fa-lock"></i> <strong>Use Case:</strong> Perfect for onboarding checklists, compliance 
+                procedures, or any process where steps must happen in sequence.</p>
+            </div>
+
+            <h3>Tag Filtering <i class="fas fa-filter"></i></h3>
+            <p>
+                In Execution mode, you can filter workflows to show only units with specific tags.
+            </p>
+
+            <div class="steps">
+                <ul>
+                    <li>Switch to Execution mode</li>
+                    <li>Find a unit with a tag you want to filter by</li>
+                    <li>Click on the tag badge</li>
+                    <li>The workflow filters to show only units with that tag</li>
+                    <li>A filter banner appears at the top</li>
+                    <li>Click "Clear" in the banner to remove the filter</li>
+                </ul>
+            </div>
+
+            <div class="example-box">
+                <h4><i class="fas fa-example"></i> Tag Filter Example</h4>
+                <p><strong>Scenario:</strong> You have 100 controls, and 15 are tagged "critical".</p>
+                <p><strong>Action:</strong> Click the "critical" tag.</p>
+                <p><strong>Result:</strong> Only those 15 critical controls are displayed, making it easy to focus on high-priority items.</p>
+            </div>
+
+            <h3>Export to Project Boards <i class="fas fa-diagram-project"></i></h3>
+            <p>
+                Convert workflow units into Kanban boards for project management.
+            </p>
+
+            <h4>Export Entire Unit Tree</h4>
+            <div class="steps">
+                <ul>
+                    <li>In Execution mode, find a parent unit you want to export</li>
+                    <li>Click the "Board" button on that unit</li>
+                    <li>A new Kanban board is created</li>
+                    <li>All child units become tasks in the "To Do" column</li>
+                    <li>Navigate to the Boards section to view</li>
+                </ul>
+            </div>
+
+            <h4>Export by Tag</h4>
+            <div class="steps">
+                <ul>
+                    <li>Filter the workflow by a tag (click any tag)</li>
+                    <li>Click "Create Board" in the filter banner</li>
+                    <li>A new board is created with all tagged items</li>
+                    <li>Great for creating sprint boards or phase-specific boards</li>
+                </ul>
+            </div>
+
+            <div class="tip">
+                <p><i class="fas fa-exchange-alt"></i> <strong>Tip:</strong> Exported boards are independent - changes 
+                in the board don't affect the workflow and vice versa. They're snapshots for project management.</p>
+            </div>
+
+            <h3>Workflow Renaming</h3>
+            <p>Change a workflow's name at any time:</p>
+
+            <div class="steps">
+                <ul>
+                    <li>Select the workflow you want to rename</li>
+                    <li>Switch to Creation mode</li>
+                    <li>Click the "Rename" button (pencil icon)</li>
+                    <li>Enter the new name</li>
+                    <li>Press OK</li>
+                    <li>The workflow name updates immediately</li>
+                </ul>
+            </div>
+
+            <h3>Workflow Deletion</h3>
+            <p>Remove workflows you no longer need:</p>
+
+            <div class="steps">
+                <ul>
+                    <li>Select the workflow to delete</li>
+                    <li>Switch to Creation mode</li>
+                    <li>Click the "Delete" button (trash icon)</li>
+                    <li>Confirm the deletion</li>
+                    <li>The workflow is permanently removed</li>
+                </ul>
+            </div>
+
+            <div class="important">
+                <p><i class="fas fa-exclamation-triangle"></i> <strong>Warning:</strong> Workflow deletion is permanent 
+                and cannot be undone! Make sure you have backups if needed. If the workflow is linked, it will be 
+                automatically unlinked before deletion.</p>
+            </div>
+
+            <h3>Theme Toggle <i class="fas fa-moon"></i></h3>
+            <p>
+                Switch between light and dark themes for comfortable viewing:
+            </p>
+
+            <ul>
+                <li>Click the theme toggle button (moon/sun icon) in the top-right</li>
+                <li>Theme switches immediately</li>
+                <li>Preference is saved in your browser</li>
+                <li>Works across all pages (workflows, templates, boards)</li>
+            </ul>
+        </section>
+
+        <section id="best-practices">
+            <h2>11. Best Practices</h2>
+
+            <h3>Workflow Organization</h3>
+            <div class="tip">
+                <p><strong>Naming Convention:</strong> Use descriptive names that include purpose and scope.</p>
+                <ul>
+                    <li>✅ Good: "NIST CSF 2024 - Finance Department"</li>
+                    <li>❌ Bad: "Workflow 1"</li>
+                </ul>
+            </div>
+
+            <div class="tip">
+                <p><strong>Template Strategy:</strong> Create templates for repeated workflow structures.</p>
+                <ul>
+                    <li>Start with a template for any workflow you'll use more than once</li>
+                    <li>Use Empty Workflow only for one-off checklists</li>
+                    <li>Document your templates with clear names and descriptions</li>
+                </ul>
+            </div>
+
+            <h3>Using Tags Effectively</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tag Type</th>
+                        <th>Examples</th>
+                        <th>Use For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Priority</strong></td>
+                        <td>critical, high, medium, low</td>
+                        <td>Identifying urgent items</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase</strong></td>
+                        <td>Q1-2025, sprint-1, phase-A</td>
+                        <td>Time-based organization</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Owner</strong></td>
+                        <td>IT, finance, legal</td>
+                        <td>Responsibility assignment</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status</strong></td>
+                        <td>in-progress, review, blocked</td>
+                        <td>Workflow state tracking</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Type</strong></td>
+                        <td>technical, administrative</td>
+                        <td>Categorization</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Linked Workflow Management</h3>
+            <ul>
+                <li><strong>Designate a Master:</strong> Choose one workflow as the "master" where structural changes are made</li>
+                <li><strong>Communicate Changes:</strong> Notify team members before making structural changes</li>
+                <li><strong>Test First:</strong> Make a copy to test changes before applying to linked production workflows</li>
+                <li><strong>Document Links:</strong> Keep a list of which workflows are linked together</li>
+                <li><strong>Regular Audits:</strong> Periodically review linked workflows to ensure they're still needed</li>
+            </ul>
+
+            <h3>Grading Strategy</h3>
+            <div class="example-box">
+                <h4><i class="fas fa-star"></i> Recommended Grading Scale</h4>
+                <ul>
+                    <li><strong>0-25:</strong> Not started or minimal progress</li>
+                    <li><strong>26-50:</strong> In progress, significant work remaining</li>
+                    <li><strong>51-75:</strong> Mostly complete, minor issues</li>
+                    <li><strong>76-90:</strong> Complete, pending review</li>
+                    <li><strong>91-100:</strong> Complete and verified</li>
+                </ul>
+            </div>
+
+            <h3>Saving Strategy</h3>
+            <ul>
+                <li><strong>Save Frequently:</strong> Every 5-10 minutes or after significant changes</li>
+                <li><strong>Before Switching:</strong> Always save before switching modes or workflows</li>
+                <li><strong>After Bulk Changes:</strong> Save immediately after adding many units</li>
+                <li><strong>Before Closing:</strong> Always save before closing the browser</li>
+            </ul>
+
+            <div class="important">
+                <p><i class="fas fa-database"></i> <strong>Backup Recommendation:</strong> The system saves to JSON files 
+                in the data/ folder. Periodically backup these files to prevent data loss.</p>
+            </div>
+
+            <h3>Performance Tips</h3>
+            <ul>
+                <li>Keep workflows under 500 units for optimal performance</li>
+                <li>Use multiple workflows instead of one massive workflow</li>
+                <li>Minimize attachment sizes (especially images)</li>
+                <li>Clear browser cache if the system becomes slow</li>
+                <li>Use tag filtering to work with subsets of large workflows</li>
+            </ul>
+        </section>
+
+        <section id="faq">
+            <h2>12. Frequently Asked Questions</h2>
+
+            <h3>General Questions</h3>
+
+            <div class="example-box">
+                <h4>Q: What's the difference between V6 and V7?</h4>
+                <p><strong>A:</strong> Version 7 introduces dynamic templates, allowing unlimited custom workflow structures. 
+                V6 had a fixed 3-level structure (Rules → Actions → Evidences). V7 lets you define 1-10+ levels with 
+                custom names and properties.</p>
+            </div>
+
+            <div class="example-box">
+                <h4>Q: Do I need to create templates before using workflows?</h4>
+                <p><strong>A:</strong> No! You can use "Empty Workflow (Quick Start)" which automatically creates a simple 
+                template for you. However, creating templates first gives you more control over structure and features.</p>
+            </div>
+
+            <div class="example-box">
+                <h4>Q: Can I change a workflow's template after creation?</h4>
+                <p><strong>A:</strong> No. Each workflow has a template snapshot that's fixed at creation time. To use a 
+                different template, create a new workflow. However, you can modify the structure manually in Creation mode.</p>
+            </div>
+
+            <h3>Template Questions</h3>
+
+            <div class="example-box">
+                <h4>Q: If I edit a template, do existing workflows change?</h4>
+                <p><strong>A:</strong> No! Each workflow has its own independent template snapshot. Template changes only 
+                affect new workflows created from that template.</p>
+            </div>
+
+            <div class="example-box">
+                <h4>Q: Can I have different properties at different levels?</h4>
+                <p><strong>A:</strong> Yes! This is a key feature. For example, you might have:</p>
+                <ul>
+                    <li>Level 1: Icons, progress bars (no Done checkbox)</li>
+                    <li>Level 2: Icons, grades (no Done checkbox)</li>
+                    <li>Level 3: Everything (Done checkbox, attachments, etc.)</li>
+                </ul>
+            </div>
+
+            <h3>Linked Workflow Questions</h3>
+
+            <div class="example-box">
+                <h4>Q: What's the difference between Copy and Linked workflows?</h4>
+                <p><strong>A:</strong></p>
+                <ul>
+                    <li><strong>Copy:</strong> Creates independent duplicate. Changes in one don't affect the other.</li>
+                    <li><strong>Linked:</strong> Creates synchronized workflow. Structural changes in one update all linked workflows.</li>
+                </ul>
+            </div>
+
+            <div class="example-box">
+                <h4>Q: Can I link workflows created from different templates?</h4>
+                <p><strong>A:</strong> No. Workflows can only be linked if they share the same template. This prevents 
+                structural mismatches.</p>
+            </div>
+
+            <div class="example-box">
+                <h4>Q: If I unlink a workflow, what happens to my data?</h4>
+                <p><strong>A:</strong> Nothing! The workflow continues to function normally with all its data intact. 
+                It just stops receiving structural updates from the link group.</p>
+            </div>
+
+            <div class="example-box">
+                <h4>Q: Can I re-link an unlinked workflow?</h4>
+                <p><strong>A:</strong> Not directly. Once unlinked, you would need to create a new linked workflow from 
+                an existing one in the link group.</p>
+            </div>
+
+            <h3>Mode Questions</h3>
+
+            <div class="example-box">
+                <h4>Q: Can I edit unit names in Execution mode?</h4>
+                <p><strong>A:</strong> No. Execution mode is for tracking progress only. Switch to Creation mode to edit 
+                structure, names, or properties.</p>
+            </div>
+
+            <div class="example-box">
+                <h4>Q: Why can't I see the Add/Delete buttons?</h4>
+                <p><strong>A:</strong> You're probably in Execution mode. Switch to Creation mode using the toggle in the 
+                top-right corner.</p>
+            </div>
+
+            <div class="example-box">
+                <h4>Q: Do I need to save separately in each mode?</h4>
+                <p><strong>A:</strong> Yes! "Save Structure" (Creation) and "Save Execution" (Execution) are separate. 
+                Changes in one mode don't automatically save data for the other.</p>
+            </div>
+
+            <h3>Data Questions</h3>
+
+            <div class="example-box">
+                <h4>Q: Where is my workflow data stored?</h4>
+                <p><strong>A:</strong> Data is stored in JSON files in the <code>data/</code> folder:</p>
+                <ul>
+                    <li><code>workflows.json</code> - Workflow structures</li>
+                    <li><code>executions.json</code> - Completion states</li>
+                    <li><code>templates.json</code> - Templates</li>
+                    <li><code>workflow-links.json</code> - Link relationships</li>
+                </ul>
+            </div>
+
+            <div class="example-box">
+                <h4>Q: How do I backup my workflows?</h4>
+                <p><strong>A:</strong> Copy the entire <code>data/</code> folder to a backup location. These JSON files 
+                contain all your workflow, template, and execution data.</p>
+            </div>
+
+            <div class="example-box">
+                <h4>Q: Can multiple users work on the same workflow?</h4>
+                <p><strong>A:</strong> The system saves to files, so concurrent editing can cause conflicts. For multi-user 
+                scenarios:</p>
+                <ul>
+                    <li>Use linked workflows (one per user/team)</li>
+                    <li>Coordinate edit times to avoid conflicts</li>
+                    <li>Consider implementing a backend database in production</li>
+                </ul>
+            </div>
+
+            <h3>Performance Questions</h3>
+
+            <div class="example-box">
+                <h4>Q: How many units can a workflow have?</h4>
+                <p><strong>A:</strong> Technically unlimited, but for best performance:</p>
+                <ul>
+                    <li>Keep workflows under 500 units</li>
+                    <li>Use multiple workflows for large projects</li>
+                    <li>Consider using tag filtering for large workflows</li>
+                </ul>
+            </div>
+
+            <div class="example-box">
+                <h4>Q: The system seems slow. What can I do?</h4>
+                <p><strong>A:</strong> Try these steps:</p>
+                <ul>
+                    <li>Clear browser cache</li>
+                    <li>Reduce workflow size (split into multiple workflows)</li>
+                    <li>Minimize image sizes in attachments</li>
+                    <li>Close other browser tabs</li>
+                    <li>Update to the latest browser version</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="troubleshooting">
+            <h2>13. Troubleshooting</h2>
+
+            <h3>Common Issues</h3>
+
+            <div class="important">
+                <h4><i class="fas fa-exclamation-triangle"></i> "Create Workflow" button not responding</h4>
+                <p><strong>Possible Causes:</strong></p>
+                <ul>
+                    <li>Name field is empty</li>
+                    <li>No template selected (in Template mode)</li>
+                    <li>No source workflow selected (in Copy/Linked mode)</li>
+                </ul>
+                <p><strong>Solution:</strong> Fill in all required fields marked with <span style="color: #ef4444;">*</span> 
+                before clicking "Create Workflow".</p>
+            </div>
+
+            <div class="important">
+                <h4><i class="fas fa-exclamation-triangle"></i> Changes not saving</h4>
+                <p><strong>Possible Causes:</strong></p>
+                <ul>
+                    <li>Didn't click "Save Structure" or "Save Execution"</li>
+                    <li>Browser closed before save completed</li>
+                    <li>File permission issues on server</li>
+                </ul>
+                <p><strong>Solution:</strong> Always click the Save button and wait for confirmation. Check browser console 
+                for errors.</p>
+            </div>
+
+            <div class="important">
+                <h4><i class="fas fa-exclamation-triangle"></i> Can't see Add/Delete buttons</h4>
+                <p><strong>Cause:</strong> You're in Execution mode</p>
+                <p><strong>Solution:</strong> Switch to Creation mode using the toggle in the top-right corner.</p>
+            </div>
+
+            <div class="important">
+                <h4><i class="fas fa-exclamation-triangle"></i> Linked workflows not synchronizing</h4>
+                <p><strong>Possible Causes:</strong></p>
+                <ul>
+                    <li>Workflows have different templates</li>
+                    <li>Changes made but not saved</li>
+                    <li>Workflows not actually linked (check for "Linked" indicator)</li>
+                </ul>
+                <p><strong>Solution:</strong> Verify workflows are in the same link group, share the same template, 
+                and save after making changes.</p>
+            </div>
+
+            <div class="important">
+                <h4><i class="fas fa-exclamation-triangle"></i> "Template not found" error</h4>
+                <p><strong>Cause:</strong> Template was deleted but workflow still references it</p>
+                <p><strong>Solution:</strong> Workflows contain template snapshots and should still work. If you see this 
+                error, check browser console for details.</p>
+            </div>
+
+            <h3>Getting Help</h3>
+            <div class="tip">
+                <p><strong>Debug Mode:</strong> Open browser Developer Tools (F12) and check the Console tab for detailed 
+                error messages. These can help identify issues quickly.</p>
+            </div>
+
+            <div class="tip">
+                <p><strong>Data Recovery:</strong> If workflows become corrupted:</p>
+                <ul>
+                    <li>Check the <code>data/</code> folder for JSON files</li>
+                    <li>Restore from backup if available</li>
+                    <li>Edit JSON files manually if needed (advanced users)</li>
+                </ul>
+            </div>
+        </section>
+
+        <footer style="margin-top: 60px; padding-top: 30px; border-top: 2px solid #e9ecef; text-align: center; color: #6c757d;">
+            <p><strong>Compliance Workflow Manager Version 7.0</strong></p>
+            <p>Dynamic Template System - Built for Flexibility and Power</p>
+            <p style="margin-top: 20px; font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i> For additional support, check the 
+                <a href="template-builder-documentation.html">Template Builder Manual</a> or 
+                <a href="boards-documentation.html">Project Boards Manual</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 0.85rem;">
+                <a href="index.html" style="color: #4a6cf7; text-decoration: none;">
+                    <i class="fas fa-arrow-left"></i> Return to Workflow Manager
+                </a>
+            </p>
         </footer>
     </main>
+
+    <a href="#" class="back-to-top">
+        <i class="fas fa-arrow-up"></i> Top
+    </a>
 </body>
 </html>
