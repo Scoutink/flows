@@ -1592,35 +1592,170 @@ Parent grade = (80 + 90 + 55) / 3 = 75</pre>
                 <p><strong>Result:</strong> Only those 15 critical controls are displayed, making it easy to focus on high-priority items.</p>
             </div>
 
-            <h3>Export to Project Boards <i class="fas fa-diagram-project"></i></h3>
+            <h3>Export to Project Boards <span class="new-badge">ENHANCED IN V7</span></h3>
             <p>
-                Convert workflow units into Kanban boards for project management.
+                Transform your workflows into actionable project boards with the powerful export system. 
+                Version 7 introduces a comprehensive export modal with multiple options for complete flexibility.
             </p>
 
-            <h4>Export Entire Unit Tree</h4>
-            <div class="steps">
+            <div class="feature">
+                <h4><i class="fas fa-rocket"></i> Three Ways to Export</h4>
                 <ul>
-                    <li>In Execution mode, find a parent unit you want to export</li>
-                    <li>Click the "Board" button on that unit</li>
-                    <li>A new Kanban board is created</li>
-                    <li>All child units become tasks in the "To Do" column</li>
-                    <li>Navigate to the Boards section to view</li>
+                    <li><strong>Full Workflow</strong> - Export entire workflow with all levels</li>
+                    <li><strong>Partial Workflow</strong> - Select specific sections with an interactive tree</li>
+                    <li><strong>Tag-Filtered</strong> - Export only nodes matching a specific tag</li>
                 </ul>
             </div>
 
-            <h4>Export by Tag</h4>
+            <h4>Method 1: Comprehensive Export Modal <span class="new-badge">NEW!</span></h4>
+            <p>Access the full export system with all options:</p>
+            
             <div class="steps">
                 <ul>
-                    <li>Filter the workflow by a tag (click any tag)</li>
-                    <li>Click "Create Board" in the filter banner</li>
-                    <li>A new board is created with all tagged items</li>
-                    <li>Great for creating sprint boards or phase-specific boards</li>
+                    <li>Click the <strong>"Export to Board"</strong> button in the workflow header (next to Delete)</li>
+                    <li>The Export Modal opens with 5 configuration sections</li>
+                    <li>Configure your export options (see below)</li>
+                    <li>Review the live preview showing what will be exported</li>
+                    <li>Click <strong>"Create Board"</strong></li>
+                    <li>Board opens automatically in a new tab with all your content!</li>
                 </ul>
+            </div>
+
+            <div class="feature">
+                <h4><i class="fas fa-sliders-h"></i> Export Configuration Sections</h4>
+                
+                <p><strong>Section 1: Export Scope</strong></p>
+                <ul>
+                    <li><strong>Full Workflow:</strong> Export everything - all nodes from all levels</li>
+                    <li><strong>Partial Workflow:</strong> Interactive tree appears - check boxes next to sections you want</li>
+                    <li><strong>Tag-Filtered:</strong> Dropdown shows all tags - select one to export only matching nodes</li>
+                </ul>
+
+                <p><strong>Section 2: Board Configuration</strong></p>
+                <ul>
+                    <li><strong>Board Name:</strong> Auto-generated based on scope (editable)</li>
+                    <li><strong>Description:</strong> Optional - add context for your team</li>
+                </ul>
+
+                <p><strong>Section 3: Reference Column (Optional)</strong></p>
+                <ul>
+                    <li>Export a specific level to the locked References column</li>
+                    <li>Select which level (e.g., Level 0: Rules, Level 1: Actions)</li>
+                    <li>Descendants become task nodes, ancestors become connection nodes in dynamic list</li>
+                </ul>
+
+                <p><strong>Section 4: Dynamic List (Optional)</strong></p>
+                <ul>
+                    <li>Export workflow hierarchy to board's dynamic list</li>
+                    <li>Interactive tree shows each node with type selector</li>
+                    <li>Choose: <strong>Task</strong> (standalone with content), <strong>Connection</strong> (filters board), or <strong>Skip</strong></li>
+                    <li>Maintains parent-child relationships for hierarchical organization</li>
+                </ul>
+
+                <p><strong>Section 5: Preview</strong></p>
+                <ul>
+                    <li>Real-time count of nodes to export</li>
+                    <li>Shows how many go to References vs. regular columns</li>
+                    <li>Dynamic list breakdown (tasks vs. connections)</li>
+                    <li>Updates instantly as you change settings</li>
+                </ul>
+            </div>
+
+            <div class="example-box">
+                <h4><i class="fas fa-lightbulb"></i> Complete Export Example</h4>
+                <p><strong>Scenario:</strong> You want to create a board for Q1 2025 critical items only</p>
+                <p><strong>Configuration:</strong></p>
+                <ol style="list-style-type: decimal; padding-left: 20px;">
+                    <li>Click "Export to Board" button</li>
+                    <li>Scope: Select "Tag-Filtered" → Choose "#critical"</li>
+                    <li>Board Name: Auto-fills "WorkflowName #critical" → Edit to "Q1 2025 Critical Items"</li>
+                    <li>Reference Column: Check ✓ → Select "Level 0: Rules"</li>
+                    <li>Dynamic List: Check ✓ → Set all Level 0 as "Connection", Level 1+ as "Task"</li>
+                    <li>Preview shows: "15 nodes | 5 to References | 10 to board | 15 dynamic list nodes (10 tasks, 5 connections)"</li>
+                    <li>Click "Create Board"</li>
+                </ol>
+                <p><strong>Result:</strong> New board opens with Rules in References column, all critical Actions/Evidences as tasks, 
+                hierarchical dynamic list for filtering, all attachments (notes, links, images, comments) automatically included!</p>
+            </div>
+
+            <h4>Method 2: Quick Export by Tag</h4>
+            <p>For simple tag-based exports without configuration:</p>
+            
+            <div class="steps">
+                <ul>
+                    <li>In Execution mode, click any tag to filter the workflow</li>
+                    <li>The filter banner appears at the top</li>
+                    <li>Click <strong>"Create Board"</strong> button in the banner</li>
+                    <li>Board is created instantly with default settings and all tagged items</li>
+                </ul>
+            </div>
+
+            <h4>What Gets Exported?</h4>
+            <p>The export system maps all workflow content to board tasks:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Workflow Property</th>
+                        <th>Board Task Property</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Node name</td>
+                        <td>Card title</td>
+                    </tr>
+                    <tr>
+                        <td>Node description</td>
+                        <td>Card description</td>
+                    </tr>
+                    <tr>
+                        <td>Footer comments</td>
+                        <td>Card attachments (type: comment)</td>
+                    </tr>
+                    <tr>
+                        <td>Footer notes</td>
+                        <td>Card attachments (type: note with rich text)</td>
+                    </tr>
+                    <tr>
+                        <td>Footer links</td>
+                        <td>Card attachments (type: link, clickable)</td>
+                    </tr>
+                    <tr>
+                        <td>Footer images</td>
+                        <td>Card attachments (type: image, viewable)</td>
+                    </tr>
+                    <tr>
+                        <td>Tags</td>
+                        <td>Labels (auto-created with colors)</td>
+                    </tr>
+                    <tr>
+                        <td>Completed status</td>
+                        <td>isDone flag</td>
+                    </tr>
+                    <tr>
+                        <td>Grade</td>
+                        <td>sourceGrade (preserved for reference)</td>
+                    </tr>
+                    <tr>
+                        <td>Tree hierarchy</td>
+                        <td>Dynamic list structure (if enabled)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="important">
+                <p><i class="fas fa-shield-alt"></i> <strong>Important:</strong> Exported boards are <em>snapshots</em>, 
+                not live links. Changes to the board don't affect the workflow, and vice versa. This protects your reusable 
+                workflow templates while allowing flexible project execution. Export the same workflow multiple times for 
+                different projects or time periods (e.g., "Q1 Audit", "Q2 Audit").</p>
             </div>
 
             <div class="tip">
-                <p><i class="fas fa-exchange-alt"></i> <strong>Tip:</strong> Exported boards are independent - changes 
-                in the board don't affect the workflow and vice versa. They're snapshots for project management.</p>
+                <p><i class="fas fa-lightbulb"></i> <strong>Pro Tip:</strong> Use the Reference Column for high-level 
+                organizational items that shouldn't move through your workflow columns. Export Dynamic List to maintain 
+                workflow hierarchy and use connection nodes to filter the board by initiative. All workflow attachments 
+                (notes, comments, links, images) are automatically available in board tasks - no manual re-attachment needed!</p>
             </div>
 
             <h3>Workflow Renaming</h3>

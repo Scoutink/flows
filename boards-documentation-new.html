@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Boards - Complete User Manual</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* [Include same comprehensive styles from workflow documentation] */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.8;
+            color: #343a40;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        main {
+            max-width: 1000px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 2rem 3rem;
+        }
+        header {
+            text-align: center;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+        }
+        .version {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        h2 {
+            color: #4a6cf7;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-top: 40px;
+            font-size: 1.8rem;
+        }
+        h3 {
+            color: #495057;
+            margin-top: 30px;
+            font-size: 1.3rem;
+        }
+        h4 {
+            color: #495057;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        p, li {
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+            color: #495057;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .tip {
+            background-color: #d1ecf1;
+            border-left: 5px solid #0dcaf0;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .important {
+            background-color: #f8d7da;
+            border-left: 5px solid #dc3545;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .feature {
+            background-color: #e7f5ff;
+            border-left: 5px solid #4a6cf7;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .new-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        ul {
+            padding-left: 25px;
+            list-style-type: none;
+        }
+        li {
+            padding-left: 1.4em;
+            text-indent: -1.4em;
+            margin-bottom: 10px;
+        }
+        li::before {
+            content: "\f058"; 
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 10px;
+            color: #10b981;
+        }
+        code {
+            background-color: #f1f3f5;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: "Courier New", monospace;
+            color: #e03e2d;
+            font-size: 0.9em;
+        }
+        .steps {
+            counter-reset: step;
+        }
+        .steps li {
+            counter-increment: step;
+            padding-left: 2.5em;
+            text-indent: -2.5em;
+        }
+        .steps li::before {
+            content: counter(step);
+            background-color: #4a6cf7;
+            color: white;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 50%;
+            margin-right: 12px;
+            font-size: 0.9em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .example-box {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .example-box h4 {
+            margin-top: 0;
+            color: #4a6cf7;
+        }
+        .nav {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .nav h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .nav ul {
+            padding-left: 0;
+        }
+        .nav li::before {
+            content: "\f138";
+            color: #4a6cf7;
+        }
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #4a6cf7;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 4px 10px rgba(74, 108, 247, 0.3);
+            transition: all 0.3s;
+        }
+        .back-to-top:hover {
+            background-color: #3651d4;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(74, 108, 247, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <header>
+            <h1><i class="fas fa-diagram-project"></i> Project Boards</h1>
+            <p class="version">Complete User Manual - Version 3.0 (Major Update)</p>
+            <p style="color: #6c757d; font-size: 0.95rem; margin-top: 15px;">
+                Transform workflows into actionable projects with advanced Kanban boards
+            </p>
+        </header>
+
+        <div class="highlight">
+            <strong><i class="fa-solid fa-star"></i> What's New in Version 3.0:</strong>
+            <ul>
+                <li><strong>Comprehensive Workflow Export</strong> - Full/Partial/Tag-filtered with dynamic list and references</li>
+                <li><strong>Dynamic List Feature</strong> - Hierarchical task organization with filtering (Task & Connection nodes)</li>
+                <li><strong>Milestones System</strong> - Link tasks, track completion, visual progress indicators</li>
+                <li><strong>Categories</strong> - Organize and filter tasks by category</li>
+                <li><strong>Groups with Bulk Actions</strong> - Perform 10 different bulk operations on multiple tasks</li>
+                <li><strong>Thread-like Attachments</strong> - Comments, notes, links, and images displayed inline</li>
+            </ul>
+        </div>
+
+        <div class="nav">
+            <h3>📑 Quick Navigation</h3>
+            <ul style="columns: 2; -webkit-columns: 2; -moz-columns: 2;">
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#creating-boards">Creating Boards</a></li>
+                <li><a href="#interface">Board Interface</a></li>
+                <li><a href="#tasks">Managing Tasks</a></li>
+                <li><a href="#dynamic-list">Dynamic List (NEW)</a></li>
+                <li><a href="#milestones">Milestones (NEW)</a></li>
+                <li><a href="#categories">Categories (NEW)</a></li>
+                <li><a href="#groups">Groups & Bulk Actions (NEW)</a></li>
+                <li><a href="#attachments">Attachments</a></li>
+                <li><a href="#assignments">Team Assignments</a></li>
+                <li><a href="#advanced">Advanced Features</a></li>
+                <li><a href="#faq">FAQ</a></li>
+            </ul>
+        </div>
+
+        <section id="introduction">
+            <h2>1. Introduction to Project Boards</h2>
+            
+            <h3>What Are Project Boards?</h3>
+            <p>
+                Project Boards are advanced Kanban-style task management boards that transform your compliance workflows 
+                into actionable, team-based projects. While workflows define <em>what</em> needs to be done, boards help 
+                you manage <em>how</em>, <em>when</em>, and <em>who</em> does it.
+            </p>
+
+            <div class="feature">
+                <h4><i class="fas fa-star"></i> Key Capabilities</h4>
+                <ul>
+                    <li><strong>Comprehensive Workflow Export:</strong> Full, partial, or tag-filtered export with dynamic list</li>
+                    <li><strong>Hierarchical Organization:</strong> Dynamic list with task and connection nodes</li>
+                    <li><strong>Milestone Tracking:</strong> Link tasks to milestones, track completion automatically</li>
+                    <li><strong>Category Filtering:</strong> Organize tasks by category and filter the board</li>
+                    <li><strong>Bulk Operations:</strong> Perform actions on multiple tasks simultaneously via groups</li>
+                    <li><strong>Rich Attachments:</strong> Comments, notes, links, and images in threaded display</li>
+                    <li><strong>Team Collaboration:</strong> 4-role assignment system with real-time updates</li>
+                    <li><strong>Visual Progress:</strong> Drag-and-drop, color-coded deadlines, completion indicators</li>
+                </ul>
+            </div>
+
+            <h3>Workflow vs. Board: Understanding the Difference</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Workflow</th>
+                        <th>Project Board</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Purpose</strong></td>
+                        <td>Reusable template</td>
+                        <td>Project execution instance</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Structure</strong></td>
+                        <td>Hierarchical tree</td>
+                        <td>Flat Kanban + Dynamic list</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Team</strong></td>
+                        <td>Single-user focused</td>
+                        <td>Multi-user collaboration</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Time</strong></td>
+                        <td>No deadlines</td>
+                        <td>Due dates & scheduling</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Organization</strong></td>
+                        <td>Tags only</td>
+                        <td>Milestones, categories, groups, labels</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Progress</strong></td>
+                        <td>Completion checkboxes</td>
+                        <td>Columns, checklist progress, visual indicators</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="example-box">
+                <h4><i class="fas fa-lightbulb"></i> Real-World Scenario</h4>
+                <p><strong>Workflow:</strong> "ISO 27001 Compliance" - 150 controls defined</p>
+                <p><strong>Boards Created:</strong></p>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>"Q1 2025 ISO Audit" - 50 critical controls, due March 31, Finance team</li>
+                    <li>"Q2 2025 ISO Audit" - 50 controls, due June 30, IT team</li>
+                    <li>"Emergency Access Review" - 15 #access-control tagged controls, IT + Security</li>
+                </ul>
+                <p><strong>Benefits:</strong></p>
+                <ul style="list-style-type: disc; padding-left: 20px;">
+                    <li>Same workflow template for all three projects</li>
+                    <li>Independent tracking per board (different teams, deadlines, progress)</li>
+                    <li>Dynamic list maintains workflow hierarchy for easy navigation</li>
+                    <li>Milestones group related tasks (e.g., "Phase 1: Documentation")</li>
+                    <li>Categories filter by domain (e.g., #Technical, #Administrative)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="creating-boards">
+            <h2>2. Creating Boards</h2>
+            
+            <h3>Method 1: Comprehensive Workflow Export <span class="new-badge">PRIMARY METHOD</span></h3>
+            <p>
+                The most powerful way to create boards - export workflows with full control over scope, structure, and features.
+            </p>
+
+            <div class="steps">
+                <ul>
+                    <li>Open the Workflow Manager (<code>index.html</code>)</li>
+                    <li>Select the workflow you want to export</li>
+                    <li>Click <strong>"Export to Board"</strong> button (in workflow header)</li>
+                    <li>The Export Modal opens with 5 configuration sections</li>
+                    <li>Configure your export (see configuration guide below)</li>
+                    <li>Review the live preview</li>
+                    <li>Click <strong>"Create Board"</strong></li>
+                    <li>Board opens automatically - you're ready to work!</li>
+                </ul>
+            </div>
+
+            <h4>Export Configuration Guide</h4>
+            
+            <div class="feature">
+                <h4><i class="fas fa-sliders-h"></i> Section 1: Export Scope</h4>
+                <p>Choose what to export from your workflow:</p>
+                <ul>
+                    <li><strong>Full Workflow:</strong> Everything - all levels, all nodes
+                        <ul style="list-style-type: circle; padding-left: 20px;">
+                            <li>Use when: You want the complete workflow as a project</li>
+                            <li>Example: Annual compliance audit with all controls</li>
+                        </ul>
+                    </li>
+                    <li><strong>Partial Workflow:</strong> Select specific sections
+                        <ul style="list-style-type: circle; padding-left: 20px;">
+                            <li>Interactive tree appears with checkboxes</li>
+                            <li>Check specific Rules, Actions, or Evidences</li>
+                            <li>Use when: You need only certain parts (e.g., one department's controls)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Tag-Filtered:</strong> Export only nodes with a specific tag
+                        <ul style="list-style-type: circle; padding-left: 20px;">
+                            <li>Dropdown shows all workflow tags</li>
+                            <li>Selects all matching nodes across the entire workflow</li>
+                            <li>Use when: Creating thematic boards (#critical, #Q1-2025, #firewall)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="feature">
+                <h4><i class="fas fa-edit"></i> Section 2: Board Configuration</h4>
+                <ul>
+                    <li><strong>Board Name:</strong> Auto-generated based on scope (e.g., "WorkflowName Full"), fully editable</li>
+                    <li><strong>Description:</strong> Optional - add context about the board's purpose, team, or timeline</li>
+                </ul>
+            </div>
+
+            <div class="feature">
+                <h4><i class="fas fa-thumbtack"></i> Section 3: Reference Column (Optional)</h4>
+                <p>Export a specific level to the locked References column:</p>
+                <ul>
+                    <li>Select which level (e.g., Level 0: Rules, Level 1: Actions)</li>
+                    <li>Nodes from that level go to References column (locked, can't be moved)</li>
+                    <li><strong>Bonus:</strong> Automatically creates dynamic list nodes:
+                        <ul style="list-style-type: circle; padding-left: 20px;">
+                            <li>Descendants → Task nodes (clickable, have content)</li>
+                            <li>Ancestors → Connection nodes (organizational, filter board)</li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <div class="example-box">
+                    <h4>Example: Reference Column Usage</h4>
+                    <p><strong>Configuration:</strong> Export Level 0 (Rules) to References</p>
+                    <p><strong>Result:</strong></p>
+                    <ul style="list-style-type: disc; padding-left: 20px;">
+                        <li>Rules appear in locked References column (organizational context)</li>
+                        <li>Actions and Evidences appear as regular tasks</li>
+                        <li>Dynamic list shows hierarchy: Rules (connection) → Actions (task) → Evidences (task)</li>
+                        <li>Click Rule in dynamic list → filters board to show only its related tasks</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="feature">
+                <h4><i class="fas fa-network-wired"></i> Section 4: Dynamic List (Optional)</h4>
+                <p>Export workflow hierarchy to board's dynamic list feature:</p>
+                <ul>
+                    <li>Check ✓ to enable</li>
+                    <li>Interactive tree shows all nodes being exported</li>
+                    <li>For each node, select type:
+                        <ul style="list-style-type: circle; padding-left: 20px;">
+                            <li><strong>Task:</strong> Standalone item with content (description, checklist, attachments)</li>
+                            <li><strong>Connection:</strong> Organizational node that filters board when clicked</li>
+                            <li><strong>Skip:</strong> Don't include in dynamic list</li>
+                        </ul>
+                    </li>
+                    <li><strong>Default suggestion:</strong> Higher levels as Connection, lower levels as Task</li>
+                </ul>
+                
+                <p><strong>Why use Dynamic List?</strong></p>
+                <ul>
+                    <li>Maintains workflow hierarchy on the board</li>
+                    <li>Filter board by clicking connection nodes (show only related tasks)</li>
+                    <li>Navigate complex boards easily</li>
+                    <li>Organize by initiative, phase, or domain</li>
+                </ul>
+            </div>
+
+            <div class="feature">
+                <h4><i class="fas fa-eye"></i> Section 5: Preview</h4>
+                <p>Live preview updates as you configure:</p>
+                <ul>
+                    <li><strong>Total nodes:</strong> How many nodes will be exported</li>
+                    <li><strong>References:</strong> How many go to References column (if enabled)</li>
+                    <li><strong>Board columns:</strong> How many become regular tasks</li>
+                    <li><strong>Dynamic list:</strong> Breakdown of task vs. connection nodes (if enabled)</li>
+                </ul>
+                <p>Changes instantly reflect your selections - no surprises!</p>
+            </div>
+
+            <h3>Method 2: Quick Tag Export</h3>
+            <p>Fast export for tag-based boards without configuration:</p>
+            
+            <div class="steps">
+                <ul>
+                    <li>In Workflow Manager, switch to Execution mode</li>
+                    <li>Click any tag to apply a filter</li>
+                    <li>Filter banner appears with <strong>"Create Board"</strong> button</li>
+                    <li>Click button → Board created instantly with default settings</li>
+                </ul>
+            </div>
+
+            <h3>Method 3: Manual Board Creation</h3>
+            <p>Create empty boards from scratch:</p>
+            
+            <div class="steps">
+                <ul>
+                    <li>Open Project Boards (<code>boards.html</code>)</li>
+                    <li>Click <strong>"Create Board"</strong> button</li>
+                    <li>Enter board name and description</li>
+                    <li>Choose whether to include References column</li>
+                    <li>Click <strong>"Create Board"</strong></li>
+                    <li>Empty board created with default columns</li>
+                </ul>
+            </div>
+
+            <div class="tip">
+                <p><i class="fas fa-lightbulb"></i> <strong>Recommendation:</strong> Use Method 1 (Comprehensive Export) for most scenarios. 
+                It provides maximum flexibility, maintains workflow content and hierarchy, and saves time vs. manual task creation.</p>
+            </div>
+        </section>
+
+        <!-- Continue with remaining sections... This is part 1 of the documentation -->
+        <!-- I'll need to continue in subsequent responses due to length -->
+
+        <p style="text-align: center; margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+            <strong>📖 Documentation continues...</strong><br>
+            This is the foundation. The complete manual includes:<br>
+            Interface, Tasks, Dynamic List, Milestones, Categories, Groups, Attachments, Assignments, Advanced Features, and FAQ
+        </p>
+
+    </main>
+
+    <a href="#" class="back-to-top">
+        <i class="fas fa-arrow-up"></i> Top
+    </a>
+</body>
+</html>
