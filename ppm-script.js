@@ -1939,20 +1939,37 @@ const PPM = (() => {
                         </div>
                     ` : ''}
                     
-                    ${card.checklist.length > 0 ? `
+                    ${card.checklist && card.checklist.length > 0 ? `
                         <div class="detail-section">
                             <label>Checklist</label>
-                            <div class="checklist">
+                            <div class="checklist" id="card-checklist-${card.id}">
                                 ${card.checklist.map((item, i) => `
                                     <div class="checklist-item">
-                                        <input type="checkbox" id="check-${i}" ${item.completed ? 'checked' : ''} 
+                                        <input type="checkbox" 
+                                               id="check-${i}" 
+                                               ${item.completed ? 'checked' : ''} 
                                                onchange="PPM.ui.toggleChecklistItem('${card.id}', ${i})">
                                         <label for="check-${i}">${item.text}</label>
+                                        <button class="btn-icon-sm" onclick="PPM.ui.removeChecklistItem('${card.id}', ${i})">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
                                     </div>
                                 `).join('')}
                             </div>
                         </div>
                     ` : ''}
+                    
+                    <div class="detail-section">
+                        <label>Add Checklist Item</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="text" id="card-new-checklist-${card.id}" class="form-input"
+                                   placeholder="New checklist item"
+                                   onkeypress="if(event.key==='Enter') PPM.ui.addChecklistItem('${card.id}')">
+                            <button class="btn-primary" onclick="PPM.ui.addChecklistItem('${card.id}')">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
                     
                     <!-- Activity Thread Section -->
                     <div class="detail-section">
@@ -2106,6 +2123,69 @@ const PPM = (() => {
             card.checklist[index].completedBy = card.checklist[index].completed ? state.currentUser?.id : null;
             card.checklist[index].completedAt = card.checklist[index].completed ? new Date().toISOString() : null;
             saveBoards();
+        }
+    };
+    
+    ui.addChecklistItem = async (cardId) => {
+        try {
+            const board = getCurrentBoard();
+            const card = getCardById(board, cardId);
+            const input = document.getElementById(`card-new-checklist-${cardId}`);
+            
+            if (!input) {
+                console.error('Checklist input not found');
+                return;
+            }
+            
+            const text = input.value.trim();
+            if (!text) {
+                alert('Please enter checklist item text');
+                return;
+            }
+            
+            if (!card.checklist) card.checklist = [];
+            
+            card.checklist.push({
+                text: text,
+                completed: false,
+                completedBy: null,
+                completedAt: null
+            });
+            
+            await saveBoards();
+            input.value = '';
+            
+            // Re-render modal to show new item
+            closeCardModal();
+            setTimeout(() => {
+                ui.openCardDetail(cardId);
+            }, 100);
+        } catch (err) {
+            console.error('addChecklistItem error:', err);
+            alert('Failed to add checklist item: ' + err.message);
+        }
+    };
+    
+    ui.removeChecklistItem = async (cardId, index) => {
+        if (!confirm('Remove this checklist item?')) return;
+        
+        try {
+            const board = getCurrentBoard();
+            const card = getCardById(board, cardId);
+            
+            if (card && card.checklist) {
+                card.checklist.splice(index, 1);
+                await saveBoards();
+                
+                // Re-render modal
+                closeCardModal();
+                setTimeout(() => {
+                    ui.openCardDetail(cardId);
+                }, 100);
+            }
+        } catch (err) {
+            console.error('removeChecklistItem error:', err);
+            alert('Failed to remove checklist item: ' + err.message);
         }
     };
 
