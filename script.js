@@ -1658,7 +1658,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (quillEditor) quillEditor = null;
     };
 
+    // Expose functions for export module
     window.closeModal = closeModal;
+    window.openModal = openModal;
+    window.generateId = generateId;
+    window.getCurrentFlow = getCurrentFlow;
+    window.getTemplate = getTemplate;
+    window.nodeHasTag = nodeHasTag;
 
     // ===== FLOW OPERATIONS =====
     const populateFlowSelect = () => {
@@ -2091,6 +2097,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // ===== EXPORT TO BOARD BUTTON HANDLER =====
+    // Attach export handler to button (handler defined in export-to-board-module.js)
+    const attachExportHandler = () => {
+        const exportBtn = document.getElementById('flow-export-to-board');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                if (typeof window.openExportToBoardModal === 'function') {
+                    window.openExportToBoardModal();
+                } else {
+                    alert('Export module not loaded');
+                }
+            });
+        }
+    };
+
     // Start the app
     init();
+    
+    // Attach export handler after init
+    attachExportHandler();
 });
