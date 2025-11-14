@@ -1524,18 +1524,124 @@ const PPM = (() => {
                 return;
             }
             
+            const connectionNodes = board.dynamicList?.nodes?.filter(n => n.type === 'connection') || [];
+            
             openModal(`Bulk Actions: ${group.name}`, `
-                <div class="modal-form">
-                    <p>Apply actions to all ${group.linkedCards.length} cards in this group:</p>
+                <div class="modal-form" style="max-height: 70vh; overflow-y: auto;">
+                    <p style="margin-bottom: 1.5rem;"><strong>Apply actions to all ${group.linkedCards.length} cards in this group</strong></p>
                     
-                    <button type="button" class="btn-danger" style="width: 100%; margin-bottom: 0.5rem;" 
-                            onclick="PPM.ui.bulkDeleteCards('${groupId}')">
-                        <i class="fa-solid fa-trash"></i> Delete All Cards
-                    </button>
+                    <!-- Milestone Actions -->
+                    <div class="bulk-action-section" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                        <h4 style="margin: 0 0 0.75rem 0; color: var(--text-primary);"><i class="fa-solid fa-flag"></i> Milestone</h4>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <select id="bulk-milestone-select" style="flex: 1; min-width: 200px;">
+                                <option value="">Select Milestone...</option>
+                                ${board.milestones.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}
+                            </select>
+                            <button type="button" class="btn-primary" onclick="PPM.ui.bulkAddMilestone('${groupId}')">
+                                <i class="fa-solid fa-plus"></i> Add
+                            </button>
+                            <button type="button" class="btn-secondary" onclick="PPM.ui.bulkRemoveMilestone('${groupId}')">
+                                <i class="fa-solid fa-minus"></i> Remove
+                            </button>
+                        </div>
+                    </div>
                     
-                    <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
-                        Note: More bulk actions (assign, move, label) can be added as needed.
-                    </p>
+                    <!-- Category Actions -->
+                    <div class="bulk-action-section" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                        <h4 style="margin: 0 0 0.75rem 0; color: var(--text-primary);"><i class="fa-solid fa-tag"></i> Category</h4>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <select id="bulk-category-select" style="flex: 1; min-width: 200px;">
+                                <option value="">Select Category...</option>
+                                ${board.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+                            </select>
+                            <button type="button" class="btn-primary" onclick="PPM.ui.bulkAddCategory('${groupId}')">
+                                <i class="fa-solid fa-plus"></i> Add
+                            </button>
+                            <button type="button" class="btn-secondary" onclick="PPM.ui.bulkRemoveCategory('${groupId}')">
+                                <i class="fa-solid fa-minus"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                    
+                    ${connectionNodes.length > 0 ? `
+                        <!-- Dynamic List Connections -->
+                        <div class="bulk-action-section" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                            <h4 style="margin: 0 0 0.75rem 0; color: var(--text-primary);"><i class="fa-solid fa-sitemap"></i> Dynamic List Nodes</h4>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <select id="bulk-node-select" style="flex: 1; min-width: 200px;">
+                                    <option value="">Select Node...</option>
+                                    ${connectionNodes.map(n => {
+                                        const indent = '&nbsp;'.repeat((n.level || 0) * 3);
+                                        return `<option value="${n.id}">${indent}${n.title}</option>`;
+                                    }).join('')}
+                                </select>
+                                <button type="button" class="btn-primary" onclick="PPM.ui.bulkAddNode('${groupId}')">
+                                    <i class="fa-solid fa-plus"></i> Add
+                                </button>
+                                <button type="button" class="btn-secondary" onclick="PPM.ui.bulkRemoveNode('${groupId}')">
+                                    <i class="fa-solid fa-minus"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- Assignments -->
+                    <div class="bulk-action-section" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                        <h4 style="margin: 0 0 0.75rem 0; color: var(--text-primary);"><i class="fa-solid fa-user-plus"></i> Assign Users</h4>
+                        <div style="display: grid; gap: 0.5rem;">
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <select id="bulk-assign-user" style="flex: 1; min-width: 150px;">
+                                    <option value="">Select User...</option>
+                                    ${board.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}
+                                </select>
+                                <select id="bulk-assign-role" style="flex: 1; min-width: 120px;">
+                                    <option value="executor">Executor</option>
+                                    <option value="approver">Approver</option>
+                                    <option value="follower">Follower</option>
+                                    <option value="supervisor">Supervisor</option>
+                                </select>
+                                <button type="button" class="btn-primary" onclick="PPM.ui.bulkAssignUser('${groupId}')">
+                                    <i class="fa-solid fa-user-plus"></i> Assign
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mark as Done -->
+                    <div class="bulk-action-section" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                        <h4 style="margin: 0 0 0.75rem 0; color: var(--text-primary);"><i class="fa-solid fa-check-circle"></i> Completion Status</h4>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button type="button" class="btn-primary" style="flex: 1;" onclick="PPM.ui.bulkMarkDone('${groupId}', true)">
+                                <i class="fa-solid fa-check"></i> Mark All as Done
+                            </button>
+                            <button type="button" class="btn-secondary" style="flex: 1;" onclick="PPM.ui.bulkMarkDone('${groupId}', false)">
+                                <i class="fa-solid fa-times"></i> Mark All as Undone
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Due Date -->
+                    <div class="bulk-action-section" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;">
+                        <h4 style="margin: 0 0 0.75rem 0; color: var(--text-primary);"><i class="fa-solid fa-calendar"></i> Due Date</h4>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <input type="date" id="bulk-due-date" style="flex: 1; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 4px;">
+                            <button type="button" class="btn-primary" onclick="PPM.ui.bulkSetDueDate('${groupId}')">
+                                <i class="fa-solid fa-calendar-plus"></i> Set Date
+                            </button>
+                            <button type="button" class="btn-secondary" onclick="PPM.ui.bulkClearDueDate('${groupId}')">
+                                <i class="fa-solid fa-calendar-xmark"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Delete -->
+                    <div class="bulk-action-section" style="margin-bottom: 1rem; padding: 1rem; background: var(--bg-danger-subtle); border-radius: 8px; border: 2px solid var(--danger);">
+                        <h4 style="margin: 0 0 0.75rem 0; color: var(--danger);"><i class="fa-solid fa-trash"></i> Danger Zone</h4>
+                        <button type="button" class="btn-danger" style="width: 100%;" onclick="PPM.ui.bulkDeleteCards('${groupId}')">
+                            <i class="fa-solid fa-trash"></i> Delete All Cards (Cannot be undone!)
+                        </button>
+                    </div>
                     
                     <div class="modal-actions">
                         <button type="button" class="btn-secondary" onclick="PPM.closeModal()">Close</button>
@@ -1566,6 +1672,329 @@ const PPM = (() => {
                 
                 alert('All cards deleted successfully.');
             }
+        },
+        
+        bulkAddMilestone: async (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            const milestoneId = document.getElementById('bulk-milestone-select')?.value;
+            
+            if (!group || !milestoneId) {
+                alert('Please select a milestone first.');
+                return;
+            }
+            
+            const milestone = getMilestoneById(board, milestoneId);
+            if (!milestone) return;
+            
+            let count = 0;
+            group.linkedCards.forEach(cardId => {
+                const card = getCardById(board, cardId);
+                if (!card) return;
+                
+                // Remove from old milestone if exists
+                if (card.milestoneId) {
+                    const oldMilestone = getMilestoneById(board, card.milestoneId);
+                    if (oldMilestone) {
+                        oldMilestone.linkedCards = oldMilestone.linkedCards.filter(id => id !== cardId);
+                    }
+                }
+                
+                // Add to new milestone
+                card.milestoneId = milestoneId;
+                if (!milestone.linkedCards.includes(cardId)) {
+                    milestone.linkedCards.push(cardId);
+                }
+                count++;
+            });
+            
+            updateMilestoneStatus(board, milestoneId);
+            await saveBoards();
+            renderMilestones(board);
+            renderColumns(board);
+            
+            alert(`${count} card(s) added to milestone "${milestone.name}".`);
+        },
+        
+        bulkRemoveMilestone: async (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            if (!group) return;
+            
+            let count = 0;
+            group.linkedCards.forEach(cardId => {
+                const card = getCardById(board, cardId);
+                if (!card || !card.milestoneId) return;
+                
+                const milestone = getMilestoneById(board, card.milestoneId);
+                if (milestone) {
+                    milestone.linkedCards = milestone.linkedCards.filter(id => id !== cardId);
+                    updateMilestoneStatus(board, milestone.id);
+                }
+                
+                card.milestoneId = null;
+                count++;
+            });
+            
+            await saveBoards();
+            renderMilestones(board);
+            renderColumns(board);
+            
+            alert(`${count} card(s) removed from their milestones.`);
+        },
+        
+        bulkAddCategory: async (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            const categoryId = document.getElementById('bulk-category-select')?.value;
+            
+            if (!group || !categoryId) {
+                alert('Please select a category first.');
+                return;
+            }
+            
+            const category = getCategoryById(board, categoryId);
+            if (!category) return;
+            
+            let count = 0;
+            group.linkedCards.forEach(cardId => {
+                const card = getCardById(board, cardId);
+                if (!card) return;
+                
+                card.categoryId = categoryId;
+                count++;
+            });
+            
+            await saveBoards();
+            renderCategories(board);
+            renderColumns(board);
+            
+            alert(`${count} card(s) added to category "${category.name}".`);
+        },
+        
+        bulkRemoveCategory: async (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            if (!group) return;
+            
+            let count = 0;
+            group.linkedCards.forEach(cardId => {
+                const card = getCardById(board, cardId);
+                if (!card || !card.categoryId) return;
+                
+                card.categoryId = null;
+                count++;
+            });
+            
+            await saveBoards();
+            renderCategories(board);
+            renderColumns(board);
+            
+            alert(`${count} card(s) removed from their categories.`);
+        },
+        
+        bulkAddNode: async (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            const nodeId = document.getElementById('bulk-node-select')?.value;
+            
+            if (!group || !nodeId) {
+                alert('Please select a node first.');
+                return;
+            }
+            
+            if (!board.dynamicList || !board.dynamicList.nodes) return;
+            
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            if (!node) return;
+            
+            // Ensure linkedTaskIds array exists
+            if (!node.linkedTaskIds) {
+                node.linkedTaskIds = [];
+            }
+            
+            let count = 0;
+            group.linkedCards.forEach(cardId => {
+                if (!node.linkedTaskIds.includes(cardId)) {
+                    node.linkedTaskIds.push(cardId);
+                    count++;
+                }
+            });
+            
+            await saveBoards();
+            renderColumns(board);
+            
+            alert(`${count} card(s) linked to node "${node.title}".`);
+        },
+        
+        bulkRemoveNode: async (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            const nodeId = document.getElementById('bulk-node-select')?.value;
+            
+            if (!group || !nodeId) {
+                alert('Please select a node first.');
+                return;
+            }
+            
+            if (!board.dynamicList || !board.dynamicList.nodes) return;
+            
+            const node = board.dynamicList.nodes.find(n => n.id === nodeId);
+            if (!node || !node.linkedTaskIds) return;
+            
+            let count = 0;
+            group.linkedCards.forEach(cardId => {
+                if (node.linkedTaskIds.includes(cardId)) {
+                    node.linkedTaskIds = node.linkedTaskIds.filter(id => id !== cardId);
+                    count++;
+                }
+            });
+            
+            await saveBoards();
+            renderColumns(board);
+            
+            alert(`${count} card(s) unlinked from node "${node.title}".`);
+        },
+        
+        bulkAssignUser: async (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            const userId = document.getElementById('bulk-assign-user')?.value;
+            const role = document.getElementById('bulk-assign-role')?.value;
+            
+            if (!group || !userId || !role) {
+                alert('Please select a user and role first.');
+                return;
+            }
+            
+            const user = board.members.find(m => m.id === userId);
+            if (!user) return;
+            
+            let count = 0;
+            group.linkedCards.forEach(cardId => {
+                const card = getCardById(board, cardId);
+                if (!card) return;
+                
+                // Check if user is already assigned with this role
+                const existingAssignment = card.assignments.find(a => a.userId === userId && a.role === role);
+                if (!existingAssignment) {
+                    card.assignments.push({
+                        userId: userId,
+                        role: role,
+                        assignedAt: new Date().toISOString(),
+                        assignedBy: state.currentUser?.id || 'user-default-001'
+                    });
+                    count++;
+                }
+            });
+            
+            await saveBoards();
+            renderColumns(board);
+            
+            alert(`${count} card(s) assigned to ${user.name} as ${role}.`);
+        },
+        
+        bulkMarkDone: async (groupId, isDone) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            if (!group) return;
+            
+            let count = 0;
+            const affectedMilestones = new Set();
+            
+            group.linkedCards.forEach(cardId => {
+                const card = getCardById(board, cardId);
+                if (!card) return;
+                
+                card.isDone = isDone;
+                count++;
+                
+                // Track affected milestones
+                if (card.milestoneId) {
+                    affectedMilestones.add(card.milestoneId);
+                }
+            });
+            
+            // Update all affected milestones
+            affectedMilestones.forEach(milestoneId => {
+                updateMilestoneStatus(board, milestoneId);
+            });
+            
+            await saveBoards();
+            renderMilestones(board);
+            renderColumns(board);
+            
+            alert(`${count} card(s) marked as ${isDone ? 'done' : 'undone'}.`);
+        },
+        
+        bulkSetDueDate: async (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            const dueDate = document.getElementById('bulk-due-date')?.value;
+            
+            if (!group || !dueDate) {
+                alert('Please select a due date first.');
+                return;
+            }
+            
+            let count = 0;
+            group.linkedCards.forEach(cardId => {
+                const card = getCardById(board, cardId);
+                if (!card) return;
+                
+                if (!card.schedule) {
+                    card.schedule = {
+                        startDate: null,
+                        startMode: 'date',
+                        startDays: null,
+                        startDependency: null,
+                        dueDate: null,
+                        dueMode: 'date',
+                        dueDays: null,
+                        recurrence: {
+                            enabled: false,
+                            pattern: 'monthly',
+                            interval: 1,
+                            startOf: 'month',
+                            endOf: null,
+                            customDays: [],
+                            endMode: 'never',
+                            endOccurrences: null,
+                            endDate: null
+                        },
+                        reminders: []
+                    };
+                }
+                
+                card.schedule.dueDate = dueDate;
+                card.schedule.dueMode = 'date';
+                count++;
+            });
+            
+            await saveBoards();
+            renderColumns(board);
+            
+            alert(`Due date set for ${count} card(s).`);
+        },
+        
+        bulkClearDueDate: async (groupId) => {
+            const board = getCurrentBoard();
+            const group = getGroupById(board, groupId);
+            if (!group) return;
+            
+            let count = 0;
+            group.linkedCards.forEach(cardId => {
+                const card = getCardById(board, cardId);
+                if (!card || !card.schedule || !card.schedule.dueDate) return;
+                
+                card.schedule.dueDate = null;
+                count++;
+            });
+            
+            await saveBoards();
+            renderColumns(board);
+            
+            alert(`Due date cleared for ${count} card(s).`);
         },
 
         deleteGroupConfirm: async (groupId) => {
