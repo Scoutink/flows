@@ -66,6 +66,11 @@ const PPM = (() => {
             });
         }
         
+        // Apply category filter if active
+        if (state.categoryFilter) {
+            cards = cards.filter(c => c.categoryId === state.categoryFilter);
+        }
+        
         return cards.sort((a, b) => a.order - b.order);
     };
 
@@ -293,13 +298,10 @@ const PPM = (() => {
         const milestone = board.milestones.find(m => m.id === milestoneId);
         if (!milestone || milestone.linkedCards.length === 0) return;
         
-        // Check if all linked cards are in "Done" column
-        const doneColumn = board.columns.find(c => c.name === 'Done');
-        if (!doneColumn) return;
-        
+        // Check if all linked cards are marked as done
         const allDone = milestone.linkedCards.every(cardId => {
             const card = board.cards.find(c => c.id === cardId);
-            return card && card.columnId === doneColumn.id;
+            return card && card.isDone === true;
         });
         
         const oldStatus = milestone.status;
@@ -464,6 +466,7 @@ const PPM = (() => {
                 approvedBy: null,
                 approvedAt: null
             },
+            isDone: cardData.isDone || false,  // Task completion status for milestone tracking
             effort: {
                 estimated: null,
                 actual: null,
@@ -844,8 +847,7 @@ const PPM = (() => {
             const linkedCount = milestone.linkedCards.length;
             const doneCount = milestone.linkedCards.filter(cardId => {
                 const card = board.cards.find(c => c.id === cardId);
-                const doneColumn = board.columns.find(col => col.name === 'Done');
-                return card && doneColumn && card.columnId === doneColumn.id;
+                return card && card.isDone === true;
             }).length;
             
             const isCompleted = milestone.status === 'completed';
@@ -853,11 +855,11 @@ const PPM = (() => {
             
             return `
                 <div class="milestone-item ${isCompleted ? 'completed' : ''}" 
-                     style="border-color: ${milestone.color}; ${!isCompleted ? `background-color: ${milestone.color}15;` : ''}"
+                     style="border-color: ${milestone.color}; ${isCompleted ? `background-color: ${milestone.color}30;` : `background-color: ${milestone.color}15;`}"
                      onclick="PPM.ui.showMilestoneDetails('${milestone.id}')"
                      title="${milestone.description || milestone.name}">
                     <div class="milestone-color" style="background-color: ${milestone.color}"></div>
-                    <span class="milestone-name">${milestone.name}</span>
+                    <span class="milestone-name">${isCompleted ? '✅ ' : ''}${milestone.name}</span>
                     <span class="milestone-progress">${progress}</span>
                     <div class="milestone-actions" onclick="event.stopPropagation()">
                         <button class="btn-milestone-action" onclick="PPM.ui.showEditMilestoneDialog('${milestone.id}')" title="Edit">
@@ -1876,6 +1878,18 @@ const PPM = (() => {
                     </div>
                     
                     <div class="detail-section">
+                        <label>
+                            <input type="checkbox" 
+                                   id="card-done-status" 
+                                   ${card.isDone ? 'checked' : ''}
+                                   onchange="PPM.ui.toggleCardDone('${card.id}', this.checked)"
+                                   style="margin-right: 8px; transform: scale(1.2);">
+                            <strong>Mark as Done</strong>
+                        </label>
+                        <small class="form-hint" style="display: block; margin-top: 4px;">Check this when the task is completed (used for milestone tracking)</small>
+                    </div>
+                    
+                    <div class="detail-section">
                         <label>Milestone</label>
                         <select id="card-milestone" onchange="PPM.ui.updateMilestone('${card.id}', this.value)">
                             <option value="">No Milestone</option>
@@ -2168,6 +2182,22 @@ const PPM = (() => {
         const board = getCurrentBoard();
         updateCard(board, cardId, { description });
         saveBoards();
+    };
+    
+    ui.toggleCardDone = async (cardId, isDone) => {
+        const board = getCurrentBoard();
+        const card = getCardById(board, cardId);
+        
+        if (!card) return;
+        
+        card.isDone = isDone;
+        await saveBoards();
+        
+        // Update milestone status if card is linked to one
+        if (card.milestoneId) {
+            updateMilestoneStatus(board, card.milestoneId);
+            renderMilestones(board);
+        }
     };
     
     ui.updateMilestone = async (cardId, milestoneId) => {
